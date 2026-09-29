@@ -9,6 +9,9 @@ const FLOOD_CHANCE := 0.004
 const METEOR_CHANCE := 0.00002
 const LAVA_COOL_DAYS := 540
 const MIN_DAY := 1800
+const CLIMATE_THRESHOLD := 40.0
+const SEA_RISE_STEP := 0.004
+const MAX_FLOODED := 10
 
 
 static func step(state: Dictionary, rng: Rng, census: Dictionary) -> void:
@@ -22,6 +25,7 @@ static func step(state: Dictionary, rng: Rng, census: Dictionary) -> void:
 	if state["weather"] == "rain" and rng.chance(FLOOD_CHANCE):
 		_flood(state, rng, alive)
 	_cool_lava(state)
+	_climate(state, rng, alive)
 	if state["day"] < MIN_DAY:
 		return
 	if rng.chance(VOLCANO_CHANCE):
@@ -71,6 +75,33 @@ static func _flood(state: Dictionary, rng: Rng, alive: Array) -> void:
 				t["food"] *= 0.5
 	var ruin := " et emporte une maison" if lost > 0 else ""
 	Journal.log_event(state, "catastrophe", "🌊 La rivière sort de son lit à %s : les réserves et les champs sont noyés%s." % [s["name"], ruin], {"x": s["x"], "y": s["y"], "settlement": s["id"], "flood": true, "houses_lost": lost, "highlight": true})
+
+
+static func _climate(state: Dictionary, rng: Rng, alive: Array) -> void:
+	if state["day"] % 360 != 90:
+		return
+	var industry: int = alive.filter(func(s): return Techs.has_tech(s, "machines")).size()
+	state["carbon"] = state.get("carbon", 0.0) + industry
+	if state["carbon"] < CLIMATE_THRESHOLD or not rng.chance(0.5):
+		return
+	state["sea_level"] = state.get("sea_level", 0.41) + SEA_RISE_STEP
+	var flooded := 0
+	for i in state["world"]["tiles"].size():
+		var t: Dictionary = state["world"]["tiles"][i]
+		var x: int = i % WorldGen.SIZE
+		var y: int = i / WorldGen.SIZE
+		if flooded >= MAX_FLOODED or Biomes.is_water(t["biome"]) or t["height"] >= state["sea_level"] or not Geography.is_coastal(state["world"], x, y):
+			continue
+		if alive.any(func(s): return absi(s["x"] - x) <= 1 and absi(s["y"] - y) <= 1):
+			continue
+		t["biome"] = "ocean"
+		t["trees"] = 0
+		t["food"] = 0.0
+		t["fertility"] = Biomes.DATA["ocean"]["food"]
+		flooded += 1
+	if flooded > 0:
+		Regions.invalidate()
+		Journal.log_event(state, "climat", "🌡️ Les fumées des machines réchauffent le monde : la mer monte et engloutit %s de côte." % Names.plural(flooded, "arpent"), {"map": true, "highlight": true})
 
 
 static func _cool_lava(state: Dictionary) -> void:

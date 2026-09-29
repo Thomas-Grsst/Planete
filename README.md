@@ -39,15 +39,29 @@ Des habitants naissent, travaillent, s'aiment, découvrent le feu, le bronze ou 
 Vitesses disponibles : ⏸ pause, ▶ ×1, ▶▶ ×10, ▶▶▶ ×100.
 Quand l'application est fermée, le monde continue au rythme normal (jusqu'à 30 jours d'absence rattrapés).
 
-## 🎮 Version Godot (en cours)
+## 🎮 Version Godot 4 (dossier `godot/`)
 
-Le jeu est en train d'être refait avec **Godot 4** dans le dossier `godot/`, pour un monde qui bouge vraiment : les habitants se lèvent, partent travailler (cueillette, bûcheronnage, pêche, chasse, champs), rapportent leur récolte, se retrouvent au feu le soir et rentrent dormir. Arbres qui ondulent, eau animée, fumée des cheminées, fenêtres allumées la nuit, saisons, pluie, neige et orages.
+La version principale du jeu est désormais faite avec **Godot 4** : un monde qui bouge sous tes yeux, et une vraie app Android.
+
+- **Vie quotidienne visible** : les habitants se lèvent, partent travailler (cueillette, bois, pêche, chasse, champs, forge, garde, soins), rapportent leur récolte, se retrouvent au feu le soir et rentrent dormir. Arbres qui ondulent, eau animée, fumée des cheminées, fenêtres allumées, saisons, rivières gelées, pluie, neige, orages et sons d'ambiance.
+- **Toute la simulation de la version web** : 22 savoirs découverts par causes et savoir fragile, maladies, loups, zombies, chefs, conseils, lois, dynasties, révoltes, civilisations, territoires, diplomatie, commerce, guerres, conquêtes, religions nées de tes miracles, temples, schismes.
+- **Nouveautés** : catastrophes qui changent la carte (volcans, séismes, crues, météorites, montée des eaux), barbares, pirates, espions, machines rebelles, loups mutants, visiteurs venus d'ailleurs, archéologie, langues qui dérivent, monuments, personnages célèbres et statues, amitiés, rivalités, duels, arbre généalogique, chronique « Le Livre du monde », replay accéléré, succès, graine de monde à partager, et nouvelle planète fondée par l'équipage du vaisseau.
 
 ```bash
 godot --path godot
 ```
 
-Ou ouvre `godot/project.godot` dans l'éditeur Godot puis F5. La simulation reprend celle de la version web (même rythme, rattrapage hors ligne) ; les civilisations, maladies et religions restent à reporter.
+Ou ouvre `godot/project.godot` dans l'éditeur Godot puis F5.
+
+### 📱 Android
+
+L'export produit `godot/build/PetitePlanete.apk` (Android 7 et plus, ARM64 et x86_64). Il faut OpenJDK 17, le kit Android (build-tools 35.0.1, plateforme 35) et les modèles d'export Godot 4.7.2 :
+
+```bash
+godot --headless --path godot --export-debug "Android" build/PetitePlanete.apk
+```
+
+Copie l'APK sur ton téléphone et installe-le (autoriser les sources inconnues). La version web ci-dessous reste disponible.
 
 ## 🚀 Lancer le jeu
 

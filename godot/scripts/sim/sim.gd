@@ -111,6 +111,7 @@ func tick(announce: bool = true) -> void:
 	Exodus.step(state)
 	Fame.yearly(state)
 	Achievements.daily(state)
+	Housekeeping.step(state)
 	_check_extinction()
 	state["rng_state"] = rng.state
 	if not announce:

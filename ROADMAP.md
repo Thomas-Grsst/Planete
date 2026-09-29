@@ -1,10 +1,10 @@
 # Petite Planète — Feuille de route
 
-État actuel : **V3 livrée + religions** : civilisations, territoires, diplomatie et guerres, religions nées de tes miracles, en plus des métiers, des 22 savoirs découverts par causes, des maladies, de l'apocalypse zombie et du cycle jour/nuit de 10 min.
+État actuel : **version Godot 4 complète + APK Android** : civilisations, territoires, diplomatie et guerres, religions nées de tes miracles, en plus des métiers, des 22 savoirs découverts par causes, des maladies, de l'apocalypse zombie et du cycle jour/nuit de 10 min.
 
 ---
 
-## 🎮 Passage à Godot 4 (en cours)
+## 🎮 Passage à Godot 4 (fait)
 
 Objectif : un monde **qui bouge sous tes yeux**, pas seulement dans le journal, et une vraie app Android.
 
@@ -15,9 +15,10 @@ Objectif : un monde **qui bouge sous tes yeux**, pas seulement dans le journal, 
 - [x] Simulation : naissances, couples, famines, métiers, migrations et nouvelles colonies, 9 premiers savoirs par causes.
 - [x] Sauvegarde, rattrapage hors ligne progressif, écran « Bon retour », fiches habitant et village, journal.
 - [x] Pouvoirs (pluie, soleil, végétation, avancer le temps) et religions : prières visibles le soir, miracles, légendes, prophètes auréolés, pèlerins missionnaires, temples et grands temples, schismes.
-- [ ] Reporter le reste : 22 savoirs, maladies, zombies (et leur pouvoir), chefs et conseils, civilisations, diplomatie, guerres, religion officielle.
-- [ ] Export Android (APK) et notifications.
-- [ ] Sons d'ambiance.
+- [x] Tout le reste de la version web : 22 savoirs, savoir fragile, maladies, loups, zombies et leur pouvoir, chefs, conseils, civilisations, territoires, diplomatie, guerres, religion officielle et guerres saintes.
+- [x] Export Android (APK, testé dans l'émulateur).
+- [ ] Notifications Android (nécessite un plugin Android natif).
+- [x] Sons d'ambiance générés (oiseaux, grillons, pluie, feu, cloche, carillon, cor, tonnerre).
 
 ## ⏱️ Rythme du temps (à faire en premier)
 
@@ -57,7 +58,7 @@ Remplacer les « points de savoir » par des **idées déclenchées** : fini le 
 
 ## 📱 Widget et notifications
 
-- [ ] Impossible en PWA. Voie réaliste : **app Android via Capacitor** (APK installé sans Play Store).
+- [x] App Android : faite avec l'export Godot (APK installé sans Play Store).
   - Nécessite Node.js + Android Studio sur la machine.
   - Bonus : vraies notifications (« Aster a découvert le bronze »).
 - [ ] iPhone : nécessite Mac + Xcode + compte développeur Apple (compliqué hors App Store).
@@ -67,41 +68,41 @@ Remplacer les « points de savoir » par des **idées déclenchées** : fini le 
 ## 🌟 Idées pour les versions suivantes
 
 ### 🌍 Monde vivant
-- [ ] Saisons visibles (neige, arbres roux, rivières gelées).
-- [ ] Catastrophes qui changent la carte : volcans, séismes, inondations, météorites.
-- [ ] Changement climatique causé par une civilisation industrielle (montée des eaux).
+- [x] Saisons visibles (neige, arbres roux, rivières gelées).
+- [x] Catastrophes qui changent la carte : volcans, séismes, inondations, météorites.
+- [x] Changement climatique causé par une civilisation industrielle (montée des eaux).
 
 ### 👤 Attachement aux habitants
-- [ ] Arbre généalogique interactif.
-- [ ] Personnages célèbres (inventeur, conquérant, prophète) avec statue.
-- [ ] Dynasties au pouvoir sur plusieurs générations.
-- [ ] Rivalités et amitiés (duels, alliances, trahisons).
+- [x] Arbre généalogique interactif.
+- [x] Personnages célèbres (inventeur, conquérant, prophète) avec statue.
+- [x] Dynasties au pouvoir sur plusieurs générations.
+- [x] Rivalités et amitiés (duels, alliances, trahisons).
 
 ### 🎭 Culture
 - [x] Religions inventées, prophètes, schismes — **tes pouvoirs vus comme des miracles** (un culte envers toi).
   - Prières des villages en détresse, prières exaucées, missionnaires, temples, religion officielle, guerres saintes.
-- [ ] Langues inventées qui dérivent entre colonies isolées.
-- [ ] Monuments visibles de loin (pyramides, temples, observatoires).
+- [x] Langues inventées qui dérivent entre colonies isolées.
+- [x] Monuments visibles de loin (pyramides, temples, observatoires).
 - [x] Légendes qui racontent tes interventions (« Le Grand Déluge de l'An 12 »).
 
 ### ⚔️ Après la V3
-- [ ] Routes commerciales et caravanes visibles, ports, bateaux marchands.
-- [ ] Révolutions contre les chefs impopulaires.
-- [ ] Espions, pirates, barbares des terres sauvages.
+- [x] Routes commerciales et caravanes visibles, bateaux (ports à venir).
+- [x] Révolutions contre les chefs impopulaires.
+- [x] Espions, pirates, barbares des terres sauvages.
 
 ### 🚀 Fin de partie spatiale
-- [ ] Suivre le vaisseau après l'exode et fonder une **nouvelle planète**.
-- [ ] Contact extraterrestre (ultra-rare).
-- [ ] Archéologie : une civilisation découvre les ruines de la précédente.
+- [x] Suivre le vaisseau après l'exode et fonder une **nouvelle planète**.
+- [x] Contact extraterrestre (ultra-rare).
+- [x] Archéologie : une civilisation découvre les ruines de la précédente.
 
 ### 🧟 Autres fléaux
-- [ ] Animaux mutants, nouvelles espèces.
-- [ ] IA rebelle chez une civilisation avancée.
+- [x] Animaux mutants, nouvelles espèces.
+- [x] IA rebelle chez une civilisation avancée.
 
 ### 🎮 Pour le joueur
-- [ ] Replay accéléré (1 000 ans en 30 secondes).
-- [ ] **Chronique automatique** : « Le Livre de Noria ».
-- [ ] Partage de graine de monde entre amis.
-- [ ] Succès (« Atteindre l'espace », « Survivre à 3 apocalypses »…).
+- [x] Replay accéléré (1 000 ans en 30 secondes).
+- [x] **Chronique automatique** : « Le Livre de Noria ».
+- [x] Partage de graine de monde entre amis.
+- [x] Succès (« Atteindre l'espace », « Survivre à 3 apocalypses »…).
 
 **Coups de cœur** (renforcent le « qu'est-ce qui s'est passé pendant mon absence ? ») : ~~découvertes par causes~~, ~~religions liées à tes pouvoirs~~, personnages célèbres, chronique automatique.

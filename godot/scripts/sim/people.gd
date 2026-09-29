@@ -141,6 +141,9 @@ static func _siblings(a: Dictionary, b: Dictionary) -> bool:
 
 static func _give_birth(state: Dictionary, rng: Rng, mother: Dictionary) -> void:
 	var child := create(state, rng, 0, mother["home"], [mother["id"], mother["partner"]])
+	var home = Settlements.by_id(state, mother["home"])
+	if home != null:
+		child["name"] = Languages.accent(state, home, child["name"])
 	Dynasties.inherit(child, mother, by_id(state, mother["partner"]))
 	mother["children"].append(child["id"])
 	mother["last_birth"] = state["day"]

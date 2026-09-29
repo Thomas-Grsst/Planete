@@ -58,8 +58,24 @@ func _draw() -> void:
 			var p := _local(village.center() + spot)
 			draw_line(p, p + Vector2(0, -9), LAMP_POST, 1.0)
 			draw_circle(p + Vector2(0, -9.5), 1.3, Color(1.0, 0.95, 0.7))
+	match s.get("monument", ""):
+		"pyramide": _pyramid(_local(village.center() + Vector2(-1.9, 1.2)))
+		"observatoire": _observatory(_local(village.center() + Vector2(-1.9, 1.2)))
 	if Techs.has_tech(s, "fusee") and not s.has("departed"):
 		_rocket(_local(village.center() + Vector2(1.6, -1.2)))
+
+
+func _pyramid(p: Vector2) -> void:
+	draw_colored_polygon(PackedVector2Array([p + Vector2(-22, 0), p + Vector2(0, 11), p + Vector2(0, -34)]), Color("d9c38a"))
+	draw_colored_polygon(PackedVector2Array([p + Vector2(0, 11), p + Vector2(22, 0), p + Vector2(0, -34)]), Color("b89d62"))
+	draw_circle(p + Vector2(0, -34), 1.6, Color("fff3c4"))
+
+
+func _observatory(p: Vector2) -> void:
+	draw_rect(Rect2(p + Vector2(-8, -16), Vector2(16, 16)), Color("cfd8dc"))
+	draw_circle(p + Vector2(0, -16), 9.0, Color("eceff1"))
+	draw_line(p + Vector2(0, -18), p + Vector2(10, -28), Color("455a64"), 2.0)
+	draw_rect(Rect2(p + Vector2(-2, -8), Vector2(4, 8)), Color("546e7a"))
 
 
 func _anvil(p: Vector2) -> void:

@@ -3,6 +3,7 @@ extends RefCounted
 
 const REPLAY := preload("res://scripts/ui/replay.gd")
 const SEED_DIALOG := preload("res://scripts/ui/seed_dialog.gd")
+const CONFIRM := preload("res://scripts/ui/confirm_dialog.gd")
 
 
 static func run(hud, parts: PackedStringArray) -> bool:
@@ -10,10 +11,15 @@ static func run(hud, parts: PackedStringArray) -> bool:
 		return false
 	match parts[1]:
 		"power":
-			var msg: String = Sim.use_power(parts[2])
-			if msg != "":
-				hud.toast(msg)
-			hud.refresh_panel()
+			if parts[2] == "zombie":
+				var ask := PanelContainer.new()
+				ask.set_script(CONFIRM)
+				ask.title = "☣️ Réveiller les morts ?"
+				ask.message = "Des habitants mourront. Cela pourrait détruire ta planète."
+				hud.root.add_child(ask)
+				ask.confirmed.connect(func(): _power(hud, "zombie"))
+			else:
+				_power(hud, parts[2])
 		"new":
 			_new_world(hud, "")
 		"seed":
@@ -31,6 +37,10 @@ static func run(hud, parts: PackedStringArray) -> bool:
 			Sim.start_new(Names.place_name(Rng.new(Time.get_ticks_usec()), {}), "", colony)
 			Sim.save_now()
 			hud.toast("🚀 Le vaisseau se pose sur %s. Une nouvelle histoire commence." % Sim.state["name"])
+		"sound":
+			var mute: bool = hud.get_tree().root.find_child("Soundscape", true, false).toggle()
+			hud.toast("🔇 Son coupé." if mute else "🔊 Son activé.")
+			hud.refresh_panel()
 		"replay":
 			hud.close_panel()
 			var replay := Node.new()
@@ -38,6 +48,13 @@ static func run(hud, parts: PackedStringArray) -> bool:
 			hud.add_child(replay)
 			replay.start(hud)
 	return true
+
+
+static func _power(hud, name: String) -> void:
+	var msg: String = Sim.use_power(name)
+	if msg != "":
+		hud.toast(msg)
+	hud.refresh_panel()
 
 
 static func _new_world(hud, seed_text: String) -> void:

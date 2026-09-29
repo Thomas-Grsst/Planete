@@ -50,6 +50,7 @@ static func world(st: Dictionary) -> String:
 	out += InfoPanels.link("chronicle:0", "📖 Le Livre du monde") + "   " + InfoPanels.link("pantheon:0", "🗿 Panthéon") + "   " + InfoPanels.link("achievements:0", "🏆 Succès") + "\n\n"
 	if not st.get("ended", {}).is_empty():
 		out += InfoPanels.link("action:colony", "🚀 Suivre le vaisseau et fonder une nouvelle planète") + "\n"
+	out += InfoPanels.link("action:sound", "🔊 Activer ou couper le son") + "\n"
 	out += InfoPanels.link("action:new", "🌱 Créer un nouveau monde") + "\n"
 	out += InfoPanels.link("action:seed", "🔑 Créer un monde à partir d'une graine") + "\n\n"
 	out += InfoPanels.muted("Le monde continue de vivre quand l'application est fermée.")

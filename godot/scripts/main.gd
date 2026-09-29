@@ -38,6 +38,10 @@ func _build_scene() -> void:
 	add_child(camera)
 	camera.tapped.connect(func(pos): world_view.life.tap(pos))
 	world_view.life.world_fx.shake.connect(func(amount): camera.shake(amount))
+	var sound := Node.new()
+	sound.name = "Soundscape"
+	sound.set_script(load("res://scripts/view/soundscape.gd"))
+	add_child(sound)
 	var sky := CanvasLayer.new()
 	sky.layer = 1
 	sky.set_script(load("res://scripts/view/sky.gd"))

@@ -57,6 +57,9 @@ func _process(delta: float) -> void:
 	if w == "storm" and Sim.speed > 0.0 and randf() < LIGHTNING_CHANCE * min(Sim.speed, 5.0):
 		flash_alpha = 0.55
 		flash_color = Color(0.95, 0.97, 1.0)
+		var sound = get_tree().root.find_child("Soundscape", true, false)
+		if sound != null:
+			sound.cue("thunder")
 	flash_alpha = move_toward(flash_alpha, 0.0, delta * 1.8)
 	flash.color = Color(flash_color, flash_alpha)
 
