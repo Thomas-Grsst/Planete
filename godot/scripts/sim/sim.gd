@@ -1,0 +1,131 @@
+extends Node
+
+signal day_passed(day: int)
+signal event_logged(entry: Dictionary)
+signal world_loaded
+signal catch_up_progress(done: int, total: int)
+signal caught_up(days: int)
+
+const MS_PER_DAY := 600000.0
+const MAX_OFFLINE_DAYS := 4320
+const MAX_TICKS_PER_FRAME := 30
+const AUTOSAVE_SECONDS := 20.0
+const CATCH_UP_BUDGET_MS := 14
+
+var state: Dictionary = {}
+var speed := 1.0
+var persist := true
+var rng := Rng.new()
+var _save_timer := 0.0
+var pending_days := 0
+var _catch_total := 0
+
+
+func start_new(world_name: String, seed_text: String = "") -> void:
+	state = WorldState.create(world_name, seed_text)
+	_bind()
+
+
+func load_existing(data: Dictionary) -> int:
+	state = data
+	state["pending_summary"] = {}
+	state["pending_highlights"] = []
+	_bind()
+	return catch_up()
+
+
+func _bind() -> void:
+	rng = Rng.new()
+	rng.state = state["rng_state"]
+	Journal.take_fresh()
+	world_loaded.emit()
+
+
+func catch_up() -> int:
+	var elapsed_ms: float = max(0.0, Time.get_unix_time_from_system() - state["last_sim_time"]) * 1000.0
+	var total: float = state["acc_ms"] + elapsed_ms
+	var days: int = min(MAX_OFFLINE_DAYS, int(total / MS_PER_DAY))
+	state["acc_ms"] = fmod(total, MS_PER_DAY)
+	state["last_sim_time"] = Time.get_unix_time_from_system()
+	pending_days = days
+	_catch_total = days
+	return days
+
+
+func _step_catch_up() -> void:
+	var start := Time.get_ticks_msec()
+	while pending_days > 0 and Time.get_ticks_msec() - start < CATCH_UP_BUDGET_MS:
+		tick(false)
+		pending_days -= 1
+	catch_up_progress.emit(_catch_total - pending_days, _catch_total)
+	if pending_days > 0:
+		return
+	Journal.take_fresh()
+	world_loaded.emit()
+	caught_up.emit(_catch_total)
+
+
+func _process(delta: float) -> void:
+	if state.is_empty():
+		return
+	if pending_days > 0:
+		_step_catch_up()
+		return
+	_save_timer += delta
+	if _save_timer >= AUTOSAVE_SECONDS:
+		_save_timer = 0.0
+		save_now()
+	if speed <= 0.0:
+		return
+	state["acc_ms"] += delta * 1000.0 * speed
+	var ticks := 0
+	while state["acc_ms"] >= MS_PER_DAY and ticks < MAX_TICKS_PER_FRAME:
+		state["acc_ms"] -= MS_PER_DAY
+		tick(true)
+		ticks += 1
+
+
+func tick(announce: bool = true) -> void:
+	state["day"] += 1
+	rng.state = state["rng_state"]
+	Weather.step(state, rng)
+	Work.regrow(state)
+	var census := Census.build(state)
+	Work.step(state, rng, census)
+	People.step(state, rng, census)
+	Jobs.step(state, rng, census)
+	Settlements.step(state, rng, census)
+	Herds.step(state, rng)
+	Ideas.step(state, rng, census)
+	_check_extinction()
+	state["rng_state"] = rng.state
+	if not announce:
+		return
+	for entry in Journal.take_fresh():
+		event_logged.emit(entry)
+	day_passed.emit(state["day"])
+
+
+func _check_extinction() -> void:
+	if state["extinct"] or People.alive_count(state) > 0:
+		return
+	state["extinct"] = true
+	Journal.log_event(state, "extinction", "🪦 Plus personne ne respire sur %s. Le silence est total." % state["name"])
+
+
+func day_phase() -> float:
+	return clamp(state.get("acc_ms", 0.0) / MS_PER_DAY, 0.0, 0.9999)
+
+
+func hour() -> float:
+	return fmod(6.0 + day_phase() * 24.0, 24.0)
+
+
+func save_now() -> void:
+	if persist and not state.is_empty():
+		SaveStore.save(state)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_APPLICATION_PAUSED:
+		save_now()
