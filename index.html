@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#0f1a24">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Petite Planète</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <canvas id="world"></canvas>
+
+  <header id="topbar">
+    <div id="clock"><span id="year">Année 1</span><span id="day">Jour 1</span></div>
+    <div id="weather">☀️</div>
+    <div id="speeds">
+      <button data-speed="0" title="Pause">⏸</button>
+      <button data-speed="1" class="active">▶</button>
+      <button data-speed="10" title="×10">▶▶</button>
+      <button data-speed="100" title="×100">▶▶▶</button>
+    </div>
+  </header>
+
+  <nav id="bottombar">
+    <button id="btn-journal">📜 Journal</button>
+    <button id="btn-stats">👥 <span id="pop">0</span></button>
+    <button id="btn-powers">✨ Pouvoirs</button>
+    <button id="btn-menu">☰</button>
+  </nav>
+
+  <div id="feed"></div>
+
+  <aside id="panel" class="hidden">
+    <button class="close">✕</button>
+    <div id="panel-content"></div>
+  </aside>
+
+  <div id="modal" class="hidden">
+    <div id="modal-content"></div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "name": "Petite Planète",
+  "short_name": "Planète",
+  "description": "Un petit monde vivant qui évolue même quand tu n'es pas là.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f1a24",
+  "theme_color": "#0f1a24",
+  "lang": "fr",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
