@@ -1,7 +1,7 @@
 class_name Techs
 extends RefCounted
 
-const DEFAULT_MODS := {"gather": 1.0, "wood": 1.0, "fish": 0.6, "farm": 0.0, "hunt": 1.0, "store": 1.0, "heal": 0.0, "capacity": 4, "spread": 1.0}
+const DEFAULT_MODS := {"gather": 1.0, "wood": 1.0, "fish": 0.6, "farm": 0.0, "hunt": 1.0, "store": 1.0, "heal": 0.0, "capacity": 4, "spread": 1.0, "happiness": 0.0}
 
 const DATA := {
 	"feu": {"the": "le feu", "name": "Feu", "emoji": "🔥", "needs": [], "job": "", "mods": {"gather": ["mul", 1.1], "heal": ["add", 0.1]}},

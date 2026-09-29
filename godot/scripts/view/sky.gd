@@ -6,6 +6,7 @@ var rain: CPUParticles2D
 var snow: CPUParticles2D
 var flash: ColorRect
 var flash_alpha := 0.0
+var flash_color := Color(0.95, 0.97, 1.0)
 
 
 func _ready() -> void:
@@ -17,6 +18,7 @@ func _ready() -> void:
 	flash.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(flash)
 	get_viewport().size_changed.connect(_fit)
+	Sim.power_used.connect(_on_power)
 	_fit()
 
 
@@ -54,5 +56,11 @@ func _process(delta: float) -> void:
 	snow.emitting = w == "snow"
 	if w == "storm" and Sim.speed > 0.0 and randf() < LIGHTNING_CHANCE * min(Sim.speed, 5.0):
 		flash_alpha = 0.55
+		flash_color = Color(0.95, 0.97, 1.0)
 	flash_alpha = move_toward(flash_alpha, 0.0, delta * 1.8)
-	flash.color = Color(0.95, 0.97, 1.0, flash_alpha)
+	flash.color = Color(flash_color, flash_alpha)
+
+
+func _on_power(name: String, _answered: Array) -> void:
+	flash_color = {"sun": Color(1.0, 0.9, 0.55), "grow": Color(0.6, 1.0, 0.55), "rain": Color(0.6, 0.75, 1.0)}.get(name, Color.WHITE)
+	flash_alpha = 0.45

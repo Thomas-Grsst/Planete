@@ -15,6 +15,7 @@ func _ready() -> void:
 	options = DebugOptions.parse()
 	_build_scene()
 	Sim.day_passed.connect(_on_day)
+	Sim.power_used.connect(_on_power)
 	var offline := Boot.start(options)
 	_on_world_loaded()
 	Sim.world_loaded.connect(_on_world_loaded)
@@ -24,7 +25,8 @@ func _ready() -> void:
 	else:
 		hud.welcome(0)
 	if options.has("panel"):
-		hud.show_info(options["panel"], Sim.state["settlements"][0]["id"] if options["panel"] == "settlement" else -1)
+		var ids := {"settlement": Sim.state["settlements"][0]["id"], "faith": Sim.state.get("religions", [{"id": -1}])[0]["id"] if not Sim.state.get("religions", []).is_empty() else -1}
+		hud.show_info(options["panel"], ids.get(options["panel"], -1))
 	if options.has("shot"):
 		DebugOptions.schedule_shot(self, options)
 
@@ -83,6 +85,16 @@ func debug_report() -> String:
 				counts[key] = counts.get(key, 0) + 1
 	var perf := "process %.1f ms · physics %.1f ms · objects %d · draw calls %d · items %d" % [Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0, Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS) * 1000.0, Performance.get_monitor(Performance.OBJECT_NODE_COUNT), Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME), Performance.get_monitor(Performance.RENDER_TOTAL_OBJECTS_IN_FRAME)]
 	return "fps %d · villagers %d · %s · activities: %s" % [Engine.get_frames_per_second(), counts.values().reduce(func(a, b): return a + b, 0), perf, str(counts)]
+
+
+func _on_power(name: String, answered: Array) -> void:
+	if not answered.is_empty():
+		var s = Settlements.by_id(Sim.state, answered[0])
+		if s != null:
+			camera.focus(Iso.ground(Sim.state["world"], s["x"], s["y"]))
+	if name == "grow":
+		for d in flora:
+			flora[d].refresh()
 
 
 func _on_world_loaded() -> void:

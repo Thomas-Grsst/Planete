@@ -20,6 +20,8 @@ static func create(state: Dictionary, rng: Rng, x: int, y: int, parent = null) -
 		"id": state["next_id"], "name": Names.place_name(rng, taken), "x": x, "y": y, "houses": 1, "wood": 5.0, "food": 15.0,
 		"founded_day": state["day"], "level": 0, "max_level": 0, "abandoned": -1, "construction": -1.0, "last_gain": 0.0,
 		"techs": parent["techs"].duplicate() if parent != null else [], "geo": Geography.of(state["world"], x, y), "parent": parent["id"] if parent != null else -1,
+		"faith": parent.get("faith", -1) if parent != null else -1, "devotion": parent.get("devotion", 0.0) * 0.8 if parent != null else 0.0,
+		"temple": 0, "prayer": {}, "awe": {}, "converted_day": state["day"],
 	}
 	state["settlements"].append(s)
 	clear_land(state, s)

@@ -5,6 +5,7 @@ signal event_logged(entry: Dictionary)
 signal world_loaded
 signal catch_up_progress(done: int, total: int)
 signal caught_up(days: int)
+signal power_used(name: String, answered: Array)
 
 const MS_PER_DAY := 600000.0
 const MAX_OFFLINE_DAYS := 4320
@@ -94,6 +95,7 @@ func tick(announce: bool = true) -> void:
 	Work.step(state, rng, census)
 	People.step(state, rng, census)
 	Jobs.step(state, rng, census)
+	Faith.step(state, rng, census)
 	Settlements.step(state, rng, census)
 	Herds.step(state, rng)
 	Ideas.step(state, rng, census)
@@ -104,6 +106,23 @@ func tick(announce: bool = true) -> void:
 	for entry in Journal.take_fresh():
 		event_logged.emit(entry)
 	day_passed.emit(state["day"])
+
+
+func use_power(name: String) -> String:
+	if state.is_empty():
+		return ""
+	if name == "skip":
+		for i in Powers.SKIP_DAYS:
+			tick(true)
+		return "⏩ %d jours passent." % Powers.SKIP_DAYS
+	var msg := Powers.apply(state, name)
+	rng.state = state["rng_state"]
+	var miracle := Miracles.record(state, rng, name)
+	state["rng_state"] = rng.state
+	for entry in Journal.take_fresh():
+		event_logged.emit(entry)
+	power_used.emit(name, miracle["answered"])
+	return msg if miracle["echo"] == "" else "%s %s" % [msg, miracle["echo"]]
 
 
 func _check_extinction() -> void:

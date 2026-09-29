@@ -46,7 +46,7 @@ func setup(v) -> void:
 	add_child(ground)
 	label = Node2D.new()
 	label.z_as_relative = false
-	label.z_index = 20
+	label.z_index = 28
 	label.draw.connect(_draw_label)
 	add_child(label)
 
@@ -66,6 +66,8 @@ func bump(item: String) -> void:
 
 
 func _process(delta: float) -> void:
+	if village.praying():
+		label.queue_redraw()
 	var fire := has_fire()
 	embers.emitting = fire
 	var flicker := 0.85 + 0.15 * sin(Time.get_ticks_msec() * 0.013) * sin(Time.get_ticks_msec() * 0.007)
@@ -141,6 +143,12 @@ func _draw_label() -> void:
 	var s: Dictionary = village.settlement
 	var font := ThemeDB.fallback_font
 	var text: String = s["name"] if village.alive() else "%s (abandonné)" % s["name"]
+	var rel = Religions.of(Sim.state, s)
+	if rel != null and village.alive():
+		text = "%s %s" % [rel["emoji"], text]
 	var y := -30.0 - lift
 	label.draw_string_outline(font, Vector2(-60, y), text, HORIZONTAL_ALIGNMENT_CENTER, 120, 11, 3, Color(0, 0, 0, 0.6))
 	label.draw_string(font, Vector2(-60, y), text, HORIZONTAL_ALIGNMENT_CENTER, 120, 11, Color(1, 1, 1, 0.95))
+	if village.alive() and village.praying():
+		var pulse := 0.55 + 0.45 * sin(Time.get_ticks_msec() * 0.004)
+		label.draw_string(font, Vector2(-10, y - 14), "🙏", HORIZONTAL_ALIGNMENT_CENTER, 20, 12, Color(1, 1, 1, pulse))

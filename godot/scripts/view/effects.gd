@@ -31,10 +31,14 @@ func on_event(entry: Dictionary, life) -> void:
 		burst(pos, Color("ffe27a"))
 	elif entry["type"] == "croissance" or entry["type"] == "fondation":
 		burst(pos, Color("b9f6ca"))
-	floaters.append({"pos": pos, "text": text, "color": style[1], "age": 0.0, "big": entry["type"] in ["decouverte", "fondation", "croissance"]})
+	float_text(pos, text, style[1], entry["type"] in ["decouverte", "fondation", "croissance"])
 
 
-func _where(entry: Dictionary, life):
+func float_text(pos: Vector2, text: String, color: Color, big: bool = false) -> void:
+	floaters.append({"pos": pos, "text": text, "color": color, "age": 0.0, "big": big})
+
+
+func _where(entry: Dictionary, life) -> Variant:
 	if entry.has("person"):
 		var v = life.villager(entry["person"])
 		if v != null and v.visible:

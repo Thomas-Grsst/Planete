@@ -80,7 +80,7 @@ static func step(state: Dictionary, rng: Rng, census: Dictionary) -> void:
 			p["health"] -= (p["hunger"] - 40) * 0.05
 		elif p["health"] < 100:
 			p["health"] = min(100.0, p["health"] + 0.3 + (entry["mods"]["heal"] if entry else 0.0))
-		var mood := -0.4 if p["hunger"] > 30 else 0.15
+		var mood: float = (-0.4 if p["hunger"] > 30 else 0.15) + (entry["mods"]["happiness"] if entry else 0.0)
 		p["happiness"] = clamp(p["happiness"] + mood, 0.0, 100.0)
 		if age > OLD_AGE and rng.chance((age - OLD_AGE) * 0.00008):
 			kill(state, p, "de vieillesse")
@@ -154,5 +154,7 @@ static func kill(state: Dictionary, p: Dictionary, cause: String) -> void:
 		if q != null:
 			q["partner"] = -1
 	var home = Settlements.by_id(state, p["home"])
+	if home != null:
+		Faith.note_death(state, home)
 	var where := " à %s" % home["name"] if home != null else ""
 	Journal.log_event(state, "deces", "🕯️ %s meurt %s à %d ans%s." % [p["name"], cause, age, where], {"person": p["id"]})

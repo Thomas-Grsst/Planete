@@ -6,11 +6,13 @@ const VILLAGER := preload("res://scripts/view/villager.gd")
 const VILLAGE := preload("res://scripts/view/village_view.gd")
 const HERD := preload("res://scripts/view/herd_view.gd")
 const EFFECTS := preload("res://scripts/view/effects.gd")
+const FAITH_FX := preload("res://scripts/view/faith_fx.gd")
 const PICK_VILLAGER := 16.0
 const PICK_VILLAGE := 46.0
 
 var entities: Node2D
 var effects: Node2D
+var faith_fx: Node2D
 var villagers := {}
 var villages := {}
 var herds := {}
@@ -22,6 +24,10 @@ func setup(entity_root: Node2D) -> void:
 	effects = Node2D.new()
 	effects.set_script(EFFECTS)
 	add_child(effects)
+	faith_fx = Node2D.new()
+	faith_fx.set_script(FAITH_FX)
+	add_child(faith_fx)
+	faith_fx.setup(self, effects)
 	Sim.day_passed.connect(func(_d): sync())
 	Sim.world_loaded.connect(_reset)
 	Sim.event_logged.connect(_on_event)
@@ -107,6 +113,7 @@ func herd_near(tile: Vector2):
 
 func _on_event(entry: Dictionary) -> void:
 	effects.on_event(entry, self)
+	faith_fx.on_event(entry)
 
 
 func villager(id: int):

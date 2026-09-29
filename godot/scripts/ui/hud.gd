@@ -66,7 +66,7 @@ func _build_bottom() -> void:
 	bar.offset_bottom = -18
 	bar.add_theme_constant_override("separation", 12)
 	root.add_child(bar)
-	for spec in [["📜 Journal", _show.bind("journal", -1)], ["👥 0", _show.bind("stats", -1)], ["🌍 Monde", _show.bind("world", -1)]]:
+	for spec in [["📜 Journal", _show.bind("journal", -1)], ["👥 0", _show.bind("stats", -1)], ["✨ Pouvoirs", _show.bind("powers", -1)], ["🌍", _show.bind("world", -1)]]:
 		var b := Button.new()
 		b.text = spec[0]
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -157,7 +157,12 @@ func _refresh_panel() -> void:
 
 func _on_meta(meta) -> void:
 	var parts: PackedStringArray = str(meta).split(":")
-	if parts[0] == "action" and parts[1] == "new":
+	if parts[0] == "action" and parts[1] == "power":
+		var msg: String = Sim.use_power(parts[2])
+		if msg != "":
+			toast(msg)
+		_refresh_panel()
+	elif parts[0] == "action" and parts[1] == "new":
 		panel.visible = false
 		Sim.start_new(Names.place_name(Rng.new(Time.get_ticks_usec()), {}))
 		Sim.save_now()

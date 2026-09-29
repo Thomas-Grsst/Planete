@@ -45,7 +45,7 @@ static func glow_sprite(color: Color, radius: float) -> Sprite2D:
 	mat.light_mode = CanvasItemMaterial.LIGHT_MODE_UNSHADED
 	s.material = mat
 	s.z_as_relative = false
-	s.z_index = 25
+	s.z_index = 15
 	s.visible = false
 	return s
 

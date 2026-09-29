@@ -14,7 +14,8 @@ Objectif : un monde **qui bouge sous tes yeux**, pas seulement dans le journal, 
 - [x] Troupeaux (cerfs, moutons, loups) qui errent ; météo (pluie, neige, éclairs) ; jour et nuit.
 - [x] Simulation : naissances, couples, famines, métiers, migrations et nouvelles colonies, 9 premiers savoirs par causes.
 - [x] Sauvegarde, rattrapage hors ligne progressif, écran « Bon retour », fiches habitant et village, journal.
-- [ ] Reporter le reste : 22 savoirs, maladies, zombies, chefs et conseils, civilisations, diplomatie, guerres, religions, pouvoirs.
+- [x] Pouvoirs (pluie, soleil, végétation, avancer le temps) et religions : prières visibles le soir, miracles, légendes, prophètes auréolés, pèlerins missionnaires, temples et grands temples, schismes.
+- [ ] Reporter le reste : 22 savoirs, maladies, zombies (et leur pouvoir), chefs et conseils, civilisations, diplomatie, guerres, religion officielle.
 - [ ] Export Android (APK) et notifications.
 - [ ] Sons d'ambiance.
 

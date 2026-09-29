@@ -29,6 +29,7 @@ var leaving := false
 var bedtime := 21.0
 var wake := 6.0
 var lift := 0.0
+var cheer := 0.0
 
 
 func setup(p: Dictionary, manager) -> void:
@@ -54,6 +55,10 @@ func _place() -> void:
 	lift = Iso.lift_at(Sim.state["world"], tile.x, tile.y)
 
 
+func cheer_up(seconds: float) -> void:
+	cheer = seconds
+
+
 func leave() -> void:
 	leaving = true
 
@@ -77,6 +82,7 @@ func _process(delta: float) -> void:
 		if alpha <= 0.0:
 			queue_free()
 		return
+	cheer = max(0.0, cheer - delta)
 	var ts := time_scale()
 	if ts > 0.0:
 		_think()
@@ -111,13 +117,13 @@ func _think() -> void:
 	if activity == "sleep":
 		activity = "idle"
 		timer = 0.0
-	if h >= EVENING_HOUR and activity not in ["sit", "drop"]:
+	if h >= EVENING_HOUR and activity not in ["sit", "pray", "drop"]:
 		if carrying != "":
 			_walk(village.storage_spot(person_id), "drop")
 		else:
-			_walk(village.sit_spot(person_id), "sit")
+			_walk(village.sit_spot(person_id), "pray" if village.praying() else "sit")
 		return
-	if timer > 0.0 or (activity == "sit" and h >= EVENING_HOUR):
+	if timer > 0.0 or (activity in ["sit", "pray"] and h >= EVENING_HOUR):
 		return
 	_finish(village)
 
@@ -169,5 +175,5 @@ func _draw() -> void:
 	look.draw_on(self, {
 		"alpha": alpha, "lift": lift, "walking": walking, "activity": activity, "step": step, "facing": facing,
 		"carrying": carrying, "selected": selected, "child": not People.is_adult(Sim.state, person),
-		"time": Time.get_ticks_msec() / 1000.0, "job": person["job"], "name": person["name"],
+		"time": Time.get_ticks_msec() / 1000.0, "job": person["job"], "name": person["name"], "cheer": cheer, "prophet": person.get("prophet_of", -1) >= 0,
 	})

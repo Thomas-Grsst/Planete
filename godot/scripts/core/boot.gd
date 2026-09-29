@@ -4,12 +4,23 @@ extends RefCounted
 const DEFAULT_NAME := "Noria"
 
 
+static func _answer_prayers() -> void:
+	var answers := {"drought": "rain", "hunger": "grow", "storm": "sun", "cold": "sun"}
+	for s in Sim.state["settlements"]:
+		var need: String = s.get("prayer", {}).get("need", "")
+		if s["abandoned"] < 0 and answers.has(need):
+			Sim.use_power(answers[need])
+			return
+
+
 static func start(options: Dictionary) -> int:
 	if options.has("fresh"):
 		Sim.persist = false
 		Sim.start_new(options.get("name", DEFAULT_NAME), options.get("seed", ""))
 		for i in int(options.get("days", "0")):
 			Sim.tick(false)
+			if options.has("auto-pray") and i % 400 == 399:
+				_answer_prayers()
 		Journal.take_fresh()
 		if options.has("hour"):
 			Sim.state["acc_ms"] = fposmod(float(options["hour"]) - 6.0, 24.0) / 24.0 * Sim.MS_PER_DAY

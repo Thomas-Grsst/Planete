@@ -4,6 +4,9 @@ const HOUSE := preload("res://scripts/view/house.gd")
 const PROPS := preload("res://scripts/view/village_props.gd")
 const RINGS := [[0.95, 6, 0.3], [1.65, 10, 0.1], [2.35, 14, 0.5], [3.0, 18, 0.2]]
 const FIELD_MIN_FERTILITY := 0.5
+const TEMPLE := preload("res://scripts/view/temple.gd")
+const TEMPLE_OFFSET := Vector2(-0.95, -0.95)
+const TEMPLE_CLEARANCE := 0.75
 
 var settlement: Dictionary
 var settlement_id := -1
@@ -12,6 +15,7 @@ var effects: Node2D
 var houses: Array = []
 var fields: Array = []
 var props
+var temple
 var slots: Array = []
 
 
@@ -27,7 +31,7 @@ func setup(s: Dictionary, entity_root: Node2D, fx: Node2D) -> void:
 		for i in ring[1]:
 			var a: float = TAU * i / ring[1] + ring[2]
 			var offset: Vector2 = Vector2(cos(a), sin(a)) * ring[0]
-			if _dry(world, center() + offset):
+			if _dry(world, center() + offset) and offset.distance_to(TEMPLE_OFFSET) >= TEMPLE_CLEARANCE:
 				slots.append(offset)
 	if slots.is_empty():
 		slots.append(Vector2(0.6, 0.0))
@@ -35,6 +39,12 @@ func setup(s: Dictionary, entity_root: Node2D, fx: Node2D) -> void:
 	props.set_script(PROPS)
 	add_child(props)
 	props.setup(self)
+	temple = Node2D.new()
+	temple.set_script(TEMPLE)
+	add_child(temple)
+	var spot := _land(center() + TEMPLE_OFFSET)
+	temple.global_position = Iso.project(spot.x, spot.y)
+	temple.setup(self, Iso.lift_at(world, spot.x, spot.y))
 
 
 func _dry(world: Dictionary, tile: Vector2) -> bool:
@@ -52,6 +62,10 @@ func _land(point: Vector2) -> Vector2:
 			return point
 		point = point.lerp(center(), 0.4)
 	return center()
+
+
+func praying() -> bool:
+	return not settlement.get("prayer", {}).is_empty()
 
 
 func alive() -> bool:
@@ -82,6 +96,7 @@ func refresh() -> void:
 		h.refresh()
 	_refresh_fields()
 	props.refresh()
+	temple.refresh()
 
 
 func _refresh_fields() -> void:

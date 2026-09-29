@@ -3,7 +3,7 @@ extends RefCounted
 
 const CAP := 1500
 const HISTORY_CAP := 30
-const RARE := ["fondation", "decouverte", "croissance", "grande_famine", "disparition", "extinction", "catastrophe", "chef"]
+const RARE := ["fondation", "decouverte", "croissance", "grande_famine", "disparition", "extinction", "catastrophe", "chef", "religion", "schisme", "miracle", "religion_fin"]
 const PRIORITY := {"extinction": 95, "decouverte": 60, "fondation": 40, "croissance": 30, "grande_famine": 30, "disparition": 25, "catastrophe": 20, "chef": 30}
 
 static var fresh: Array = []

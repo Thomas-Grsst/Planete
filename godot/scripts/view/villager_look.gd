@@ -38,8 +38,12 @@ func draw_on(node: Node2D, st: Dictionary) -> void:
 		crouch = 2.5 + sin(t * 3.0) * 0.8
 	elif act == "sit":
 		crouch = 3.0
+	elif act == "pray":
+		crouch = 3.5 + sin(t * 1.5) * 0.4
 	elif act == "play":
 		bob = absf(sin(t * 7.0 + node.person_id)) * 3.0
+	if st["cheer"] > 0.0:
+		bob = absf(sin(t * 9.0 + node.person_id)) * 4.0
 	if st["selected"]:
 		node.draw_arc(up, 7.0, 0.0, TAU, 20, Color(1, 0.84, 0.3, a), 1.6)
 	node.draw_set_transform(up, 0.0, Vector2(1.0, 0.45))
@@ -49,6 +53,8 @@ func draw_on(node: Node2D, st: Dictionary) -> void:
 	_body(node, st, a, crouch)
 	_arms(node, st, a, crouch, t, f)
 	_head(node, a, crouch, f)
+	if st["prophet"]:
+		node.draw_arc(Vector2(0, -17.5 + crouch), 2.6, 0.0, TAU, 12, Color(1.0, 0.85, 0.35, a), 1.0)
 	if st["carrying"] != "":
 		_carry(node, st["carrying"], a, crouch)
 	node.draw_set_transform(up, 0.0, Vector2.ONE)
@@ -60,7 +66,7 @@ func draw_on(node: Node2D, st: Dictionary) -> void:
 func _legs(node: Node2D, st: Dictionary, a: float, crouch: float) -> void:
 	var swing := sin(st["step"]) * 2.2 if st["walking"] else 0.0
 	var leg := Color(0.25, 0.2, 0.18, a)
-	if st["activity"] == "sit" and not st["walking"]:
+	if st["activity"] in ["sit", "pray"] and not st["walking"]:
 		node.draw_line(Vector2(-1.2, -3), Vector2(2.5 * st["facing"], -1.5), leg, 1.4)
 		node.draw_line(Vector2(1.2, -3), Vector2(3.5 * st["facing"], -1.5), leg, 1.4)
 		return
@@ -81,6 +87,11 @@ func _arms(node: Node2D, st: Dictionary, a: float, crouch: float, t: float, f: f
 	var shoulder := Vector2(1.8 * f, -9.5 + crouch)
 	var arm := Color(skin, a)
 	var act: String = st["activity"]
+	if st["cheer"] > 0.0 or act == "pray":
+		var lift_arm := 5.5 if st["cheer"] > 0.0 else 4.0 + sin(t * 1.5) * 0.6
+		node.draw_line(shoulder, shoulder + Vector2(1.5 * f, -lift_arm), arm, 1.2)
+		node.draw_line(shoulder + Vector2(-3.6 * f, 0), shoulder + Vector2(-4.5 * f, -lift_arm), arm, 1.2)
+		return
 	if st["walking"]:
 		var s := sin(st["step"]) * 2.0
 		node.draw_line(shoulder, shoulder + Vector2(s * f, 4.5), arm, 1.2)

@@ -5,11 +5,12 @@ const MUTED := "#8fa3b3"
 const LINK := "#8fd3ff"
 const GOLD := "#ffd54f"
 const JOURNAL_SHOWN := 60
-const WELCOME_TYPES := ["naissance", "deces", "couple", "construction", "decouverte", "fondation", "croissance", "migration", "diffusion"]
+const WELCOME_TYPES := ["naissance", "deces", "couple", "construction", "decouverte", "fondation", "croissance", "migration", "diffusion", "religion", "conversion", "temple", "schisme"]
 const SUMMARY_LABELS := {
 	"naissance": "👶 naissances", "deces": "🕯️ décès", "couple": "💞 couples formés", "construction": "🏠 maisons construites",
 	"decouverte": "💡 découvertes", "fondation": "🏕️ colonies fondées", "croissance": "📈 colonies qui grandissent",
 	"migration": "🧭 départs", "diffusion": "🧳 savoirs transmis",
+	"religion": "🙏 religions fondées", "conversion": "🕯️ conversions", "temple": "🛕 temples élevés", "schisme": "⚡ schismes",
 }
 
 
@@ -30,6 +31,11 @@ static func render(kind: String, id: int) -> String:
 			return world(st)
 		"welcome":
 			return welcome(st, id)
+		"powers":
+			return FaithPanels.powers(st)
+		"faith":
+			var rel = Religions.by_id(st, id)
+			return FaithPanels.religion(st, rel) if rel != null else ""
 	return ""
 
 
@@ -50,6 +56,7 @@ static func person(st: Dictionary, p: Dictionary) -> String:
 	if home != null:
 		out += " à " + link("settlement:%d" % home["id"], home["name"])
 	out += "\n" + muted(", ".join(p["traits"].map(func(t): return Names.trait_label(t, p["sex"])))) + "\n"
+	out += FaithPanels.prophet_line(st, p)
 	if p["alive"]:
 		out += "❤️ Santé %d %%   😊 Bonheur %d %%   🍽️ Faim %d %%\n" % [p["health"], p["happiness"], p["hunger"]]
 	var partner = People.by_id(st, p["partner"]) if p["partner"] >= 0 else null
@@ -77,6 +84,7 @@ static func settlement(st: Dictionary, s: Dictionary) -> String:
 		out += "🔨 Maison en construction : %d %%\n" % int(s["construction"] * 100)
 	var techs: Array = s["techs"].map(func(k): return "%s %s" % [Techs.DATA[k]["emoji"], Techs.DATA[k]["name"]])
 	out += "💡 " + (" · ".join(techs) if not techs.is_empty() else muted("Aucun savoir pour l'instant")) + "\n"
+	out += FaithPanels.settlement_lines(st, s)
 	if e != null:
 		var jobs: Array = []
 		for j in e["jobs"]:
@@ -112,6 +120,7 @@ static func stats(st: Dictionary) -> String:
 		if st["discoveries"].has(k):
 			var d: Dictionary = st["discoveries"][k]
 			out += "%s %s — %s à %s, %s\n" % [Techs.DATA[k]["emoji"], Techs.DATA[k]["name"], link("person:%d" % d["person"], d["name"]), d["place"], muted(Journal.format_day(d["day"]))]
+	out += FaithPanels.stats_section(st)
 	out += "\n[b]Animaux[/b]\n"
 	for key in Herds.SPECIES:
 		var total := 0.0
