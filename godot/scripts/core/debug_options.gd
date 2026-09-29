@@ -24,6 +24,13 @@ static func _fake_conversion() -> void:
 	Sim.event_logged.emit({"type": "conversion", "from": s["id"], "settlement": alive[1]["id"], "religion": rel["id"], "text": "🕯️ Test de pèlerinage."})
 
 
+static func panel_id(kind: String) -> int:
+	var st: Dictionary = Sim.state
+	var lists := {"settlement": st["settlements"], "faith": st.get("religions", []), "civ": st.get("civs", []), "person": st["people"].filter(func(p): return p["alive"])}
+	var items: Array = lists.get(kind, [])
+	return items[0]["id"] if not items.is_empty() else -1
+
+
 static func _tap(host: Node, pos: Vector2) -> void:
 	for pressed in [true, false]:
 		var e := InputEventMouseButton.new()

@@ -7,6 +7,8 @@ const VILLAGE := preload("res://scripts/view/village_view.gd")
 const HERD := preload("res://scripts/view/herd_view.gd")
 const EFFECTS := preload("res://scripts/view/effects.gd")
 const FAITH_FX := preload("res://scripts/view/faith_fx.gd")
+const WORLD_FX := preload("res://scripts/view/world_fx.gd")
+const TROOP := preload("res://scripts/view/troop_view.gd")
 const PICK_VILLAGER := 16.0
 const PICK_VILLAGE := 46.0
 
@@ -16,6 +18,8 @@ var faith_fx: Node2D
 var villagers := {}
 var villages := {}
 var herds := {}
+var troops := {}
+var world_fx: Node2D
 var selection_id := -1
 
 
@@ -28,6 +32,10 @@ func setup(entity_root: Node2D) -> void:
 	faith_fx.set_script(FAITH_FX)
 	add_child(faith_fx)
 	faith_fx.setup(self, effects)
+	world_fx = Node2D.new()
+	world_fx.set_script(WORLD_FX)
+	add_child(world_fx)
+	world_fx.setup(self, effects)
 	Sim.day_passed.connect(func(_d): sync())
 	Sim.world_loaded.connect(_reset)
 	Sim.event_logged.connect(_on_event)
@@ -35,7 +43,7 @@ func setup(entity_root: Node2D) -> void:
 
 
 func _reset() -> void:
-	for group in [villagers, villages, herds]:
+	for group in [villagers, villages, herds, troops]:
 		for n in group.values():
 			n.queue_free()
 		group.clear()
@@ -52,6 +60,7 @@ func sync() -> void:
 		_sync_villagers(state)
 	if not opts.has("no-animals"):
 		_sync_herds(state)
+	_sync_troops(state)
 
 
 func _sync_villages(state: Dictionary) -> void:
@@ -85,6 +94,26 @@ func _sync_villagers(state: Dictionary) -> void:
 			villagers.erase(id)
 
 
+func _sync_troops(state: Dictionary) -> void:
+	var seen := {}
+	var groups := [["z", state.get("zombies", {}).get("hordes", [])], ["r", state.get("raiders", [])]]
+	for g in groups:
+		for r in g[1]:
+			var key: String = "%s%d" % [g[0], r["id"]]
+			seen[key] = true
+			if not troops.has(key):
+				var v := Node2D.new()
+				v.set_script(TROOP)
+				entities.add_child(v)
+				v.setup(r, "zombie" if g[0] == "z" else r["kind"])
+				troops[key] = v
+			troops[key].record = r
+	for key in troops.keys():
+		if not seen.has(key):
+			troops[key].queue_free()
+			troops.erase(key)
+
+
 func _sync_herds(state: Dictionary) -> void:
 	for h in state["herds"]:
 		if not herds.has(h["id"]):
@@ -114,6 +143,9 @@ func herd_near(tile: Vector2):
 func _on_event(entry: Dictionary) -> void:
 	effects.on_event(entry, self)
 	faith_fx.on_event(entry)
+	world_fx.on_event(entry)
+	if entry["type"] in ["apocalypse", "raid", "zombie"]:
+		_sync_troops(Sim.state)
 
 
 func villager(id: int):

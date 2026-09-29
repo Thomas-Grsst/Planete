@@ -72,4 +72,6 @@ func _process(_delta: float) -> void:
 	elif w == "drought":
 		base = DROUGHT
 	var dusk := 1.0 - absf(night - 0.45) / 0.45 if night > 0.0 and night < 0.9 else 0.0
+	if Zombies.active(Sim.state):
+		base = base.lerp(Color(0.75, 0.9, 0.6), 0.35)
 	color = base.lerp(DUSK, clamp(dusk, 0.0, 1.0) * 0.6).lerp(NIGHT, night)

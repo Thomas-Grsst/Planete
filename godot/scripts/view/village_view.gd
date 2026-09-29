@@ -5,6 +5,7 @@ const PROPS := preload("res://scripts/view/village_props.gd")
 const RINGS := [[0.95, 6, 0.3], [1.65, 10, 0.1], [2.35, 14, 0.5], [3.0, 18, 0.2]]
 const FIELD_MIN_FERTILITY := 0.5
 const TEMPLE := preload("res://scripts/view/temple.gd")
+const EXTRAS := preload("res://scripts/view/village_extras.gd")
 const TEMPLE_OFFSET := Vector2(-0.95, -0.95)
 const TEMPLE_CLEARANCE := 0.75
 
@@ -16,6 +17,7 @@ var houses: Array = []
 var fields: Array = []
 var props
 var temple
+var extras
 var slots: Array = []
 
 
@@ -45,6 +47,10 @@ func setup(s: Dictionary, entity_root: Node2D, fx: Node2D) -> void:
 	var spot := _land(center() + TEMPLE_OFFSET)
 	temple.global_position = Iso.project(spot.x, spot.y)
 	temple.setup(self, Iso.lift_at(world, spot.x, spot.y))
+	extras = Node2D.new()
+	extras.set_script(EXTRAS)
+	add_child(extras)
+	extras.setup(self)
 
 
 func _dry(world: Dictionary, tile: Vector2) -> bool:
@@ -92,11 +98,16 @@ func refresh() -> void:
 		houses.append(h)
 		if Sim.state["day"] - settlement["founded_day"] > 1:
 			effects.puff(_ground(tile))
+	while houses.size() > max(0, wanted) and not houses.is_empty():
+		var gone = houses.pop_back()
+		effects.puff(gone.global_position + Vector2(0, -gone.lift))
+		gone.collapse()
 	for h in houses:
 		h.refresh()
 	_refresh_fields()
 	props.refresh()
 	temple.refresh()
+	extras.refresh()
 
 
 func _refresh_fields() -> void:
@@ -144,6 +155,16 @@ func storage_spot(person_id: int) -> Vector2:
 func construction_spot(seed_value: int) -> Vector2:
 	var tile := slot_tile(houses.size())
 	return tile + Vector2(0.28 * (1 if seed_value % 2 == 0 else -1), 0.2)
+
+
+func patrol_spot(seed_value: int) -> Vector2:
+	var a := float(absi(seed_value * 2654435) % 628) / 100.0
+	var r: float = 1.4 + 0.25 * houses.size() / 6.0
+	return _land(center() + Vector2(cos(a), sin(a)) * min(r, 3.2))
+
+
+func forge_spot(person_id: int) -> Vector2:
+	return _land(center() + Vector2(-0.55, 0.45) + Vector2(0.08 * (person_id % 2), 0))
 
 
 func receive(item: String) -> void:

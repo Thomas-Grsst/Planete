@@ -69,6 +69,13 @@ func _process(delta: float) -> void:
 
 
 
+func collapse() -> void:
+	var tween := create_tween()
+	tween.tween_property(self, "scale", Vector2(1.2, 0.1), 0.6)
+	tween.parallel().tween_property(self, "modulate:a", 0.0, 0.6)
+	tween.tween_callback(queue_free)
+
+
 func _ease(t: float) -> float:
 	return 1.0 - pow(1.0 - t, 3.0) + sin(t * PI) * 0.15
 

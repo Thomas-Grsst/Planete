@@ -148,6 +148,15 @@ func _show(kind: String, id: int) -> void:
 	_refresh_panel()
 
 
+func refresh_panel() -> void:
+	_refresh_panel()
+
+
+func close_panel() -> void:
+	panel.visible = false
+	current = {"kind": "", "id": -1}
+
+
 func _refresh_panel() -> void:
 	if current["kind"] == "welcome" and panel_text.text != "":
 		return
@@ -157,17 +166,9 @@ func _refresh_panel() -> void:
 
 func _on_meta(meta) -> void:
 	var parts: PackedStringArray = str(meta).split(":")
-	if parts[0] == "action" and parts[1] == "power":
-		var msg: String = Sim.use_power(parts[2])
-		if msg != "":
-			toast(msg)
-		_refresh_panel()
-	elif parts[0] == "action" and parts[1] == "new":
-		panel.visible = false
-		Sim.start_new(Names.place_name(Rng.new(Time.get_ticks_usec()), {}))
-		Sim.save_now()
-		toast("🌱 Un nouveau monde vient de naître : %s." % Sim.state["name"])
-	elif parts[0] == "tile":
+	if HudActions.run(self, parts):
+		return
+	if parts[0] == "tile":
 		focus_requested.emit(Iso.ground(Sim.state["world"], int(parts[1]), int(parts[2])))
 	else:
 		_show(parts[0], int(parts[1]))

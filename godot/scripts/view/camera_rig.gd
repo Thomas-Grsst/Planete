@@ -15,11 +15,16 @@ var _moved := false
 var _pinch_start := 0.0
 var _pinch_zoom := 1.0
 var _dragging_mouse := false
+var _shake := 0.0
 
 
 func _ready() -> void:
 	zoom = Vector2.ONE * target_zoom
 	target_pos = position
+
+
+func shake(amount: float) -> void:
+	_shake = max(_shake, amount)
 
 
 func focus(world_pos: Vector2) -> void:
@@ -35,6 +40,8 @@ func _process(delta: float) -> void:
 	var k: float = clamp(delta * GLIDE, 0.0, 1.0)
 	position = position.lerp(target_pos, k)
 	zoom = zoom.lerp(Vector2.ONE * target_zoom, k)
+	offset = Vector2(randf_range(-1, 1), randf_range(-1, 1)) * _shake
+	_shake = move_toward(_shake, 0.0, delta * 8.0)
 
 
 func _unhandled_input(event: InputEvent) -> void:

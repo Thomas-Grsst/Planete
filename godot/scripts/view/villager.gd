@@ -176,4 +176,5 @@ func _draw() -> void:
 		"alpha": alpha, "lift": lift, "walking": walking, "activity": activity, "step": step, "facing": facing,
 		"carrying": carrying, "selected": selected, "child": not People.is_adult(Sim.state, person),
 		"time": Time.get_ticks_msec() / 1000.0, "job": person["job"], "name": person["name"], "cheer": cheer, "prophet": person.get("prophet_of", -1) >= 0,
+		"sick": not person.get("sick", {}).is_empty(), "bitten": person.get("bitten", -1) >= 0, "famous": person.get("fame", 0) >= Fame.STATUE_FAME,
 	})

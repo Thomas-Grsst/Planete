@@ -22,8 +22,8 @@ var pending_days := 0
 var _catch_total := 0
 
 
-func start_new(world_name: String, seed_text: String = "") -> void:
-	state = WorldState.create(world_name, seed_text)
+func start_new(world_name: String, seed_text: String = "", colony: Dictionary = {}) -> void:
+	state = WorldState.create(world_name, seed_text, colony)
 	_bind()
 
 
@@ -110,6 +110,7 @@ func tick(announce: bool = true) -> void:
 	World.step(state, rng, census)
 	Exodus.step(state)
 	Fame.yearly(state)
+	Achievements.daily(state)
 	_check_extinction()
 	state["rng_state"] = rng.state
 	if not announce:

@@ -5,12 +5,14 @@ const MUTED := "#8fa3b3"
 const LINK := "#8fd3ff"
 const GOLD := "#ffd54f"
 const JOURNAL_SHOWN := 60
-const WELCOME_TYPES := ["naissance", "deces", "couple", "construction", "decouverte", "fondation", "croissance", "migration", "diffusion", "religion", "conversion", "temple", "schisme"]
+const WELCOME_TYPES := ["naissance", "deces", "couple", "construction", "decouverte", "fondation", "croissance", "migration", "diffusion", "religion", "conversion", "temple", "schisme", "civilisation", "guerre", "bataille", "conquete", "paix", "epidemie", "apocalypse", "raid", "cataclysme", "statue", "succes"]
 const SUMMARY_LABELS := {
 	"naissance": "👶 naissances", "deces": "🕯️ décès", "couple": "💞 couples formés", "construction": "🏠 maisons construites",
 	"decouverte": "💡 découvertes", "fondation": "🏕️ colonies fondées", "croissance": "📈 colonies qui grandissent",
 	"migration": "🧭 départs", "diffusion": "🧳 savoirs transmis",
 	"religion": "🙏 religions fondées", "conversion": "🕯️ conversions", "temple": "🛕 temples élevés", "schisme": "⚡ schismes",
+	"civilisation": "🏰 civilisations fondées", "guerre": "⚔️ guerres déclarées", "bataille": "🗡️ batailles", "conquete": "🏴 conquêtes", "paix": "🕊️ paix signées",
+	"epidemie": "🦠 épidémies", "apocalypse": "🧟 apocalypses", "raid": "🔥 raids", "cataclysme": "🌋 cataclysmes", "statue": "🗿 statues", "succes": "🏆 succès",
 }
 
 
@@ -28,7 +30,19 @@ static func render(kind: String, id: int) -> String:
 		"stats":
 			return stats(st)
 		"world":
-			return world(st)
+			return StoryPanels.world(st)
+		"chronicle":
+			return StoryPanels.chronicle(st)
+		"pantheon":
+			return StoryPanels.pantheon(st)
+		"achievements":
+			return StoryPanels.achievements(st)
+		"family":
+			var fp = People.by_id(st, id)
+			return PeoplePanels.family(st, fp) if fp != null else ""
+		"civ":
+			var c = Civs.by_id(st, id)
+			return CivPanels.civ(st, c) if c != null else ""
 		"welcome":
 			return welcome(st, id)
 		"powers":
@@ -57,6 +71,7 @@ static func person(st: Dictionary, p: Dictionary) -> String:
 		out += " à " + link("settlement:%d" % home["id"], home["name"])
 	out += "\n" + muted(", ".join(p["traits"].map(func(t): return Names.trait_label(t, p["sex"])))) + "\n"
 	out += FaithPanels.prophet_line(st, p)
+	out += PeoplePanels.details(st, p)
 	if p["alive"]:
 		out += "❤️ Santé %d %%   😊 Bonheur %d %%   🍽️ Faim %d %%\n" % [p["health"], p["happiness"], p["hunger"]]
 	var partner = People.by_id(st, p["partner"]) if p["partner"] >= 0 else null
@@ -84,6 +99,7 @@ static func settlement(st: Dictionary, s: Dictionary) -> String:
 		out += "🔨 Maison en construction : %d %%\n" % int(s["construction"] * 100)
 	var techs: Array = s["techs"].map(func(k): return "%s %s" % [Techs.DATA[k]["emoji"], Techs.DATA[k]["name"]])
 	out += "💡 " + (" · ".join(techs) if not techs.is_empty() else muted("Aucun savoir pour l'instant")) + "\n"
+	out += CivPanels.settlement_lines(st, s)
 	out += FaithPanels.settlement_lines(st, s)
 	if e != null:
 		var jobs: Array = []
@@ -120,6 +136,7 @@ static func stats(st: Dictionary) -> String:
 		if st["discoveries"].has(k):
 			var d: Dictionary = st["discoveries"][k]
 			out += "%s %s — %s à %s, %s\n" % [Techs.DATA[k]["emoji"], Techs.DATA[k]["name"], link("person:%d" % d["person"], d["name"]), d["place"], muted(Journal.format_day(d["day"]))]
+	out += CivPanels.stats_section(st)
 	out += FaithPanels.stats_section(st)
 	out += "\n[b]Animaux[/b]\n"
 	for key in Herds.SPECIES:
@@ -128,13 +145,6 @@ static func stats(st: Dictionary) -> String:
 			if h["species"] == key:
 				total += h["count"]
 		out += "%s %s : %d\n" % [Herds.SPECIES[key]["emoji"], Herds.SPECIES[key]["name"], total]
-	return out
-
-
-static func world(st: Dictionary) -> String:
-	var out := "[b]🌍 %s[/b]\n%s\n\n" % [st["name"], muted("Jour %d · %s" % [st["day"], Weather.LABELS.get(st["weather"], "")])]
-	out += "Le monde continue de vivre quand l'application est fermée.\n\n"
-	out += link("action:new", "🌱 Créer un nouveau monde") + "\n"
 	return out
 
 

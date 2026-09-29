@@ -6,7 +6,7 @@ const CLOTHES := {
 	"cueilleur": Color("5d9b4a"), "fermier": Color("d8b64a"), "chasseur": Color("8a5a36"), "pêcheur": Color("3f7fbf"),
 	"bâtisseur": Color("d9803a"), "enfant": Color("e8a0bf"), "chef": Color("8e5cc7"),
 }
-const CARRY := {"wood": Color("8b5a2b"), "berries": Color("c0392b"), "fish": Color("b8c7d6"), "meat": Color("9b3b2e"), "grain": Color("e3c565")}
+const CARRY := {"wood": Color("8b5a2b"), "berries": Color("c0392b"), "fish": Color("b8c7d6"), "meat": Color("9b3b2e"), "grain": Color("e3c565"), "herbs": Color("66bb6a")}
 const SHADOW := Color(0, 0, 0, 0.22)
 const TOOL := Color("5b4636")
 const LINE := Color(1, 1, 1, 0.55)
@@ -14,6 +14,7 @@ const LINE := Color(1, 1, 1, 0.55)
 var skin: Color
 var hair: Color
 var female := false
+var _skin := Color.WHITE
 
 
 func _init(p: Dictionary) -> void:
@@ -40,6 +41,8 @@ func draw_on(node: Node2D, st: Dictionary) -> void:
 		crouch = 3.0
 	elif act == "pray":
 		crouch = 3.5 + sin(t * 1.5) * 0.4
+	elif act == "rest":
+		crouch = 4.5
 	elif act == "play":
 		bob = absf(sin(t * 7.0 + node.person_id)) * 3.0
 	if st["cheer"] > 0.0:
@@ -52,9 +55,11 @@ func draw_on(node: Node2D, st: Dictionary) -> void:
 	_legs(node, st, a, crouch)
 	_body(node, st, a, crouch)
 	_arms(node, st, a, crouch, t, f)
+	_skin = VillagerMarks.skin(skin, st)
 	_head(node, a, crouch, f)
 	if st["prophet"]:
 		node.draw_arc(Vector2(0, -17.5 + crouch), 2.6, 0.0, TAU, 12, Color(1.0, 0.85, 0.35, a), 1.0)
+	VillagerMarks.draw(node, st, crouch, t)
 	if st["carrying"] != "":
 		_carry(node, st["carrying"], a, crouch)
 	node.draw_set_transform(up, 0.0, Vector2.ONE)
@@ -97,7 +102,7 @@ func _arms(node: Node2D, st: Dictionary, a: float, crouch: float, t: float, f: f
 		node.draw_line(shoulder, shoulder + Vector2(s * f, 4.5), arm, 1.2)
 		return
 	match act:
-		"chop", "build", "farm":
+		"chop", "build", "farm", "forge":
 			var swing := sin(t * (7.0 if act != "farm" else 4.0))
 			var hand := shoulder + Vector2((2.5 + swing * 1.5) * f, -1.0 + swing * 3.0)
 			node.draw_line(shoulder, hand, arm, 1.2)
@@ -121,7 +126,7 @@ func _arms(node: Node2D, st: Dictionary, a: float, crouch: float, t: float, f: f
 
 func _head(node: Node2D, a: float, crouch: float, f: float) -> void:
 	var c := Vector2(0, -13.2 + crouch)
-	node.draw_circle(c, 2.4, Color(skin, a))
+	node.draw_circle(c, 2.4, Color(_skin, a))
 	node.draw_arc(c + Vector2(0, -0.2), 2.5, PI * 1.05, PI * 1.95, 8, Color(hair, a), 1.6)
 	if female:
 		node.draw_line(c + Vector2(-2.2 * f, -0.5), c + Vector2(-2.6 * f, 3.0), Color(hair, a), 1.4)

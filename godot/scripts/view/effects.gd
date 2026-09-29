@@ -67,6 +67,25 @@ func burst(pos: Vector2, color: Color) -> void:
 	p.finished.connect(p.queue_free)
 
 
+func plume(pos: Vector2) -> void:
+	var p := CPUParticles2D.new()
+	p.position = pos + Vector2(0, -10)
+	p.amount = 80
+	p.lifetime = 6.0
+	p.one_shot = false
+	p.direction = Vector2(0.2, -1)
+	p.spread = 14.0
+	p.gravity = Vector2(6, -10)
+	p.initial_velocity_min = 12.0
+	p.initial_velocity_max = 24.0
+	p.scale_amount_min = 3.0
+	p.scale_amount_max = 7.0
+	p.color = Color(0.35, 0.33, 0.32, 0.55)
+	add_child(p)
+	p.emitting = true
+	get_tree().create_timer(40.0).timeout.connect(p.queue_free)
+
+
 func puff(pos: Vector2) -> void:
 	var p := CPUParticles2D.new()
 	p.position = pos

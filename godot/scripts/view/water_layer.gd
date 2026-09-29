@@ -50,7 +50,8 @@ func _draw_water(world: Dictionary, x: int, y: int, t: Dictionary) -> void:
 
 func _draw_river(x: int, y: int, t: Dictionary) -> void:
 	var c := Iso.project(x, y, Iso.lift(t["height"], t["biome"]) + 0.5)
-	_mesh.poly(_diamond(c, 0.7), Biomes.DATA["river"]["color"])
+	var frozen: bool = Weather.season(Sim.state["day"]) == 3 and (Sim.state["weather"] == "snow" or t["height"] > 0.6)
+	_mesh.poly(_diamond(c, 0.7), Color("dfeef7") if frozen else Biomes.DATA["river"]["color"])
 
 
 func _touches_land(world: Dictionary, x: int, y: int) -> bool:

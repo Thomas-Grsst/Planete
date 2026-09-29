@@ -13,9 +13,21 @@ static func choose(v, village) -> Dictionary:
 	var seed_value: int = v.person_id * 31 + Sim.state["day"] * 7 + v.chores
 	if not People.is_adult(Sim.state, p):
 		return _task(village.play_spot(seed_value), "play", 5.0, "")
+	if not p.get("sick", {}).is_empty() or p.get("bitten", -1) >= 0:
+		return _task(village.door(v.person_id), "rest", 12.0, "")
 	if age >= ELDER_AGE:
 		return _task(village.sit_spot(v.person_id), "sit", 14.0, "")
 	match p["job"]:
+		"chef":
+			return _task(village.play_spot(seed_value), "idle", 10.0, "")
+		"gardien":
+			return _task(village.patrol_spot(seed_value), "guard", 8.0, "")
+		"forgeron":
+			return _task(village.forge_spot(v.person_id), "forge", 14.0, "")
+		"guérisseur":
+			if not s.get("outbreak", {}).is_empty():
+				return _task(village.door(seed_value), "heal", 8.0, "")
+			return _tile_task(world, s, seed_value, func(t): return t["biome"] in ["forest", "swamp", "plain"], "gather", 10.0, "herbs", village)
 		"bâtisseur":
 			if s["construction"] >= 0.0:
 				return _task(village.construction_spot(seed_value), "build", 10.0, "")

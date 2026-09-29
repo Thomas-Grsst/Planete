@@ -1,20 +1,14 @@
 extends Node2D
 
-var world_root: Node2D
-var entities: Node2D
+var world_view: Node2D
 var camera: Camera2D
-var flora := {}
 var hud
 var options := {}
-
-const TERRAIN_BANDS := 12
-const BAND_SIZE := 8
 
 
 func _ready() -> void:
 	options = DebugOptions.parse()
 	_build_scene()
-	Sim.day_passed.connect(_on_day)
 	Sim.power_used.connect(_on_power)
 	var offline := Boot.start(options)
 	_on_world_loaded()
@@ -25,45 +19,25 @@ func _ready() -> void:
 	else:
 		hud.welcome(0)
 	if options.has("panel"):
-		var ids := {"settlement": Sim.state["settlements"][0]["id"], "faith": Sim.state.get("religions", [{"id": -1}])[0]["id"] if not Sim.state.get("religions", []).is_empty() else -1}
-		hud.show_info(options["panel"], ids.get(options["panel"], -1))
+		hud.show_info(options["panel"], DebugOptions.panel_id(options["panel"]))
 	if options.has("shot"):
 		DebugOptions.schedule_shot(self, options)
 
 
 func _build_scene() -> void:
-	world_root = Node2D.new()
-	add_child(world_root)
-	var water := Node2D.new()
-	water.set_script(load("res://scripts/view/water_layer.gd"))
-	water.z_index = -10
-	world_root.add_child(water)
-	for band in TERRAIN_BANDS:
-		var terrain := Node2D.new()
-		terrain.set_script(load("res://scripts/view/terrain_layer.gd"))
-		terrain.band_start = band * BAND_SIZE
-		terrain.band_end = (band + 1) * BAND_SIZE
-		terrain.z_index = -9
-		world_root.add_child(terrain)
-	var rivers := Node2D.new()
-	rivers.set_script(load("res://scripts/view/water_layer.gd"))
-	rivers.rivers_only = true
-	rivers.z_index = -8
-	world_root.add_child(rivers)
-	entities = Node2D.new()
-	entities.y_sort_enabled = true
-	world_root.add_child(entities)
-	var life := Node2D.new()
-	life.set_script(load("res://scripts/view/life.gd"))
-	world_root.add_child(life)
-	life.setup(entities)
+	world_view = Node2D.new()
+	world_view.set_script(load("res://scripts/view/world_view.gd"))
+	world_view.skip_flora = options.has("no-flora")
+	add_child(world_view)
+	world_view.build()
 	var daylight := CanvasModulate.new()
 	daylight.set_script(load("res://scripts/view/daylight.gd"))
 	add_child(daylight)
 	camera = Camera2D.new()
 	camera.set_script(load("res://scripts/view/camera_rig.gd"))
 	add_child(camera)
-	camera.tapped.connect(func(pos): life.tap(pos))
+	camera.tapped.connect(func(pos): world_view.life.tap(pos))
+	world_view.life.world_fx.shake.connect(func(amount): camera.shake(amount))
 	var sky := CanvasLayer.new()
 	sky.layer = 1
 	sky.set_script(load("res://scripts/view/sky.gd"))
@@ -73,73 +47,28 @@ func _build_scene() -> void:
 	hud.set_script(load("res://scripts/ui/hud.gd"))
 	add_child(hud)
 	hud.focus_requested.connect(func(pos): camera.focus(pos))
-	life.selected.connect(func(kind, id): hud.show_info(kind, id))
+	world_view.life.selected.connect(func(kind, id): hud.show_info(kind, id))
 
 
 func debug_report() -> String:
 	var counts := {}
-	for v in world_root.get_children():
-		if v.has_method("tap"):
-			for p in v.villagers.values():
-				var key: String = p.activity + ("*" if p.walking else "")
-				counts[key] = counts.get(key, 0) + 1
-	var perf := "process %.1f ms · physics %.1f ms · objects %d · draw calls %d · items %d" % [Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0, Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS) * 1000.0, Performance.get_monitor(Performance.OBJECT_NODE_COUNT), Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME), Performance.get_monitor(Performance.RENDER_TOTAL_OBJECTS_IN_FRAME)]
+	for p in world_view.life.villagers.values():
+		var key: String = p.activity + ("*" if p.walking else "")
+		counts[key] = counts.get(key, 0) + 1
+	var perf := "objects %d · draw calls %d" % [Performance.get_monitor(Performance.OBJECT_NODE_COUNT), Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)]
 	return "fps %d · villagers %d · %s · activities: %s" % [Engine.get_frames_per_second(), counts.values().reduce(func(a, b): return a + b, 0), perf, str(counts)]
 
 
-func _on_power(name: String, answered: Array) -> void:
-	if not answered.is_empty():
-		var s = Settlements.by_id(Sim.state, answered[0])
-		if s != null:
-			camera.focus(Iso.ground(Sim.state["world"], s["x"], s["y"]))
-	if name == "grow":
-		for d in flora:
-			flora[d].refresh()
+func _on_power(_name: String, answered: Array) -> void:
+	if answered.is_empty():
+		return
+	var s = Settlements.by_id(Sim.state, answered[0])
+	if s != null:
+		camera.focus(Iso.ground(Sim.state["world"], s["x"], s["y"]))
 
 
 func _on_world_loaded() -> void:
-	_spawn_flora()
-	_center_camera()
-
-
-func _spawn_flora() -> void:
-	for n in flora.values():
-		n.queue_free()
-	flora.clear()
-	if options.has("no-flora"):
-		return
-	var tiles: Array = Sim.state["world"]["tiles"]
-	var diagonals := {}
-	for i in tiles.size():
-		var t: Dictionary = tiles[i]
-		var grows: bool = t["fertility"] > 0.3 and Biomes.walkable(t["biome"]) and t["biome"] != "river"
-		if t["trees"] > 0 or grows:
-			var d: int = i % WorldGen.SIZE + i / WorldGen.SIZE
-			if not diagonals.has(d):
-				diagonals[d] = []
-			diagonals[d].append(i)
-	for d in diagonals:
-		var node := Node2D.new()
-		node.set_script(load("res://scripts/view/flora.gd"))
-		node.position = Vector2(0, d * Iso.TILE_H * 0.5)
-		entities.add_child(node)
-		node.setup(diagonals[d])
-		flora[d] = node
-
-
-func _on_day(day: int) -> void:
-	var near := {}
-	for s in Sim.state["settlements"]:
-		if s["abandoned"] >= 0:
-			continue
-		for r in range(-8, 9):
-			near[s["x"] + s["y"] + r] = true
-	for d in flora:
-		if near.has(d) or day % 30 == 0:
-			flora[d].refresh()
-
-
-func _center_camera() -> void:
+	world_view.spawn_flora()
 	var home = null
 	for s in Sim.state["settlements"]:
 		if s["abandoned"] < 0:

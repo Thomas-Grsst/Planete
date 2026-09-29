@@ -3,7 +3,9 @@ extends RefCounted
 
 const CAP := 1500
 const HISTORY_CAP := 30
-const RARE := ["fondation", "decouverte", "croissance", "grande_famine", "disparition", "extinction", "catastrophe", "chef", "religion", "schisme", "miracle", "religion_fin"]
+const RARE := ["fondation", "decouverte", "croissance", "grande_famine", "disparition", "extinction", "chef", "religion", "schisme", "miracle", "religion_fin",
+	"civilisation", "guerre", "conquete", "paix", "alliance", "independance", "chute", "apocalypse", "apocalypse_fin", "exode", "savoir_perdu", "epidemie",
+	"revolution", "statue", "cataclysme", "raid", "contact", "archeologie", "succes", "religion_etat", "dynastie", "trahison", "mutant"]
 const PRIORITY := {"extinction": 95, "decouverte": 60, "fondation": 40, "croissance": 30, "grande_famine": 30, "disparition": 25, "catastrophe": 20, "chef": 30}
 
 static var fresh: Array = []
@@ -27,6 +29,9 @@ static func log_event(state: Dictionary, type: String, text: String, extra: Dict
 		if state["pending_highlights"].size() > 12:
 			state["pending_highlights"].pop_front()
 	Fame.on_event(state, entry)
+	Achievements.on_event(state, entry)
+	if is_rare(entry):
+		Chronicle.record(state, entry)
 	fresh.append(entry)
 	return entry
 
