@@ -22,6 +22,8 @@ static func create(state: Dictionary, rng: Rng, x: int, y: int, parent = null) -
 		"techs": parent["techs"].duplicate() if parent != null else [], "geo": Geography.of(state["world"], x, y), "parent": parent["id"] if parent != null else -1,
 		"faith": parent.get("faith", -1) if parent != null else -1, "devotion": parent.get("devotion", 0.0) * 0.8 if parent != null else 0.0,
 		"temple": 0, "prayer": {}, "awe": {}, "converted_day": state["day"],
+		"rooted": parent.get("rooted", []).duplicate() if parent != null else [], "keeper_name": {}, "outbreak": {},
+		"civ": parent.get("civ", -1) if parent != null else -1, "conquered_day": -1, "chef": -1, "council": [],
 	}
 	state["settlements"].append(s)
 	clear_land(state, s)
@@ -76,7 +78,7 @@ static func _build(state: Dictionary, s: Dictionary, e: Dictionary) -> void:
 			s["wood"] -= BUILD_COST
 			s["construction"] = 0.0
 		return
-	s["construction"] += BUILD_BASE_SPEED + BUILD_PER_BUILDER * e["jobs"].get("bâtisseur", 0)
+	s["construction"] += (BUILD_BASE_SPEED + BUILD_PER_BUILDER * e["jobs"].get("bâtisseur", 0)) * e["mods"]["build"]
 	if s["construction"] < 1.0:
 		return
 	s["construction"] = -1.0

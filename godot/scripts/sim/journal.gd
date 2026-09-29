@@ -26,6 +26,7 @@ static func log_event(state: Dictionary, type: String, text: String, extra: Dict
 		state["pending_highlights"].append(entry)
 		if state["pending_highlights"].size() > 12:
 			state["pending_highlights"].pop_front()
+	Fame.on_event(state, entry)
 	fresh.append(entry)
 	return entry
 

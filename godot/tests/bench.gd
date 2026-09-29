@@ -22,6 +22,6 @@ func _init() -> void:
 			if e["type"] == "deces":
 				var cause: String = e["text"].split(" meurt ")[1].split(" à ")[0]
 				counts[cause] = counts.get(cause, 0) + 1
-		print("w%d: pop %d, %d ms, events %s" % [w, People.alive_count(st), Time.get_ticks_msec() - t0, str(counts)])
+		print("w%d: pop %d, %d ms, techs %d/22, civs %d, religions %d, wars %d, events %s" % [w, People.alive_count(st), Time.get_ticks_msec() - t0, st["discoveries"].size(), st.get("civs", []).size(), st.get("religions", []).size(), counts.get("guerre", 0), str(counts)])
 		sim.free()
 	quit()

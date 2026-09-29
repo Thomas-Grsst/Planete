@@ -35,7 +35,26 @@ static func of(world: Dictionary, x: int, y: int) -> Dictionary:
 				geo["coast"] = true
 			if t["biome"] == "river":
 				geo["river"] = true
+	geo["sea"] = _ocean_within(world, x, y, 8)
+	geo["island"] = _other_land_within(world, x, y, 12)
 	return geo
+
+
+static func _ocean_within(world: Dictionary, x: int, y: int, r: int) -> bool:
+	for dy in range(-r, r + 1, 2):
+		for dx in range(-r, r + 1, 2):
+			var t = WorldGen.tile_at(world, x + dx, y + dy)
+			if t != null and t["biome"] == "ocean":
+				return true
+	return false
+
+
+static func _other_land_within(world: Dictionary, x: int, y: int, r: int) -> bool:
+	for dy in range(-r, r + 1, 2):
+		for dx in range(-r, r + 1, 2):
+			if WorldGen.is_walkable(world, x + dx, y + dy) and not Regions.same_landmass(world, x, y, x + dx, y + dy):
+				return true
+	return false
 
 
 static func is_coastal(world: Dictionary, x: int, y: int) -> bool:

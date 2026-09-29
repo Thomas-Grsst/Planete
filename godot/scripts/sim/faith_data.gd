@@ -23,6 +23,13 @@ const SOURCES := {
 		"sign": "la terre reverdit en une nuit",
 		"founding": "🙏 Depuis {legend}, {name} entend la voix {ofDeity} dans les champs de {place}. {Il} fonde {religion}.",
 	},
+	"zombie": {
+		"player": true, "emoji": "💀", "color": Color("9ccc65"), "deity": "le Semeur de Morts",
+		"names": ["le Culte des Tombes", "la Confrérie de la Brume", "les Veilleurs des Morts"],
+		"legends": ["la Brume verte", "le Réveil des Morts", "la Nuit des Tombes"],
+		"sign": "les morts se relèvent",
+		"founding": "💀 Après {legend}, {name} annonce à {place} que les morts obéissent à une volonté : {deity}. Dans la peur, {il} fonde {religion}.",
+	},
 	"storm": {
 		"player": false, "emoji": "⛈️", "color": Color("9575cd"), "deity": "le Dieu de l'Orage",
 		"names": ["le Culte de l'Orage", "les Enfants de la Foudre"],

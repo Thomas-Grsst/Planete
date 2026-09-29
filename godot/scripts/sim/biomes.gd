@@ -12,6 +12,8 @@ const DATA := {
 	"desert": {"name": "Désert", "color": Color("d9b96b"), "walkable": true, "food": 0.05},
 	"tundra": {"name": "Toundra", "color": Color("b9c9c9"), "walkable": true, "food": 0.15},
 	"mountain": {"name": "Montagne", "color": Color("8d8d8d"), "walkable": true, "food": 0.05},
+	"lava": {"name": "Lave", "color": Color("d84315"), "walkable": false, "food": 0.0},
+	"rock": {"name": "Roche", "color": Color("5d5652"), "walkable": true, "food": 0.1},
 }
 
 const ORES := {

@@ -8,7 +8,8 @@ const MIN_COLONISTS := 3
 
 
 static func depart(state: Dictionary, rng: Rng, from: Dictionary, e: Dictionary) -> void:
-	var spot = Geography.find_spot(state, rng, from["x"], from["y"], RADIUS + (4 if Techs.has_tech(from, "roue") else 0))
+	var sailors: bool = e["mods"]["cross_water"] > 0
+	var spot = Geography.find_spot(state, rng, from["x"], from["y"], RADIUS + e["mods"]["migration"], sailors)
 	if spot == null:
 		return
 	var adults: Array = e["people"].filter(func(p): return People.age_of(state, p) >= People.MIGRANT_MIN_AGE and not p["traits"].has("prudent"))
@@ -34,5 +35,7 @@ static func depart(state: Dictionary, rng: Rng, from: Dictionary, e: Dictionary)
 	target["level"] = Settlements.initial_level(travellers)
 	target["max_level"] = target["level"]
 	var company := "avec %s" % Names.plural(group.size() - 1, "compagnon")
-	Journal.log_event(state, "migration", "🧭 %s quitte %s %s." % [leader["name"], from["name"], company], {"x": from["x"], "y": from["y"], "person": leader["id"]})
+	var by_boat: bool = not Regions.same_landmass(state["world"], from["x"], from["y"], spot.x, spot.y)
+	var leaving := "⛵ %s quitte %s en bateau %s." if by_boat else "🧭 %s quitte %s %s."
+	Journal.log_event(state, "migration", leaving % [leader["name"], from["name"], company], {"x": from["x"], "y": from["y"], "person": leader["id"], "from": from["id"], "to": target["id"], "boat": by_boat})
 	Journal.log_event(state, "fondation", "🏕️ %s est fondé par %s." % [target["name"], leader["name"]], {"x": target["x"], "y": target["y"], "person": leader["id"], "settlement": target["id"]})

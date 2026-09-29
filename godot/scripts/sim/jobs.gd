@@ -8,9 +8,16 @@ const DATA := {
 	"chasseur": {"emoji": "🏹", "label": "chasseur", "fem": "chasseuse"},
 	"pêcheur": {"emoji": "🎣", "label": "pêcheur", "fem": "pêcheuse"},
 	"bâtisseur": {"emoji": "🪓", "label": "bâtisseur", "fem": "bâtisseuse"},
+	"guérisseur": {"emoji": "🌱", "label": "guérisseur", "fem": "guérisseuse"},
+	"forgeron": {"emoji": "⚒️", "label": "forgeron", "fem": "forgeronne"},
+	"gardien": {"emoji": "🛡️", "label": "gardien", "fem": "gardienne"},
+	"chef": {"emoji": "👑", "label": "chef", "fem": "cheffe"},
 }
 const REVIEW_DAYS := 15
-const FAVORED := {"chasseur": ["courageux", "aventurier"], "pêcheur": ["prudent", "aventurier"], "bâtisseur": ["travailleur", "inventif"], "fermier": ["travailleur", "prudent"]}
+const FAVORED := {
+	"chasseur": ["courageux", "aventurier"], "pêcheur": ["prudent", "aventurier"], "bâtisseur": ["travailleur", "inventif"], "fermier": ["travailleur", "prudent"],
+	"guérisseur": ["sociable", "prudent", "curieux"], "forgeron": ["inventif", "travailleur"], "gardien": ["courageux", "agressif"],
+}
 
 
 static func label(job: String, sex: String) -> String:
@@ -43,6 +50,9 @@ static func _desired(state: Dictionary, e: Dictionary) -> Dictionary:
 		d["pêcheur"] = int(round(workers * (0.25 if Techs.has_tech(s, "peche") else 0.1)))
 	if Techs.has_tech(s, "agriculture"):
 		d["fermier"] = int(round(workers * 0.35))
+	d["guérisseur"] = (1 + (2 if not s.get("outbreak", {}).is_empty() else 0)) if Techs.has_tech(s, "plantes") and workers >= 8 else 0
+	d["forgeron"] = (1 if workers >= 8 else 0) + (1 if workers >= 30 else 0) if Techs.METALS.any(func(k): return Techs.has_tech(s, k)) else 0
+	d["gardien"] = (1 if workers >= 12 else 0) + (int(round(workers * 0.15)) if Threats.pressing(state, s) else 0)
 	return d
 
 

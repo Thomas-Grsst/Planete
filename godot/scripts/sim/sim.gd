@@ -94,11 +94,22 @@ func tick(announce: bool = true) -> void:
 	var census := Census.build(state)
 	Work.step(state, rng, census)
 	People.step(state, rng, census)
-	Jobs.step(state, rng, census)
-	Faith.step(state, rng, census)
-	Settlements.step(state, rng, census)
+	Epidemics.step(state, rng, census)
+	Zombies.step(state, rng, census)
 	Herds.step(state, rng)
+	Settlements.step(state, rng, census)
+	Wolves.step(state, rng, census)
+	Jobs.step(state, rng, census)
+	Governance.step(state, rng, census)
+	Faith.step(state, rng, census)
+	CivFormation.step(state, rng, census)
+	Diplomacy.step(state, rng, census)
+	Wars.step(state, rng, census)
+	Lore.step(state, rng, census)
 	Ideas.step(state, rng, census)
+	World.step(state, rng, census)
+	Exodus.step(state)
+	Fame.yearly(state)
 	_check_extinction()
 	state["rng_state"] = rng.state
 	if not announce:
@@ -115,8 +126,11 @@ func use_power(name: String) -> String:
 		for i in Powers.SKIP_DAYS:
 			tick(true)
 		return "⏩ %d jours passent." % Powers.SKIP_DAYS
-	var msg := Powers.apply(state, name)
 	rng.state = state["rng_state"]
+	var msg := Powers.wake_dead(state, rng) if name == "zombie" else Powers.apply(state, name)
+	if name == "zombie" and not msg.begins_with("☣️"):
+		state["rng_state"] = rng.state
+		return msg
 	var miracle := Miracles.record(state, rng, name)
 	state["rng_state"] = rng.state
 	for entry in Journal.take_fresh():

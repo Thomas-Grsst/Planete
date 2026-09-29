@@ -6,6 +6,7 @@ const ADULT_AGE := 14
 const MIGRANT_MIN_AGE := 16
 const BIRTH_CHANCE := 0.004
 const BIRTH_SPACING_DAYS := 720
+const LEAN_RESERVE_DAYS := 10.0
 const WORLD_SOFT_CAP := 220
 const WORLD_HARD_CAP := 320
 const OLD_AGE := 55
@@ -24,7 +25,7 @@ static func create(state: Dictionary, rng: Rng, age_years: float, home: int, par
 		"id": _next_id(state), "name": Names.person_name(rng), "sex": "F" if rng.chance(0.5) else "M",
 		"birth_day": state["day"] - int(round(age_years * YEAR)), "home": home, "partner": -1,
 		"parents": parents, "children": [], "traits": traits, "job": "enfant" if age_years < ADULT_AGE else "cueilleur",
-		"health": 100.0, "hunger": 0.0, "happiness": float(rng.range_int(55, 85)), "alive": true, "death_day": -1, "history": [],
+		"health": 100.0, "hunger": 0.0, "happiness": float(rng.range_int(55, 85)), "alive": true, "death_day": -1, "history": [], "knows": [], "sick": {}, "immune": [], "bitten": -1,
 	}
 	state["people"].append(p)
 	_index[p["id"]] = p
@@ -111,6 +112,10 @@ static func _birth_chance(entry: Dictionary, population: int) -> float:
 		c *= 0.35
 	if entry["hungry"] > entry["pop"] * 0.2:
 		c *= 0.3
+	if entry["s"]["food"] < (entry["adults"] + entry["kids"] * 0.5) * LEAN_RESERVE_DAYS:
+		c *= 0.5
+	if entry["kids"] > entry["adults"]:
+		c *= 0.5
 	return c
 
 
@@ -136,6 +141,7 @@ static func _siblings(a: Dictionary, b: Dictionary) -> bool:
 
 static func _give_birth(state: Dictionary, rng: Rng, mother: Dictionary) -> void:
 	var child := create(state, rng, 0, mother["home"], [mother["id"], mother["partner"]])
+	Dynasties.inherit(child, mother, by_id(state, mother["partner"]))
 	mother["children"].append(child["id"])
 	mother["last_birth"] = state["day"]
 	var father = by_id(state, mother["partner"])
@@ -156,5 +162,8 @@ static func kill(state: Dictionary, p: Dictionary, cause: String) -> void:
 	var home = Settlements.by_id(state, p["home"])
 	if home != null:
 		Faith.note_death(state, home)
+	p["sick"] = {}
+	p["bitten"] = -1
+	Fame.on_death(state, p, home)
 	var where := " à %s" % home["name"] if home != null else ""
 	Journal.log_event(state, "deces", "🕯️ %s meurt %s à %d ans%s." % [p["name"], cause, age, where], {"person": p["id"]})

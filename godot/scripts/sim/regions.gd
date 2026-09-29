@@ -7,6 +7,10 @@ static var _world: Dictionary = {}
 static var _regions := PackedInt32Array()
 
 
+static func invalidate() -> void:
+	_world = {}
+
+
 static func of(world: Dictionary) -> PackedInt32Array:
 	if not is_same(_world, world):
 		_world = world

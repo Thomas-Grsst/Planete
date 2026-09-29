@@ -4,8 +4,13 @@ extends RefCounted
 const MAX_DAILY_CHANCE := 0.5
 const ADULTS_REF := 15.0
 const NO_THINKER_FACTOR := 0.4
-const SPREAD_RANGE := 12
-const SPREAD_CHANCE := 0.002
+const APOCALYPSE_FACTOR := 0.3
+const SPREAD_RANGE := 14
+const KIN_SPREAD_RANGE := 30
+const KIN_SPREAD_BONUS := 3.0
+const SPREAD_BASE_CHANCE := 0.004
+const SPREAD_MAX_CHANCE := 0.5
+const EXODUS_DELAY := 60
 
 
 static func step(state: Dictionary, rng: Rng, census: Dictionary) -> void:
@@ -19,29 +24,7 @@ static func step(state: Dictionary, rng: Rng, census: Dictionary) -> void:
 		if e["pop"] < 3:
 			continue
 		_think(state, rng, e, share)
-		_spread(state, rng, e)
-
-
-static func _flag(state: Dictionary, e: Dictionary, flag: String) -> bool:
-	var s: Dictionary = e["s"]
-	var geo: Dictionary = s["geo"]
-	if flag.begins_with("tech:"):
-		return Techs.has_tech(s, flag.substr(5))
-	match flag:
-		"dream": return true
-		"lightning": return state["weather"] == "storm" and geo["forest"] > 0
-		"drought": return state["weather"] == "drought"
-		"winter": return Weather.season(state["day"]) == 3
-		"stone": return geo["mountain"] > 0
-		"water": return geo["water"] > 0
-		"river": return geo["river"]
-		"forest": return geo["forest"] > 0
-		"swamp": return geo["swamp"] > 0
-		"fertile": return geo["fertile"] > 3
-		"bone": return e["jobs"].get("chasseur", 0) > 0 and Herds.huntable_near(state, s) != null
-		"hunger": return e["hungry"] >= max(2, e["pop"] * 0.25)
-		"bigpop": return e["pop"] >= 40
-	return geo["ores"].has(flag)
+		_spread(state, rng, census, e)
 
 
 static func _people_factor(e: Dictionary) -> float:
@@ -51,39 +34,41 @@ static func _people_factor(e: Dictionary) -> float:
 	f *= 1.0 + 0.08 * inventors + 0.04 * curious
 	if inventors == 0 and curious == 0:
 		f *= NO_THINKER_FACTOR
-	return f
+	return min(4.0, f * e["mods"]["research"])
 
 
 static func _think(state: Dictionary, rng: Rng, e: Dictionary, share: float) -> void:
 	var s: Dictionary = e["s"]
 	var pf := _people_factor(e)
+	var apocalypse: bool = state.get("zombies", {}).get("active", false)
 	for key in Techs.ORDER:
 		if not Techs.can_learn(s, key):
 			continue
 		var idea: Dictionary = IdeasData.DATA[key]
 		var best = null
 		for trig in idea["triggers"]:
-			if _flag(state, e, trig[0]) and (best == null or trig[1] > best[1]):
+			if (best == null or trig[1] > best[1]) and IdeaFlags.check(state, e, trig[0]):
 				best = trig
 		if best == null:
 			continue
 		var need := 1.0
 		for flag in idea["needs"]:
-			if _flag(state, e, flag):
+			if IdeaFlags.check(state, e, flag):
 				need *= idea["needs"][flag]
-		if not rng.chance(min(MAX_DAILY_CHANCE, best[1] * need * pf * share / idea["mean"])):
+		var factor := APOCALYPSE_FACTOR if apocalypse and key != "epee" else 1.0
+		if not rng.chance(min(MAX_DAILY_CHANCE, best[1] * need * pf * share * factor / idea["mean"])):
 			continue
-		var who = _thinker(state, rng, e)
+		var who = _thinker(state, rng, e, Techs.DATA[key]["job"])
 		if who != null:
-			discover(state, s, key, who, _tell(best[2], who, s))
+			discover(state, s, key, who, null, _tell(best[2], who, s))
 		return
 
 
-static func _thinker(state: Dictionary, rng: Rng, e: Dictionary):
+static func _thinker(state: Dictionary, rng: Rng, e: Dictionary, boost_job: String) -> Variant:
 	var adults: Array = e["people"].filter(func(p): return People.is_adult(state, p))
 	if adults.is_empty():
 		return null
-	var weights: Array = adults.map(func(p): return 1.0 + (3.0 if p["traits"].has("inventif") else 0.0) + (2.0 if p["traits"].has("curieux") else 0.0))
+	var weights: Array = adults.map(func(p): return 1.0 + (3.0 if p["traits"].has("inventif") else 0.0) + (2.0 if p["traits"].has("curieux") else 0.0) + (1.0 if p["job"] == boost_job else 0.0))
 	var r: float = rng.next() * weights.reduce(func(a, b): return a + b, 0.0)
 	for i in adults.size():
 		r -= weights[i]
@@ -93,28 +78,47 @@ static func _thinker(state: Dictionary, rng: Rng, e: Dictionary):
 
 
 static func _tell(story: String, p: Dictionary, s: Dictionary) -> String:
-	return story.replace("{name}", p["name"]).replace("{place}", s["name"]).replace("{Il}", "Elle" if p["sex"] == "F" else "Il")
+	var female: bool = p["sex"] == "F"
+	return story.replace("{name}", p["name"]).replace("{place}", s["name"]).replace("{Il}", "Elle" if female else "Il").replace("{il}", "elle" if female else "il")
 
 
-static func discover(state: Dictionary, s: Dictionary, key: String, who, story: String) -> void:
+static func discover(state: Dictionary, s: Dictionary, key: String, who, source, story: String) -> void:
+	if Techs.has_tech(s, key):
+		return
 	s["techs"].append(key)
+	Lore.learned(s, key, who)
 	var first: bool = not state["discoveries"].has(key)
-	if first:
-		state["discoveries"][key] = {"day": state["day"], "person": who["id"] if who != null else -1, "name": who["name"] if who != null else "", "place": s["name"]}
-	var extra := {"x": s["x"], "y": s["y"], "settlement": s["id"], "tech": key, "highlight": first}
+	if first and source == null and who != null:
+		state["discoveries"][key] = {"day": state["day"], "person": who["id"], "name": who["name"], "place": s["name"]}
+	var extra := {"x": s["x"], "y": s["y"], "settlement": s["id"], "tech": key, "highlight": first and source == null}
 	if who != null:
 		extra["person"] = who["id"]
-	Journal.log_event(state, "decouverte" if first else "diffusion", story, extra)
+	var type := "diffusion" if source != null else ("decouverte" if first else "decouverte_locale")
+	Journal.log_event(state, type, story if first or source != null else "🔁 " + story, extra)
+	if key == "espace" and state.get("exodus", {}).is_empty():
+		state["exodus"] = {"settlement": s["id"], "launch_day": state["day"] + EXODUS_DELAY}
 
 
-static func _spread(state: Dictionary, rng: Rng, e: Dictionary) -> void:
+static func _spread(state: Dictionary, rng: Rng, census: Dictionary, e: Dictionary) -> void:
 	var s: Dictionary = e["s"]
-	if not rng.chance(SPREAD_CHANCE * e["mods"]["spread"]):
-		return
-	for o in state["settlements"]:
-		if o["abandoned"] >= 0 or is_same(o, s) or absi(o["x"] - s["x"]) + absi(o["y"] - s["y"]) > SPREAD_RANGE:
+	var pool: Array = []
+	var best := 0.0
+	var sources := {}
+	for id in census:
+		var o: Dictionary = census[id]["s"]
+		var kin: bool = s.get("civ", -1) >= 0 and o.get("civ", -1) == s.get("civ", -1)
+		if o["id"] == s["id"] or absi(o["x"] - s["x"]) + absi(o["y"] - s["y"]) > (KIN_SPREAD_RANGE if kin else SPREAD_RANGE) or Wars.at_war(state, o, s):
 			continue
-		for key in o["techs"]:
-			if Techs.can_learn(s, key):
-				discover(state, s, key, null, "🧳 Des voyageurs %s apportent %s à %s." % [Names.of_place(o["name"]), Techs.DATA[key]["the"], s["name"]])
-				return
+		for k in o["techs"]:
+			if not pool.has(k) and Techs.can_learn(s, k):
+				pool.append(k)
+				sources[k] = o
+		best = max(best, census[id]["mods"]["spread"] * (KIN_SPREAD_BONUS if kin else 1.0))
+	if pool.is_empty() or not rng.chance(min(SPREAD_MAX_CHANCE, SPREAD_BASE_CHANCE * pool.size() * best)):
+		return
+	var key: String = rng.pick(pool)
+	var adults: Array = e["people"].filter(func(p): return People.is_adult(state, p))
+	var learner = rng.pick(adults) if not adults.is_empty() else null
+	var source: Dictionary = sources[key]
+	var who := " à %s" % learner["name"] if learner != null else ""
+	discover(state, s, key, learner, source, "🧳 Un voyageur venu %s enseigne le secret %s%s, à %s." % [Names.of_place(source["name"]), Techs.DATA[key]["de"], who, s["name"]])
