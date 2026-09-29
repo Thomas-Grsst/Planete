@@ -11,8 +11,12 @@ export function personName(rng) {
   return rng.pick(SYLLABLES_A) + rng.pick(SYLLABLES_B) + rng.pick(SYLLABLES_C);
 }
 
-export function placeName(rng) {
-  return rng.pick(PLACE_A) + rng.pick(PLACE_B);
+const NAME_TRIES = 30;
+
+export function placeName(rng, taken = null) {
+  let name = rng.pick(PLACE_A) + rng.pick(PLACE_B);
+  for (let i = 0; taken && taken.has(name) && i < NAME_TRIES; i++) name = rng.pick(PLACE_A) + rng.pick(PLACE_B);
+  return name;
 }
 
 export function randomJob(rng) {

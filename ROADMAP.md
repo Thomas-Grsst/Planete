@@ -1,8 +1,22 @@
 # Petite Planète — Feuille de route
 
-État actuel : **V3 livrée** : civilisations, territoires, diplomatie et guerres, en plus des métiers, des 22 savoirs découverts par causes, des maladies, de l'apocalypse zombie et du cycle jour/nuit de 10 min.
+État actuel : **V3 livrée + religions** : civilisations, territoires, diplomatie et guerres, religions nées de tes miracles, en plus des métiers, des 22 savoirs découverts par causes, des maladies, de l'apocalypse zombie et du cycle jour/nuit de 10 min.
 
 ---
+
+## 🎮 Passage à Godot 4 (en cours)
+
+Objectif : un monde **qui bouge sous tes yeux**, pas seulement dans le journal, et une vraie app Android.
+
+- [x] Monde généré, terrain isométrique, eau animée, arbres qui ondulent, saisons visibles.
+- [x] Habitants animés qui suivent l'heure : travail, récolte rapportée au village, veillée au feu, sommeil.
+- [x] Villages : maisons qui apparaissent, chantiers visibles, champs, feu de camp, fumée, fenêtres allumées, défrichage.
+- [x] Troupeaux (cerfs, moutons, loups) qui errent ; météo (pluie, neige, éclairs) ; jour et nuit.
+- [x] Simulation : naissances, couples, famines, métiers, migrations et nouvelles colonies, 9 premiers savoirs par causes.
+- [x] Sauvegarde, rattrapage hors ligne progressif, écran « Bon retour », fiches habitant et village, journal.
+- [ ] Reporter le reste : 22 savoirs, maladies, zombies, chefs et conseils, civilisations, diplomatie, guerres, religions, pouvoirs.
+- [ ] Export Android (APK) et notifications.
+- [ ] Sons d'ambiance.
 
 ## ⏱️ Rythme du temps (à faire en premier)
 
@@ -37,7 +51,7 @@ Remplacer les « points de savoir » par des **idées déclenchées** : fini le 
 
 ## 🔧 Restes de la V2 à corriger
 
-- [ ] La **Navigation** se déclenche rarement : les colonies s'installent peu sur les côtes (dépend de la carte).
+- [x] La **Navigation** se déclenche rarement : les colonies s'installent peu sur les côtes (dépend de la carte). *Les côtes comptent comme zones de pêche, et un explorateur qui a vu la mer peut inspirer la navigation : 16 mondes sur 16 l'ont (vers l'an 20 en médiane), contre 5 sur 16 avant.*
 - [x] L'écran « Bon retour » affiche toujours les naissances et les décès (jusqu'à 10 catégories).
 
 ## 📱 Widget et notifications
@@ -63,10 +77,11 @@ Remplacer les « points de savoir » par des **idées déclenchées** : fini le 
 - [ ] Rivalités et amitiés (duels, alliances, trahisons).
 
 ### 🎭 Culture
-- [ ] Religions inventées, prophètes, schismes — **tes pouvoirs vus comme des miracles** (un culte envers toi).
+- [x] Religions inventées, prophètes, schismes — **tes pouvoirs vus comme des miracles** (un culte envers toi).
+  - Prières des villages en détresse, prières exaucées, missionnaires, temples, religion officielle, guerres saintes.
 - [ ] Langues inventées qui dérivent entre colonies isolées.
 - [ ] Monuments visibles de loin (pyramides, temples, observatoires).
-- [ ] Légendes qui racontent tes interventions (« Le Grand Déluge de l'An 12 »).
+- [x] Légendes qui racontent tes interventions (« Le Grand Déluge de l'An 12 »).
 
 ### ⚔️ Après la V3
 - [ ] Routes commerciales et caravanes visibles, ports, bateaux marchands.
@@ -88,4 +103,4 @@ Remplacer les « points de savoir » par des **idées déclenchées** : fini le 
 - [ ] Partage de graine de monde entre amis.
 - [ ] Succès (« Atteindre l'espace », « Survivre à 3 apocalypses »…).
 
-**Coups de cœur** (renforcent le « qu'est-ce qui s'est passé pendant mon absence ? ») : découvertes par causes, religions liées à tes pouvoirs, personnages célèbres, chronique automatique.
+**Coups de cœur** (renforcent le « qu'est-ce qui s'est passé pendant mon absence ? ») : ~~découvertes par causes~~, ~~religions liées à tes pouvoirs~~, personnages célèbres, chronique automatique.

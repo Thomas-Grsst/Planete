@@ -1,7 +1,7 @@
 import { SIZE, BIOMES } from './world.js';
 import { project, TILE_W, TILE_H, ELEV } from './camera.js';
 import { SPECIES } from './animals.js';
-import { tree, house, campfire, person, orePebbles } from './decor.js';
+import { tree, house, campfire, person, orePebbles, temple } from './decor.js';
 import { drawNightOverlay, drawLights, nightAlpha } from './daylight.js';
 import { dayPhase } from './simulation.js';
 import { territoryMap } from './territory.js';
@@ -127,6 +127,7 @@ function drawDecor(ctx, o, zoom, state, selection, buckets) {
   for (const st of buckets.settlements.get(key) || NONE) {
     const n = Math.min(st.houses, 6);
     for (let i = 0; i < n; i++) house(ctx, sx + ((i % 3) - 1) * 9 * s, sy + (Math.floor(i / 3) - 0.5) * 7 * s, 5 * s, buckets.lit ? buckets.lights : null);
+    if (!st.abandoned && st.temple) temple(ctx, sx - 13 * s, sy + 5 * s, 4 * s, st.temple > 1, buckets.lit ? buckets.lights : null);
     if (!st.abandoned && (st.techs || []).includes('feu')) campfire(ctx, sx + 12 * s, sy + 6 * s, 3 * s, buckets.lights);
     ctx.fillStyle = selection && selection.type === 'settlement' && selection.id === st.id ? '#ffd54f' : '#fff';
     ctx.font = `${Math.max(10, 11 * s)}px system-ui`;

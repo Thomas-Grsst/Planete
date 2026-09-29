@@ -17,7 +17,7 @@ let lastFrame = performance.now();
 let lastSave = Date.now();
 let lastSeq = 0;
 let saveWarned = false;
-const ANNOUNCED_TYPES = ['migration', 'zombie', 'epidemie_fin', 'diffusion', 'attaque', 'bataille', 'commerce', 'ralliement'];
+const ANNOUNCED_TYPES = ['migration', 'zombie', 'epidemie_fin', 'diffusion', 'attaque', 'bataille', 'commerce', 'ralliement', 'conversion', 'temple'];
 
 function resize() {
   const dpr = Math.min(2, window.devicePixelRatio || 1);

@@ -4,6 +4,8 @@ import { chefOf } from './governance.js';
 import { ageOf, ADULT_AGE } from './people.js';
 import { grantTech } from './technology.js';
 import { aliveCivs, civSettlements, civTitle, civToTitle, relationOf, warBetween, civById } from './civs.js';
+import { religionById } from './religions.js';
+import { ofName } from './faithData.js';
 
 const DECAY = 0.998;
 const CLOSE_BORDER = 10;
@@ -19,6 +21,8 @@ const BREAK_THRESHOLD = 10;
 const TRUCE_DAYS = 1800;
 const PEACE_MIN_DAYS = 120;
 const TRADE_TECH_CHANCE = 0.003;
+const SHARED_FAITH = 0.04;
+const RIVAL_FAITH = -0.04;
 
 const manhattan = (ax, ay, bx, by) => Math.abs(ax - bx) + Math.abs(ay - by);
 const clamp = (v) => Math.max(-100, Math.min(100, v));
@@ -34,6 +38,17 @@ const chefTrait = (state, civ, trait) => { const c = capitalOf(state, civ); cons
 const trades = (state, civ) => civSettlements(state, civ).some((s) => hasTech(s, 'roue') || hasTech(s, 'navigation'));
 const lawful = (state, civ) => civSettlements(state, civ).some((s) => hasTech(s, 'lois'));
 
+function faithDrift(a, b) {
+  if (a.religionId == null || b.religionId == null) return 0;
+  return a.religionId === b.religionId ? SHARED_FAITH : RIVAL_FAITH;
+}
+
+function holyWarCry(state, attacker, defender) {
+  const rel = religionById(state, attacker.religionId);
+  if (!rel || defender.religionId == null || defender.religionId === rel.id) return null;
+  return `au nom ${ofName(rel.deity)}`;
+}
+
 function drift(state, rng, a, b, rel, d) {
   let delta = 0;
   if (d < CLOSE_BORDER) delta -= 0.12;
@@ -45,6 +60,7 @@ function drift(state, rng, a, b, rel, d) {
   }
   if (lawful(state, a) && lawful(state, b)) delta += 0.02;
   if (rel.pact) delta += 0.03;
+  delta += faithDrift(a, b);
   rel.score = clamp(rel.score * DECAY + delta + (rng.next() - 0.5) * 0.3);
 }
 
@@ -56,7 +72,7 @@ function declareWar(state, rng, a, b, d) {
   const [attacker, defender] = chefTrait(state, b, 'agressif') && !chefTrait(state, a, 'agressif') ? [b, a] : [a, b];
   const capital = capitalOf(state, attacker);
   const chef = capital && chefOf(state, capital);
-  const why = chef && chef.traits.includes('agressif') ? `sous l'impulsion ${ofPlace(chef.name)}` : d < CLOSE_BORDER ? 'pour des terres frontalières' : 'après des années de méfiance';
+  const why = holyWarCry(state, attacker, defender) || (chef && chef.traits.includes('agressif') ? `sous l'impulsion ${ofPlace(chef.name)}` : d < CLOSE_BORDER ? 'pour des terres frontalières' : 'après des années de méfiance');
   state.wars.push({ id: state.nextId++, a: attacker.id, b: defender.id, startDay: state.day, deaths: 0, battles: 0 });
   logEvent(state, 'guerre', `⚔️ ${civTitle(attacker, true)} déclare la guerre ${civToTitle(defender)}, ${why} !`, { x: capital ? capital.x : undefined, y: capital ? capital.y : undefined, civId: attacker.id });
 }

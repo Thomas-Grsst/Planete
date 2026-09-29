@@ -21,9 +21,11 @@ Des habitants naissent, travaillent, s'aiment, découvrent le feu, le bronze ou 
 - **Des territoires** visibles sur la carte, avec les frontières de chaque civilisation.
 - **De la diplomatie** : relations qui évoluent (frontières, commerce, caractère des chefs), routes commerciales qui échangent des savoirs, alliances, ruptures.
 - **Des guerres** : batailles entre villes frontalières avec leurs héros et leurs morts, conquêtes, paix, chute de civilisations.
+- **Des religions** : un orage ou un deuil fait naître le culte de l'Orage ou des Ancêtres… mais **tes pouvoirs sont vus comme des miracles**. Les villages en détresse prient ; si ta pluie répond à leur sécheresse, ils crient au miracle et fondent un culte envers toi (le Faiseur de Pluie, l'Œil d'Or, la Mère Verte… ou le Semeur de Morts). Prophètes, missionnaires, temples, religions officielles qui rapprochent ou opposent les civilisations, guerres saintes et schismes.
+- **Des légendes** : chacune de tes interventions entre dans les récits (« la Grande Pluie de l'An 12 »).
 - **Le retour du joueur** : un écran « Bon retour » résume tout ce qui s'est passé, avec les événements marquants.
 - **Le journal du monde** et la possibilité de **suivre** un habitant ou un village.
-- **Des pouvoirs** ponctuels : pluie, soleil, végétation, accélération du temps… et réveiller les morts.
+- **Des pouvoirs** ponctuels : pluie, soleil, végétation, accélération du temps… et réveiller les morts. Le panneau ✨ montre qui prie, et pour quoi.
 
 ## ⏱️ Le temps
 
@@ -36,6 +38,16 @@ Des habitants naissent, travaillent, s'aiment, découvrent le feu, le bronze ou 
 
 Vitesses disponibles : ⏸ pause, ▶ ×1, ▶▶ ×10, ▶▶▶ ×100.
 Quand l'application est fermée, le monde continue au rythme normal (jusqu'à 30 jours d'absence rattrapés).
+
+## 🎮 Version Godot (en cours)
+
+Le jeu est en train d'être refait avec **Godot 4** dans le dossier `godot/`, pour un monde qui bouge vraiment : les habitants se lèvent, partent travailler (cueillette, bûcheronnage, pêche, chasse, champs), rapportent leur récolte, se retrouvent au feu le soir et rentrent dormir. Arbres qui ondulent, eau animée, fumée des cheminées, fenêtres allumées la nuit, saisons, pluie, neige et orages.
+
+```bash
+godot --path godot
+```
+
+Ou ouvre `godot/project.godot` dans l'éditeur Godot puis F5. La simulation reprend celle de la version web (même rythme, rattrapage hors ligne) ; les civilisations, maladies et religions restent à reporter.
 
 ## 🚀 Lancer le jeu
 
@@ -82,6 +94,7 @@ Pas besoin de Play Store ni d'App Store.
 | `js/settlements.js`, `js/governance.js` | Colonies, migrations, chefs et conseils |
 | `js/civs.js`, `js/civFormation.js`, `js/territory.js` | Civilisations, ralliements, indépendances, culture, territoires |
 | `js/diplomacy.js`, `js/war.js` | Relations, commerce, alliances, guerres, batailles et conquêtes |
+| `js/religions.js`, `js/faith*.js`, `js/miracles.js` | Religions, prières, miracles et légendes, missionnaires, temples, schismes |
 | `js/techTree.js`, `js/ideasEarly.js`, `js/ideasLate.js` | Savoirs, leurs effets, déclencheurs et besoins |
 | `js/context.js`, `js/inspiration.js`, `js/lore.js`, `js/technology.js` | Ce que voient les habitants, naissance des idées, transmission et perte du savoir |
 | `js/disease*.js`, `js/epidemics.js` | Maladies et épidémies |
@@ -94,4 +107,4 @@ La simulation est **déterministe** : tout le hasard passe par un générateur �
 
 ## 🛣️ La suite
 
-La feuille de route complète est dans [ROADMAP.md](ROADMAP.md). La V3 (civilisations) est livrée ; les prochaines idées : religions liées à tes pouvoirs, personnages célèbres, chronique automatique, commerce visible sur la carte.
+La feuille de route complète est dans [ROADMAP.md](ROADMAP.md). La V3 (civilisations) et les religions sont livrées ; les prochaines idées : personnages célèbres, chronique automatique, commerce visible sur la carte.

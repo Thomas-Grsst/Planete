@@ -58,7 +58,7 @@ export function createCiv(state, capital, chef) {
   const civ = {
     id: state.nextId++, name: capital.name, regime, article, color: CIV_COLORS[state.civs.length % CIV_COLORS.length],
     capitalId: capital.id, foundedDay: state.day, founderId: chef ? chef.id : null, founderName: chef ? chef.name : null,
-    culture: 0, alive: true, fallDay: null, conquests: 0,
+    culture: 0, alive: true, fallDay: null, conquests: 0, religionId: capital.faithId ?? null,
   };
   state.civs.push(civ);
   capital.civId = civ.id;

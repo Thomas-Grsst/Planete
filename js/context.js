@@ -13,7 +13,7 @@ const LOST_LORE_DAYS = 720;
 const STORM_DAMAGE_DAYS = 360;
 const ISLAND_RANGE = 12;
 const WATER = new Set(['ocean', 'lake', 'river']);
-const SEEN_FLAGS = new Set(['cuivre', 'etain', 'fer', 'charbon', 'obsidienne', 'argile', 'stone', 'forest', 'swamp', 'fertile', 'water', 'river', 'bone']);
+const SEEN_FLAGS = new Set(['cuivre', 'etain', 'fer', 'charbon', 'obsidienne', 'argile', 'stone', 'forest', 'swamp', 'fertile', 'water', 'river', 'sea', 'bone']);
 
 const manhattan = (ax, ay, bx, by) => Math.abs(ax - bx) + Math.abs(ay - by);
 
@@ -42,6 +42,7 @@ function touchTile(state, s, p, x, y) {
       if (!n || !WATER.has(n.biome)) continue;
       note(state, s, 'water', p);
       if (n.biome === 'river') note(state, s, 'river', p);
+      if (n.biome === 'ocean') note(state, s, 'sea', p);
     }
   }
 }

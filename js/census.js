@@ -2,6 +2,7 @@ import { ageOf, ADULT_AGE } from './people.js';
 import { tileAt } from './world.js';
 import { techMods } from './techTree.js';
 import { governanceMods } from './governance.js';
+import { faithMods } from './religions.js';
 
 const HUNGRY_ABOVE = 30;
 const MAX_DEFENSE_MULT = 1.8;
@@ -49,7 +50,7 @@ export function buildCensus(state) {
   countPeople(state, census);
   markAnimals(state, census);
   for (const e of census.values()) {
-    e.mods = composeMods(e);
+    e.mods = composeMods(state, e);
     e.density = clamp(e.pop / Math.max(1, e.s.houses * e.mods.capacity), 0.5, 3);
   }
   return census;
@@ -89,11 +90,13 @@ function markAnimals(state, census) {
   }
 }
 
-function composeMods(e) {
+function composeMods(state, e) {
   const m = techMods(e.s);
   applyJobMods(m, e.jobs);
   const gm = governanceMods(e.s, e.chef, e.pop);
-  m.happiness += gm.happiness;
+  const fm = faithMods(state, e.s);
+  m.happiness += gm.happiness + fm.happiness;
+  m.defense *= fm.defense;
   m.buildChance *= gm.buildChance;
   m.defense *= gm.defense;
   m.research *= gm.research;

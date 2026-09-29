@@ -3,6 +3,7 @@ import { aliveCivs, civById, civOf, civSettlements, civTitle, civPopulation, civ
 import { territoryShare } from './territory.js';
 import { relationLabel } from './diplomacy.js';
 import { warLine } from './war.js';
+import { civFaithLine } from './panelsFaith.js';
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const dot = (civ) => `<span style="color:${civ.color}">●</span>`;
@@ -33,6 +34,7 @@ export function civPanel(state, civ) {
     <p class="muted">Fondée par ${founder}, ${formatDay(civ.foundedDay)}${capital ? ` · capitale : <span class="link" data-goto="settlement:${capital.id}">${esc(capital.name)}</span>` : ''}</p>
     <p>👥 Population : ${civPopulation(state, civ)} · 🏘️ Villes : ${civSettlements(state, civ).length}</p>
     <p>🗺️ Territoire : ${territoryShare(state, civ)} % · 💡 Technologie : ${civTechShare(state, civ)} % · 🎭 Culture : ${Math.round(civ.culture)} %</p>
+    ${civFaithLine(state, civ)}
     ${civ.conquests ? `<p>🏴 ${plural(civ.conquests, 'conquête')}</p>` : ''}
     ${wars ? `<h3>Guerres</h3>${wars}` : ''}
     <h3>Relations</h3>${relationsBlock(state, civ)}

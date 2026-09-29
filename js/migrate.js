@@ -9,6 +9,7 @@ import { levelIndexOf } from './settlements.js';
 import { compactDead } from './housekeeping.js';
 import { ensureResources } from './resources.js';
 import { ensureCivState } from './civs.js';
+import { ensureFaithState } from './religions.js';
 
 const SAVE_VERSION = 2;
 
@@ -34,6 +35,7 @@ export function migrateState(state) {
   ensureSharedDefaults(state);
   ensureResources(state);
   ensureCivState(state);
+  ensureFaithState(state);
   if (legacy) grantAncientKnowledge(state);
   compactDead(state);
   state.version = SAVE_VERSION;

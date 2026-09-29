@@ -1,6 +1,7 @@
 import { screenToTile, focusOn } from './camera.js';
 import { tileAt } from './world.js';
 import { civById } from './civs.js';
+import { religionById } from './religions.js';
 import * as ui from './ui.js';
 import * as panels from './panels.js';
 
@@ -31,6 +32,14 @@ export function goTo(app, ref) {
     if (capital) focusOn(cam, capital.x, capital.y);
     ui.hideModal();
     ui.showPanel(panels.civPanel(state, civ));
+  } else if (kind === 'faith') {
+    const rel = religionById(state, Number(a));
+    if (!rel) return;
+    app.selection = { type: 'faith', id: rel.id };
+    const holy = state.settlements.find((s) => s.id === rel.holyId);
+    if (holy) focusOn(cam, holy.x, holy.y);
+    ui.hideModal();
+    ui.showPanel(panels.religionPanel(state, rel));
   } else if (kind === 'tile') {
     focusOn(cam, Number(a), Number(b));
     ui.hideModal();
@@ -62,5 +71,8 @@ export function refreshSelection(app) {
   } else if (selection.type === 'civ') {
     const civ = civById(state, selection.id);
     if (civ) ui.showPanel(panels.civPanel(state, civ));
+  } else if (selection.type === 'faith') {
+    const rel = religionById(state, selection.id);
+    if (rel) ui.showPanel(panels.religionPanel(state, rel));
   }
 }

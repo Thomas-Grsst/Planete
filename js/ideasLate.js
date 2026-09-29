@@ -13,7 +13,10 @@ export const IDEAS_LATE = {
   },
   navigation: {
     mean: 5000,
-    triggers: [on('coast', 1, '⛵ {name} dresse une voile sur un grand radeau à {place} : le premier bateau prend la mer.')],
+    triggers: [
+      on('coast', 1, '⛵ {name} dresse une voile sur un grand radeau à {place} : le premier bateau prend la mer.'),
+      on('sea', 0.5, '🌊 De retour d\'une longue marche, {name} raconte à {place} la mer sans fin qu\'{il} a vue. On y descend avec un radeau à voile : la navigation est née.'),
+    ],
     needs: [need('island', 3), need('crowded', 1.5)],
   },
   ecriture: {

@@ -21,10 +21,11 @@ export const levelIndexOf = (name) => Math.max(0, LEVELS.findIndex((l) => l[1] =
 
 export function createSettlement(state, rng, x, y, parent = null) {
   const s = {
-    id: state.nextId++, name: placeName(rng), x, y, houses: 1, wood: 5, foundedDay: state.day, level: 'Camp', followed: false,
+    id: state.nextId++, name: placeName(rng, new Set(state.settlements.map((o) => o.name))), x, y, houses: 1, wood: 5, foundedDay: state.day, level: 'Camp', followed: false,
     geo: null, techs: parent && Array.isArray(parent.techs) ? parent.techs.slice() : [], rooted: parent && Array.isArray(parent.rooted) ? parent.rooted.slice() : [], loreReady: false, keeperName: {}, seen: {}, seenBy: {}, research: {}, techDays: {}, departed: null, huntDry: 0, maxLevelIndex: 0,
     chefId: null, chefSince: 0, chefVacantUntil: 0, council: [], councilFormedDay: null,
     outbreak: null, lastOutbreakDay: -9999, fallen: null, civId: parent && parent.civId != null ? parent.civId : null, conqueredDay: null,
+    faithId: parent ? parent.faithId ?? null : null, devotion: parent ? Math.round((parent.devotion || 0) * 0.8) : 0, temple: 0, prayer: null, awe: null,
   };
   state.settlements.push(s);
   return s;
@@ -148,10 +149,26 @@ export function findSettlementSpot(state, rng, cx, cy, radius = 10, crossWater =
     if (landLocked && !sameLandmass(world, cx, cy, x, y)) continue;
     const near = state.settlements.some((s) => Math.abs(s.x - x) + Math.abs(s.y - y) < 6);
     if (near) continue;
-    let score = 0;
-    for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) { const n = tileAt(world, x + dx, y + dy); if (n) score += n.fertility + n.trees * 0.05; }
-    if (isCoastal(world, x, y)) score += crossWater ? 3 : 1.5;
+    const score = spotScore(world, x, y, crossWater);
     if (score > bestScore) { bestScore = score; best = { x, y }; }
   }
   return best;
+}
+
+const FISHING_WATERS = { ocean: true, lake: true };
+const FISHING_VALUE = 0.55;
+const COAST_BONUS = 3;
+const SEAFARER_COAST_BONUS = 5;
+
+function spotScore(world, x, y, crossWater) {
+  let score = 0;
+  for (let dy = -2; dy <= 2; dy++) {
+    for (let dx = -2; dx <= 2; dx++) {
+      const n = tileAt(world, x + dx, y + dy);
+      if (!n) continue;
+      score += FISHING_WATERS[n.biome] ? FISHING_VALUE : n.fertility + n.trees * 0.05;
+    }
+  }
+  if (isCoastal(world, x, y)) score += crossWater ? SEAFARER_COAST_BONUS : COAST_BONUS;
+  return score;
 }

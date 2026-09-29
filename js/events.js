@@ -1,11 +1,12 @@
 export const RARE = new Set(['catastrophe', 'fondation', 'grande_famine', 'disparition',
   'decouverte', 'epidemie', 'apocalypse', 'apocalypse_fin', 'extinction', 'chef', 'conseil', 'exode', 'savoir_perdu',
-  'civilisation', 'guerre', 'conquete', 'paix', 'alliance', 'independance', 'chute']);
+  'civilisation', 'guerre', 'conquete', 'paix', 'alliance', 'independance', 'chute', 'religion', 'schisme', 'miracle', 'religion_fin']);
 
 export const PRIORITY = {
   exode: 100, extinction: 95, apocalypse: 90, apocalypse_fin: 85, chute: 80, guerre: 70, conquete: 65, civilisation: 62,
   decouverte: 60, paix: 55, independance: 55, alliance: 45, bataille: 42, epidemie: 50, epidemie_fin: 45,
-  zombie: 40, savoir_perdu: 35, chef: 30, conseil: 30, disparition: 25, fondation: 20, catastrophe: 20, grande_famine: 20, croissance: 20,
+  miracle: 64, religion: 58, schisme: 56, religion_etat: 50, religion_fin: 40,
+  zombie: 40, savoir_perdu: 35, temple: 22, chef: 30, conseil: 30, disparition: 25, fondation: 20, catastrophe: 20, grande_famine: 20, croissance: 20,
 };
 
 const MAX_HIGHLIGHTS = 8;
@@ -113,4 +114,13 @@ export const SUMMARY_LABELS = {
   rupture: ['💔', 'rupture', 'ruptures'],
   independance: ['✊', 'indépendance', 'indépendances'],
   chute: ['🏚️', 'civilisation disparue', 'civilisations disparues'],
+  religion: ['🙏', 'religion fondée', 'religions fondées'],
+  miracle: ['✨', 'prière exaucée', 'prières exaucées'],
+  schisme: ['⚡', 'schisme', 'schismes'],
+  religion_etat: ['👑', 'religion officielle', 'religions officielles'],
+  religion_fin: ['🕯️', 'religion éteinte', 'religions éteintes'],
+  conversion: ['🕯️', 'conversion', 'conversions'],
+  temple: ['🛕', 'temple élevé', 'temples élevés'],
+  priere: ['🙏', 'prière', 'prières'],
+  legende: ['📖', 'légende', 'légendes'],
 };

@@ -12,9 +12,11 @@ import { civById, civTitle } from './civs.js';
 import { DISEASES } from './diseaseTable.js';
 import { diseaseLabel, immuneLabel } from './disease.js';
 import { chefOf } from './governance.js';
+import { settlementFaithLines, prophetLine } from './panelsFaith.js';
 
 export { journalPanel, statsPanel, powersPanel } from './panelsWorld.js';
 export { civPanel } from './panelsCiv.js';
+export { religionPanel } from './panelsFaith.js';
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
@@ -51,6 +53,7 @@ export function personPanel(state, p) {
     <h2>${esc(p.name)} <span class="muted">· ${p.sex === 'F' ? 'Femme' : 'Homme'} · ${lifeStatus(p, age)}</span></h2>
     <p>${home ? `🏠 <span class="link" data-goto="settlement:${home.id}">${esc(home.name)}</span>` : '🏕️ Nomade'} · ${esc(jobLabel(p.job, p.sex))}</p>
     <p class="muted">${p.traits.map(esc).join(', ')}</p>
+    ${prophetLine(state, p)}
     ${healthLines(state, p)}
     ${p.alive ? `<h3>Santé</h3><div class="bar"><i style="width:${Math.max(0, Math.round(p.health))}%"></i></div>
     <h3>Bonheur</h3><div class="bar"><i style="width:${Math.round(p.happiness)}%;background:#ffb300"></i></div>` : ''}
@@ -111,6 +114,7 @@ export function settlementPanel(state, s) {
     <p>👥 ${pop.length} habitants · 🏠 ${s.houses} maisons · 🪵 ${Math.round(s.wood)} bois</p>
     <p class="muted">Fondé ${formatDay(s.foundedDay)}${s.abandoned ? ` · abandonné ${formatDay(s.abandoned)}` : ''}</p>
     ${settlementCivLine(state, s)}
+    ${s.abandoned ? '' : settlementFaithLines(state, s)}
     ${fateLine(s)}
     ${knowledgeLine(s)}
     ${governanceLines(state, s, pop)}

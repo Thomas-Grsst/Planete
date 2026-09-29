@@ -5,6 +5,7 @@ import { ageOf, ADULT_AGE } from './people.js';
 import { zombiePowerState } from './powers.js';
 import { civSection } from './panelsCiv.js';
 import { civById, civTitle } from './civs.js';
+import { faithSection, legendsSection, prayersBlock } from './panelsFaith.js';
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const WEATHER_LABELS = { sun: '☀️ soleil', cloud: '☁️ nuageux', rain: '🌧️ pluie', storm: '⛈️ tempête', drought: '🔥 sécheresse', snow: '❄️ neige' };
@@ -114,6 +115,8 @@ export function statsPanel(state) {
     <h3>Colonies</h3>
     <ul class="list">${active.map((s) => settlementLine(s, pops.get(s.id) || 0)).join('')}</ul>
     ${civSection(state)}
+    ${faithSection(state)}
+    ${legendsSection(state)}
     ${knowledgeSection(state)}
     <h3>Animaux</h3>
     ${Object.entries(SPECIES).map(([k, sp]) => `<p>${sp.emoji} ${sp.name} : ${animalPopulation(state, k)}</p>`).join('')}
@@ -134,6 +137,7 @@ export function powersPanel(state) {
       <button data-action="power:grow">🌱 Végétation</button>
       <button data-action="power:skip">⏩ Avancer 30 jours</button>
     </div>
+    ${prayersBlock(state)}
     <h3>☣️ Interdit aux âmes sensibles</h3>
     <div class="row"><button data-action="power:zombie"${zombie.ready ? '' : ' disabled'}>${zombie.label}</button></div>
     <p class="muted">☣️ Irréversible : des habitants mourront. Tu as déclenché ${plural(count, 'apocalypse')}.</p>

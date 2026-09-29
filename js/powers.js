@@ -1,6 +1,7 @@
 import { tick, withRng } from './simulation.js';
 import { logEvent } from './events.js';
 import { startApocalypse } from './zombies.js';
+import { recordMiracle } from './miracles.js';
 
 export const ZOMBIE_COOLDOWN = 1440;
 const MIN_POP_TO_WAKE = 6;
@@ -84,8 +85,15 @@ function zombie(state) {
 
 const POWERS = new Map([['rain', rain], ['sun', sun], ['grow', grow], ['skip', skip], ['zombie', zombie]]);
 
+const MIRACLES = new Set(['rain', 'sun', 'grow', 'zombie']);
+
 export function usePower(state, name) {
   const power = POWERS.get(name);
   if (!power) return null;
-  return power(state);
+  const apocalypses = state.powers.zombie;
+  const msg = power(state);
+  if (!MIRACLES.has(name) || (name === 'zombie' && state.powers.zombie === apocalypses)) return msg;
+  let echo = null;
+  withRng(state, (rng) => { echo = recordMiracle(state, rng, name); });
+  return echo ? `${msg} ${echo}` : msg;
 }

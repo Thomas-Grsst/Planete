@@ -28,6 +28,18 @@ export function campfire(ctx, x, y, r, lights) {
   lights.push({ x, y: y - r * 0.4, r: r * 5, color: '255,140,50', flicker: true });
 }
 
+export function temple(ctx, x, y, r, great, lights) {
+  const w = great ? r * 1.6 : r * 1.1;
+  ctx.fillStyle = '#eceff1';
+  ctx.fillRect(x - w, y - r * 0.2, w * 2, r * 0.3);
+  ctx.fillStyle = '#cfd8dc';
+  const columns = great ? 4 : 3;
+  for (let i = 0; i < columns; i++) ctx.fillRect(x - w * 0.85 + (i * w * 1.7) / (columns - 1) - r * 0.12, y - r * 1.1, r * 0.24, r * 0.9);
+  ctx.fillStyle = great ? '#ffd54f' : '#b0bec5';
+  ctx.beginPath(); ctx.moveTo(x - w * 1.1, y - r * 1.1); ctx.lineTo(x, y - r * (great ? 2 : 1.7)); ctx.lineTo(x + w * 1.1, y - r * 1.1); ctx.fill();
+  if (lights) lights.push({ x, y: y - r * 0.6, r: r * (great ? 5 : 3.5), color: '255,230,160', flicker: false });
+}
+
 export function person(ctx, x, y, s, color) {
   ctx.fillStyle = color;
   ctx.fillRect(x - 1.5 * s, y - 4 * s, 3 * s, 4 * s);
