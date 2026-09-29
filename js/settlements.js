@@ -24,7 +24,7 @@ export function createSettlement(state, rng, x, y, parent = null) {
     id: state.nextId++, name: placeName(rng), x, y, houses: 1, wood: 5, foundedDay: state.day, level: 'Camp', followed: false,
     geo: null, techs: parent && Array.isArray(parent.techs) ? parent.techs.slice() : [], rooted: parent && Array.isArray(parent.rooted) ? parent.rooted.slice() : [], loreReady: false, keeperName: {}, seen: {}, seenBy: {}, research: {}, techDays: {}, departed: null, huntDry: 0, maxLevelIndex: 0,
     chefId: null, chefSince: 0, chefVacantUntil: 0, council: [], councilFormedDay: null,
-    outbreak: null, lastOutbreakDay: -9999, fallen: null,
+    outbreak: null, lastOutbreakDay: -9999, fallen: null, civId: parent && parent.civId != null ? parent.civId : null, conqueredDay: null,
   };
   state.settlements.push(s);
   return s;

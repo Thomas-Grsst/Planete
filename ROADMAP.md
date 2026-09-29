@@ -1,6 +1,6 @@
 # Petite Planète — Feuille de route
 
-État actuel : **V2.5 livrée** (métiers, 22 savoirs découverts par causes, maladies, apocalypse zombie, chef/conseil, jour/nuit de 10 min).
+État actuel : **V3 livrée** : civilisations, territoires, diplomatie et guerres, en plus des métiers, des 22 savoirs découverts par causes, des maladies, de l'apocalypse zombie et du cycle jour/nuit de 10 min.
 
 ---
 
@@ -28,17 +28,17 @@ Remplacer les « points de savoir » par des **idées déclenchées** : fini le 
 
 ## 🏛️ V3 — Civilisations
 
-- [ ] Plusieurs colonies se regroupent en **civilisation** (nom, culture, capitale).
-- [ ] **Territoires** visibles sur la carte.
-- [ ] **Diplomatie** : alliances, traités, commerce.
-- [ ] **Guerres et conquêtes** entre colonies/civilisations.
-- [ ] Base existante : chef, conseil, tech Lois (`governance.js`).
-- [ ] Chaque civilisation a sa propre histoire technologique (grâce aux découvertes par causes).
+- [x] Plusieurs colonies se regroupent en **civilisation** (nom, culture, capitale).
+- [x] **Territoires** visibles sur la carte.
+- [x] **Diplomatie** : alliances, traités, commerce.
+- [x] **Guerres et conquêtes** entre colonies/civilisations.
+- [x] Base existante : chef, conseil, tech Lois (`governance.js`).
+- [x] Chaque civilisation a sa propre histoire technologique (grâce aux découvertes par causes).
 
 ## 🔧 Restes de la V2 à corriger
 
 - [ ] La **Navigation** se déclenche rarement : les colonies s'installent peu sur les côtes (dépend de la carte).
-- [ ] L'écran « Bon retour » n'affiche que 8 catégories : naissances/décès disparaissent après une longue absence.
+- [x] L'écran « Bon retour » affiche toujours les naissances et les décès (jusqu'à 10 catégories).
 
 ## 📱 Widget et notifications
 

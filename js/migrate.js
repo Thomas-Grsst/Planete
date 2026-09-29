@@ -8,6 +8,7 @@ import { ANCIENTS_NAME } from './techTree.js';
 import { levelIndexOf } from './settlements.js';
 import { compactDead } from './housekeeping.js';
 import { ensureResources } from './resources.js';
+import { ensureCivState } from './civs.js';
 
 const SAVE_VERSION = 2;
 
@@ -32,6 +33,7 @@ export function migrateState(state) {
   ensureGovernanceState(state);
   ensureSharedDefaults(state);
   ensureResources(state);
+  ensureCivState(state);
   if (legacy) grantAncientKnowledge(state);
   compactDead(state);
   state.version = SAVE_VERSION;

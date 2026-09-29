@@ -3,6 +3,8 @@ import { TECHS, TECH_ORDER, ANCIENTS_NAME } from './techTree.js';
 import { SPECIES, animalPopulation } from './animals.js';
 import { ageOf, ADULT_AGE } from './people.js';
 import { zombiePowerState } from './powers.js';
+import { civSection } from './panelsCiv.js';
+import { civById, civTitle } from './civs.js';
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const WEATHER_LABELS = { sun: '☀️ soleil', cloud: '☁️ nuageux', rain: '🌧️ pluie', storm: '⛈️ tempête', drought: '🔥 sécheresse', snow: '❄️ neige' };
@@ -24,7 +26,7 @@ function normalizeFilter(filter) {
 
 function matchesFilter(state, e, filter) {
   if (e.type === 'couple_silent') return false;
-  if (filter === 'followed') return state.followed.includes(e.personId);
+  if (filter === 'followed') return state.followed.includes(e.personId) || (e.civId != null && state.followed.includes(e.civId));
   if (filter === 'rare') return isRare(e);
   return true;
 }
@@ -93,7 +95,9 @@ function followedSection(state) {
     const p = state.people.find((q) => q.id === id);
     if (p) return `<p><span class="link" data-goto="person:${p.id}">${esc(p.name)}</span>${followedMark(p)}</p>`;
     const s = state.settlements.find((q) => q.id === id);
-    return s ? `<p><span class="link" data-goto="settlement:${s.id}">${esc(s.name)}</span></p>` : '';
+    if (s) return `<p><span class="link" data-goto="settlement:${s.id}">${esc(s.name)}</span></p>`;
+    const c = civById(state, id);
+    return c ? `<p><span class="link" data-goto="civ:${c.id}">🏰 ${esc(civTitle(c, true))}</span></p>` : '';
   }).join('');
 }
 
@@ -109,6 +113,7 @@ export function statsPanel(state) {
     ${worldStatus(state, active)}
     <h3>Colonies</h3>
     <ul class="list">${active.map((s) => settlementLine(s, pops.get(s.id) || 0)).join('')}</ul>
+    ${civSection(state)}
     ${knowledgeSection(state)}
     <h3>Animaux</h3>
     ${Object.entries(SPECIES).map(([k, sp]) => `<p>${sp.emoji} ${sp.name} : ${animalPopulation(state, k)}</p>`).join('')}

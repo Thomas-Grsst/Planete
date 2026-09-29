@@ -1,4 +1,4 @@
-const CACHE = 'petite-planete-v4';
+const CACHE = 'petite-planete-v5';
 const ASSETS = [
   './', './index.html', './manifest.json', './icon.svg', './css/style.css',
   './js/main.js', './js/rng.js', './js/names.js', './js/world.js', './js/people.js',
@@ -7,7 +7,8 @@ const ASSETS = [
   './js/census.js', './js/jobs.js', './js/work.js', './js/techTree.js', './js/technology.js', './js/regions.js',
   './js/diseaseTable.js', './js/disease.js', './js/epidemics.js', './js/defense.js', './js/hordes.js', './js/zombies.js',
   './js/governance.js', './js/powers.js', './js/migrate.js', './js/panelsWorld.js', './js/housekeeping.js',
-  './js/resources.js', './js/context.js', './js/inspiration.js', './js/ideasEarly.js', './js/ideasLate.js', './js/lore.js', './js/daylight.js'
+  './js/resources.js', './js/context.js', './js/inspiration.js', './js/ideasEarly.js', './js/ideasLate.js', './js/lore.js', './js/daylight.js', './js/decor.js',
+  './js/civs.js', './js/civFormation.js', './js/territory.js', './js/diplomacy.js', './js/war.js', './js/panelsCiv.js', './js/navigation.js', './js/borders.js'
 ];
 
 self.addEventListener('install', (e) => {

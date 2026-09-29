@@ -60,11 +60,17 @@ export function formatDuration(ms) {
 
 const rankOf = (type) => PRIORITY[type] || (RARE.has(type) ? 20 : 0);
 
+const ALWAYS_SHOWN = ['naissance', 'deces'];
+const MAX_SUMMARY_LINES = 10;
+
 function countItems(summary) {
-  return Object.entries(summary.counts)
-    .filter(([k, n]) => SUMMARY_LABELS[k] && n > 0)
+  const entries = Object.entries(summary.counts).filter(([k, n]) => SUMMARY_LABELS[k] && n > 0);
+  const core = ALWAYS_SHOWN.map((k) => entries.find(([key]) => key === k)).filter(Boolean);
+  const rest = entries
+    .filter(([k]) => !ALWAYS_SHOWN.includes(k))
     .sort((a, b) => rankOf(b[0]) - rankOf(a[0]) || b[1] - a[1])
-    .slice(0, 8)
+    .slice(0, MAX_SUMMARY_LINES - core.length);
+  return [...core, ...rest]
     .map(([k, n]) => `<li>${SUMMARY_LABELS[k][0]} ${n} ${SUMMARY_LABELS[k][n > 1 ? 2 : 1]}</li>`)
     .join('');
 }

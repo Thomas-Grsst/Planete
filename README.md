@@ -16,7 +16,11 @@ Des habitants naissent, travaillent, s'aiment, découvrent le feu, le bronze ou 
 - **Des découvertes qui ont une cause** : chaque savoir naît d'un déclencheur concret (la foudre, un minerai touché, un tronc qui flotte), d'un besoin (famine, loups, épidémie) et d'un inventeur. 22 savoirs, du feu au voyage spatial, en réseau à plusieurs chemins.
 - **Du savoir fragile** : il se transmet de maître à apprenti, et peut se perdre si son dernier gardien meurt.
 - **Des maladies**, des **loups**, et une rare **🧟 apocalypse zombie**.
-- **Une gouvernance légère** : chefs élus, conseils de sages, lois.
+- **Une gouvernance** : chefs élus, conseils de sages, lois.
+- **Des civilisations** : un village d'au moins 30 habitants avec un chef peut proclamer un royaume, un empire, une république… selon le caractère de son chef. Les colonies voisines s'y rallient, les villes lointaines ou conquises peuvent proclamer leur indépendance.
+- **Des territoires** visibles sur la carte, avec les frontières de chaque civilisation.
+- **De la diplomatie** : relations qui évoluent (frontières, commerce, caractère des chefs), routes commerciales qui échangent des savoirs, alliances, ruptures.
+- **Des guerres** : batailles entre villes frontalières avec leurs héros et leurs morts, conquêtes, paix, chute de civilisations.
 - **Le retour du joueur** : un écran « Bon retour » résume tout ce qui s'est passé, avec les événements marquants.
 - **Le journal du monde** et la possibilité de **suivre** un habitant ou un village.
 - **Des pouvoirs** ponctuels : pluie, soleil, végétation, accélération du temps… et réveiller les morts.
@@ -76,16 +80,18 @@ Pas besoin de Play Store ni d'App Store.
 | `js/world.js`, `js/resources.js`, `js/regions.js` | Génération du terrain, gisements, masses de terre |
 | `js/people.js`, `js/jobs.js`, `js/work.js` | Habitants, métiers et leurs effets |
 | `js/settlements.js`, `js/governance.js` | Colonies, migrations, chefs et conseils |
+| `js/civs.js`, `js/civFormation.js`, `js/territory.js` | Civilisations, ralliements, indépendances, culture, territoires |
+| `js/diplomacy.js`, `js/war.js` | Relations, commerce, alliances, guerres, batailles et conquêtes |
 | `js/techTree.js`, `js/ideasEarly.js`, `js/ideasLate.js` | Savoirs, leurs effets, déclencheurs et besoins |
 | `js/context.js`, `js/inspiration.js`, `js/lore.js`, `js/technology.js` | Ce que voient les habitants, naissance des idées, transmission et perte du savoir |
 | `js/disease*.js`, `js/epidemics.js` | Maladies et épidémies |
 | `js/zombies.js`, `js/hordes.js`, `js/defense.js`, `js/animals.js` | Zombies, défense, animaux et loups |
-| `js/render.js`, `js/decor.js`, `js/daylight.js`, `js/camera.js` | Rendu 2.5D, cycle jour/nuit, caméra |
-| `js/panels*.js`, `js/ui.js`, `js/events.js` | Interface, journal, écran de retour |
+| `js/render.js`, `js/decor.js`, `js/daylight.js`, `js/borders.js`, `js/camera.js` | Rendu 2.5D, cycle jour/nuit, frontières, caméra |
+| `js/panels*.js`, `js/ui.js`, `js/navigation.js`, `js/events.js` | Interface, fiches, journal, écran de retour |
 | `js/save.js`, `js/migrate.js` | Sauvegarde locale et compatibilité des anciennes parties |
 
 La simulation est **déterministe** : tout le hasard passe par un générateur à graine, pour que le rattrapage hors ligne soit fiable.
 
 ## 🛣️ La suite
 
-La feuille de route complète est dans [ROADMAP.md](ROADMAP.md). Prochaine grande étape : **la V3 et les civilisations** (territoires, diplomatie, guerres).
+La feuille de route complète est dans [ROADMAP.md](ROADMAP.md). La V3 (civilisations) est livrée ; les prochaines idées : religions liées à tes pouvoirs, personnages célèbres, chronique automatique, commerce visible sur la carte.

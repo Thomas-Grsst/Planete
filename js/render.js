@@ -4,6 +4,8 @@ import { SPECIES } from './animals.js';
 import { tree, house, campfire, person, orePebbles } from './decor.js';
 import { drawNightOverlay, drawLights, nightAlpha } from './daylight.js';
 import { dayPhase } from './simulation.js';
+import { territoryMap } from './territory.js';
+import { drawTerritory, civColors } from './borders.js';
 
 const WEATHER_TINT = { rain: 'rgba(40,60,90,0.25)', storm: 'rgba(20,30,50,0.4)', cloud: 'rgba(60,70,80,0.15)', drought: 'rgba(200,120,40,0.15)', snow: 'rgba(220,230,255,0.25)', sun: null };
 const NONE = [];
@@ -20,6 +22,9 @@ export function render(ctx, cam, state, selection) {
   const phase = dayPhase(state);
   buckets.lit = nightAlpha(phase) > 0.1;
   buckets.lights = [];
+  const colors = civColors(state);
+  const territory = colors.size ? territoryMap(state) : null;
+  buckets.capitals = new Set(state.civs.filter((c) => c.alive).map((c) => c.capitalId));
 
   for (let y = 0; y < SIZE; y++) {
     for (let x = 0; x < SIZE; x++) {
@@ -29,6 +34,7 @@ export function render(ctx, cam, state, selection) {
       const { sx, sy } = project(cam, x, y, h);
       if (sx < -hw * 2 || sx > canvas.width + hw * 2 || sy < -hh * 8 || sy > canvas.height + hh * 8) continue;
       drawTile(ctx, sx, sy, hw, hh, h, t, cam.zoom, state);
+      if (territory) drawTerritory(ctx, { x, y, sx, sy }, hw, hh, territory, colors, cam.zoom);
       overlay.push({ x, y, sx, sy, t });
     }
   }
@@ -125,7 +131,7 @@ function drawDecor(ctx, o, zoom, state, selection, buckets) {
     ctx.fillStyle = selection && selection.type === 'settlement' && selection.id === st.id ? '#ffd54f' : '#fff';
     ctx.font = `${Math.max(10, 11 * s)}px system-ui`;
     ctx.textAlign = 'center';
-    ctx.fillText(`${settlementPrefix(st)}${st.name}`, sx, sy - 16 * s);
+    ctx.fillText(`${buckets.capitals.has(st.id) ? '🏰 ' : ''}${settlementPrefix(st)}${st.name}`, sx, sy - 16 * s);
   }
   for (const h of buckets.herds.get(key) || NONE) {
     ctx.font = `${Math.max(10, 12 * s)}px system-ui`;

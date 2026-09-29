@@ -2,17 +2,26 @@ import { ageOf, settlementOf } from './people.js';
 import { residents } from './settlements.js';
 import { SPECIES } from './animals.js';
 import { formatDay, plural } from './events.js';
-import { BIOMES } from './world.js';
+import { BIOMES, SIZE } from './world.js';
 import { jobLabel, jobEmoji } from './jobs.js';
 import { TECHS } from './techTree.js';
 import { ORES } from './resources.js';
+import { settlementCivLine } from './panelsCiv.js';
+import { territoryMap } from './territory.js';
+import { civById, civTitle } from './civs.js';
 import { DISEASES } from './diseaseTable.js';
 import { diseaseLabel, immuneLabel } from './disease.js';
 import { chefOf } from './governance.js';
 
 export { journalPanel, statsPanel, powersPanel } from './panelsWorld.js';
+export { civPanel } from './panelsCiv.js';
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+function territoryLine(state, x, y) {
+  const civ = civById(state, territoryMap(state)[y * SIZE + x]);
+  return civ ? `<p>🗺️ Territoire : <span class="link" data-goto="civ:${civ.id}">${esc(civTitle(civ, true))}</span></p>` : '';
+}
 const personLink = (p) => `<span class="link" data-goto="person:${p.id}">${esc(p.name)}</span>`;
 
 function lifeStatus(p, age) {
@@ -101,6 +110,7 @@ export function settlementPanel(state, s) {
     <h2>${esc(s.name)} <span class="muted">· ${esc(s.level)}</span></h2>
     <p>👥 ${pop.length} habitants · 🏠 ${s.houses} maisons · 🪵 ${Math.round(s.wood)} bois</p>
     <p class="muted">Fondé ${formatDay(s.foundedDay)}${s.abandoned ? ` · abandonné ${formatDay(s.abandoned)}` : ''}</p>
+    ${settlementCivLine(state, s)}
     ${fateLine(s)}
     ${knowledgeLine(s)}
     ${governanceLines(state, s, pop)}
@@ -121,6 +131,7 @@ export function tilePanel(state, x, y, t) {
   return `
     <h2>${esc(BIOMES[t.biome].name)} <span class="muted">(${x}, ${y})</span></h2>
     <p>🌾 Nourriture : ${Math.round(t.food)} / ${Math.round(t.fertility * 12)} · 🌲 Arbres : ${t.trees}${t.stone ? ` · 🪨 Pierre : ${t.stone}` : ''}</p>
+    ${territoryLine(state, x, y)}
     ${t.ore && ORES[t.ore] ? `<p>${ORES[t.ore].emoji} Gisement : ${ORES[t.ore].name}</p>` : ''}
     ${herds.map((h) => `<p>${SPECIES[h.species].emoji} ${SPECIES[h.species].name} : ${Math.round(h.count)}</p>`).join('')}
     ${hordes.map((h) => `<p>🧟 Zombies : ${Math.round(h.count)}</p>`).join('')}`;

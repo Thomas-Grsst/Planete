@@ -1,8 +1,10 @@
 export const RARE = new Set(['catastrophe', 'fondation', 'grande_famine', 'disparition',
-  'decouverte', 'epidemie', 'apocalypse', 'apocalypse_fin', 'extinction', 'chef', 'conseil', 'exode', 'savoir_perdu']);
+  'decouverte', 'epidemie', 'apocalypse', 'apocalypse_fin', 'extinction', 'chef', 'conseil', 'exode', 'savoir_perdu',
+  'civilisation', 'guerre', 'conquete', 'paix', 'alliance', 'independance', 'chute']);
 
 export const PRIORITY = {
-  exode: 100, extinction: 95, apocalypse: 90, apocalypse_fin: 85, decouverte: 60, epidemie: 50, epidemie_fin: 45,
+  exode: 100, extinction: 95, apocalypse: 90, apocalypse_fin: 85, chute: 80, guerre: 70, conquete: 65, civilisation: 62,
+  decouverte: 60, paix: 55, independance: 55, alliance: 45, bataille: 42, epidemie: 50, epidemie_fin: 45,
   zombie: 40, savoir_perdu: 35, chef: 30, conseil: 30, disparition: 25, fondation: 20, catastrophe: 20, grande_famine: 20, croissance: 20,
 };
 
@@ -100,4 +102,15 @@ export const SUMMARY_LABELS = {
   chef: ['👑', 'chef', 'chefs'],
   conseil: ['🏛️', 'conseil formé', 'conseils formés'],
   exode: ['🚀', 'départ vers les étoiles', 'départs vers les étoiles'],
+  civilisation: ['🏰', 'civilisation fondée', 'civilisations fondées'],
+  ralliement: ['🏳️', 'colonie ralliée', 'colonies ralliées'],
+  guerre: ['⚔️', 'guerre déclarée', 'guerres déclarées'],
+  bataille: ['🗡️', 'bataille', 'batailles'],
+  conquete: ['🏴', 'conquête', 'conquêtes'],
+  paix: ['🕊️', 'paix signée', 'paix signées'],
+  commerce: ['🐪', 'route commerciale', 'routes commerciales'],
+  alliance: ['🤝', 'alliance', 'alliances'],
+  rupture: ['💔', 'rupture', 'ruptures'],
+  independance: ['✊', 'indépendance', 'indépendances'],
+  chute: ['🏚️', 'civilisation disparue', 'civilisations disparues'],
 };

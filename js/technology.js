@@ -4,9 +4,12 @@ import { ageOf, ADULT_AGE } from './people.js';
 import { scanContacts } from './context.js';
 import { stepInspiration } from './inspiration.js';
 import { stepLore, teach, rootIfWritten, ensureLoreState } from './lore.js';
+import { civById, warBetween } from './civs.js';
 
 const MIN_RESEARCH_POP = 3;
 const SPREAD_RANGE = 14;
+const CIV_SPREAD_RANGE = 30;
+const CIV_SPREAD_BONUS = 3;
 const SPREAD_BASE_CHANCE = 0.004;
 const SPREAD_MAX_CHANCE = 0.5;
 const BOAT_SPREAD_BONUS = 1.5;
@@ -33,11 +36,20 @@ export function ensureTechnologyState(state) {
 }
 
 const techsOf = (s) => (s && Array.isArray(s.techs) ? s.techs : []);
+const sameCiv = (a, s) => a.civId != null && a.civId === s.civId;
+
+function atWar(state, a, s) {
+  const ca = civById(state, a.civId);
+  const cs = civById(state, s.civId);
+  return !!ca && !!cs && ca !== cs && !!warBetween(state, ca, cs);
+}
 
 function activeNeighbours(state, census, s) {
   const out = [];
   for (const a of state.settlements) {
-    if (a === s || a.abandoned || manhattan(a.x, a.y, s.x, s.y) > SPREAD_RANGE) continue;
+    const kin = sameCiv(a, s);
+    if (a === s || a.abandoned || manhattan(a.x, a.y, s.x, s.y) > (kin ? CIV_SPREAD_RANGE : SPREAD_RANGE)) continue;
+    if (atWar(state, a, s)) continue;
     const ea = census.get(a.id);
     if (ea && ea.pop > 0) out.push(a);
   }
@@ -48,7 +60,7 @@ function spreadFactor(census, a, s) {
   const ea = census.get(a.id);
   const spread = ea && ea.mods ? ea.mods.spread : 1;
   const byBoat = a.geo && a.geo.coast && s.geo && s.geo.coast && hasTech(a, 'navigation');
-  return spread * (byBoat ? BOAT_SPREAD_BONUS : 1);
+  return spread * (byBoat ? BOAT_SPREAD_BONUS : 1) * (sameCiv(a, s) ? CIV_SPREAD_BONUS : 1);
 }
 
 function stepSpread(state, rng, census, s, entry) {

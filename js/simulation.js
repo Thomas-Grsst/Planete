@@ -14,6 +14,9 @@ import { stepGovernance } from './governance.js';
 import { stepTechnology, stepExodus } from './technology.js';
 import { migrateState } from './migrate.js';
 import { stepHousekeeping } from './housekeeping.js';
+import { stepCivs } from './civFormation.js';
+import { stepDiplomacy } from './diplomacy.js';
+import { stepWars } from './war.js';
 
 export const MS_PER_DAY = 600000;
 export const MAX_OFFLINE_DAYS = 4320;
@@ -71,6 +74,9 @@ export function tick(state) {
     stepWolves(state, rng, census);
     stepJobs(state, rng, census);
     stepGovernance(state, rng, census);
+    stepCivs(state, rng, census);
+    stepDiplomacy(state, rng, census);
+    stepWars(state, rng, census);
     stepTechnology(state, rng, census);
     stepDisasters(state, rng);
     stepExodus(state);
