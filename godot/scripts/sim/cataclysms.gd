@@ -18,25 +18,27 @@ static func _victims(state: Dictionary, rng: Rng, e: Dictionary, max_dead: int, 
 
 static func volcano(state: Dictionary, rng: Rng, census: Dictionary) -> void:
 	var peaks: Array = []
-	var tiles: Array = state["world"]["tiles"]
-	for i in tiles.size():
-		if tiles[i]["biome"] == "mountain" and tiles[i]["height"] > 0.83:
-			peaks.append(i)
+	for key in state["world"]["chunks"]:
+		var tiles: Array = state["world"]["chunks"][key]["tiles"]
+		for i in tiles.size():
+			if tiles[i]["biome"] == "mountain" and tiles[i]["height"] > 0.83:
+				peaks.append(WorldGen.origin(key) + Vector2i(i & WorldGen.LOCAL, i >> WorldGen.SHIFT))
 	if peaks.is_empty():
 		return
-	var i: int = rng.pick(peaks)
-	var cx := i % WorldGen.SIZE
-	var cy := i / WorldGen.SIZE
+	var peak: Vector2i = rng.pick(peaks)
+	var cx := peak.x
+	var cy := peak.y
 	for dy in range(-LAVA_RADIUS, LAVA_RADIUS + 1):
 		for dx in range(-LAVA_RADIUS, LAVA_RADIUS + 1):
 			var t = WorldGen.tile_at(state["world"], cx + dx, cy + dy)
 			if t != null and absi(dx) + absi(dy) <= LAVA_RADIUS and not Biomes.is_water(t["biome"]) and rng.chance(0.8):
 				t["biome"] = "lava"
 				t["since"] = state["day"]
+				state["world"].get_or_add("lava", {})[Vector2i(cx + dx, cy + dy)] = true
 				t["trees"] = 0
 				t["food"] = 0.0
 				t["fertility"] = 0.0
-	Regions.invalidate()
+	Regions.invalidate(state["world"])
 	var dead := 0
 	for id in census:
 		var s: Dictionary = census[id]["s"]
@@ -66,8 +68,9 @@ static func _quake_houses(lost: int) -> String:
 
 
 static func meteor(state: Dictionary, rng: Rng, census: Dictionary) -> void:
-	var cx := rng.range_int(3, WorldGen.SIZE - 4)
-	var cy := rng.range_int(3, WorldGen.SIZE - 4)
+	var spot := WorldGen.random_known(state["world"], rng)
+	var cx := spot.x
+	var cy := spot.y
 	var center = WorldGen.tile_at(state["world"], cx, cy)
 	if center == null or Biomes.is_water(center["biome"]):
 		Journal.log_event(state, "cataclysme", "☄️ Une étoile filante géante plonge dans la mer. Une vague immense frappe les côtes.", {"x": cx, "y": cy, "meteor": true, "highlight": true})
@@ -80,7 +83,9 @@ static func meteor(state: Dictionary, rng: Rng, census: Dictionary) -> void:
 				t["trees"] = 0
 				t["fertility"] = 0.05
 				t["ore"] = "fer" if rng.chance(0.6) else t["ore"]
-	Regions.invalidate()
+				if t["ore"] == "fer" and not t.has("ore_left"):
+					t["ore_left"] = Mining.vein_amount(rng)
+	Regions.invalidate(state["world"])
 	var dead := 0
 	for id in census:
 		var s: Dictionary = census[id]["s"]

@@ -28,19 +28,24 @@ func _draw() -> void:
 		colors[c["id"]] = c["color"]
 	var mesh := MeshBuilder.new()
 	var world: Dictionary = Sim.state["world"]
-	for y in WorldGen.SIZE:
-		for x in WorldGen.SIZE:
-			var id: int = map[y * WorldGen.SIZE + x]
-			if not colors.has(id):
-				continue
-			var c := Iso.project(x, y, Iso.tile_lift(world, x, y))
-			var corners := [c + Vector2(0, -HALF_H), c + Vector2(HALF_W, 0), c + Vector2(0, HALF_H), c + Vector2(-HALF_W, 0)]
-			mesh.poly(PackedVector2Array(corners), Color(colors[id], FILL_ALPHA))
-			for edge in EDGES:
-				var n: Vector2i = Vector2i(x, y) + edge[0]
-				var other: int = map[n.y * WorldGen.SIZE + n.x] if n.x >= 0 and n.y >= 0 and n.x < WorldGen.SIZE and n.y < WorldGen.SIZE else -1
-				if other != id:
-					mesh.line(corners[edge[1]], corners[edge[2]], Color(colors[id], EDGE_ALPHA), EDGE_WIDTH)
+	var sides: Array = EDGES.map(func(edge): return [edge[0], _corners_for(Iso.screen_dir(edge[0]))])
+	for pos in map:
+		var id: int = map[pos]
+		if not colors.has(id):
+			continue
+		var c := Iso.project(pos.x, pos.y, Iso.tile_lift(world, pos.x, pos.y))
+		var corners := [c + Vector2(0, -HALF_H), c + Vector2(HALF_W, 0), c + Vector2(0, HALF_H), c + Vector2(-HALF_W, 0)]
+		mesh.poly(PackedVector2Array(corners), Color(colors[id], FILL_ALPHA))
+		for side in sides:
+			if map.get(pos + side[0], -1) != id:
+				mesh.line(corners[side[1][0]], corners[side[1][1]], Color(colors[id], EDGE_ALPHA), EDGE_WIDTH)
 	_built = mesh.build()
 	if _built != null:
 		draw_mesh(_built, null)
+
+
+func _corners_for(screen: Vector2i) -> Array:
+	for edge in EDGES:
+		if edge[0] == screen:
+			return [edge[1], edge[2]]
+	return [0, 1]

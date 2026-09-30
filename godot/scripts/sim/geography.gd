@@ -84,8 +84,8 @@ static func find_spot(state: Dictionary, rng: Rng, cx: int, cy: int, radius: int
 	var best = null
 	var best_score := 0.0
 	for tries in SPOT_TRIES:
-		var x := clampi(cx + rng.range_int(-radius, radius), 1, WorldGen.SIZE - 2)
-		var y := clampi(cy + rng.range_int(-radius, radius), 1, WorldGen.SIZE - 2)
+		var x := cx + rng.range_int(-radius, radius)
+		var y := cy + rng.range_int(-radius, radius)
 		var t = WorldGen.tile_at(world, x, y)
 		if t == null or not Biomes.walkable(t["biome"]) or t["biome"] == "river" or t["biome"] == "mountain":
 			continue

@@ -3,31 +3,42 @@ extends Node2D
 const HALF_W := Iso.TILE_W * 0.5
 const HALF_H := Iso.TILE_H * 0.5
 const SHORE := Color(1, 1, 1, 0.35)
+const SIDES := [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]
 
-@export var rivers_only := false
+static var water_material: ShaderMaterial
 
+var key := Vector2i.ZERO
+var rivers_only := false
 var _mesh: MeshBuilder
 var _built: ArrayMesh
 
 
-func _ready() -> void:
-	material = ShaderMaterial.new()
-	material.shader = load("res://shaders/water.gdshader")
-	Sim.world_loaded.connect(queue_redraw)
+func setup(chunk_key: Vector2i, rivers: bool) -> void:
+	key = chunk_key
+	rivers_only = rivers
+	if not rivers_only:
+		if water_material == null:
+			water_material = ShaderMaterial.new()
+			water_material.shader = load("res://shaders/water.gdshader")
+		material = water_material
 
 
 func _draw() -> void:
-	if Sim.state.is_empty():
-		return
 	var world: Dictionary = Sim.state["world"]
+	var chunk = world["chunks"].get(key)
+	if chunk == null:
+		return
 	_mesh = MeshBuilder.new()
-	for y in WorldGen.SIZE:
-		for x in WorldGen.SIZE:
-			var t: Dictionary = world["tiles"][y * WorldGen.SIZE + x]
-			if not rivers_only and Biomes.is_water(t["biome"]):
-				_draw_water(world, x, y, t)
-			elif rivers_only and t["biome"] == "river":
-				_draw_river(x, y, t)
+	var o := WorldGen.origin(key)
+	var tiles: Array = chunk["tiles"]
+	for i in tiles.size():
+		var t: Dictionary = tiles[i]
+		var x: int = o.x + (i & WorldGen.LOCAL)
+		var y: int = o.y + (i >> WorldGen.SHIFT)
+		if not rivers_only and Biomes.is_water(t["biome"]):
+			_draw_water(world, x, y, t)
+		elif rivers_only and t["biome"] == "river":
+			_draw_river(x, y, t)
 	_built = _mesh.build()
 	if _built != null:
 		draw_mesh(_built, null)
@@ -55,7 +66,7 @@ func _draw_river(x: int, y: int, t: Dictionary) -> void:
 
 
 func _touches_land(world: Dictionary, x: int, y: int) -> bool:
-	for o in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+	for o in SIDES:
 		var n = WorldGen.tile_at(world, x + o.x, y + o.y)
 		if n != null and not Biomes.is_water(n["biome"]):
 			return true

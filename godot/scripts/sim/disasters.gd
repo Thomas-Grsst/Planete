@@ -88,21 +88,23 @@ static func _climate(state: Dictionary, rng: Rng, alive: Array) -> void:
 		return
 	state["sea_level"] = state.get("sea_level", 0.41) + SEA_RISE_STEP
 	var flooded := 0
-	for i in state["world"]["tiles"].size():
-		var t: Dictionary = state["world"]["tiles"][i]
-		var x: int = i % WorldGen.SIZE
-		var y: int = i / WorldGen.SIZE
-		if flooded >= MAX_FLOODED or Biomes.is_water(t["biome"]) or t["height"] >= state["sea_level"] or not Geography.is_coastal(state["world"], x, y):
-			continue
-		if alive.any(func(s): return absi(s["x"] - x) <= 1 and absi(s["y"] - y) <= 1):
-			continue
-		t["biome"] = "ocean"
-		t["trees"] = 0
-		t["food"] = 0.0
-		t["fertility"] = Biomes.DATA["ocean"]["food"]
-		flooded += 1
+	for key in state["world"]["chunks"]:
+		var tiles: Array = state["world"]["chunks"][key]["tiles"]
+		for i in tiles.size():
+			var t: Dictionary = tiles[i]
+			if flooded >= MAX_FLOODED or Biomes.is_water(t["biome"]) or t["height"] >= state["sea_level"]:
+				continue
+			var x: int = key.x * WorldGen.CHUNK + (i & WorldGen.LOCAL)
+			var y: int = key.y * WorldGen.CHUNK + (i >> WorldGen.SHIFT)
+			if not Geography.is_coastal(state["world"], x, y) or alive.any(func(s): return absi(s["x"] - x) <= 1 and absi(s["y"] - y) <= 1):
+				continue
+			t["biome"] = "ocean"
+			t["trees"] = 0
+			t["food"] = 0.0
+			t["fertility"] = Biomes.DATA["ocean"]["food"]
+			flooded += 1
 	if flooded > 0:
-		Regions.invalidate()
+		Regions.invalidate(state["world"])
 		Journal.log_event(state, "climat", "🌡️ Les fumées des machines réchauffent le monde : la mer monte et engloutit %s de côte." % Names.plural(flooded, "arpent"), {"map": true, "highlight": true})
 
 
@@ -110,11 +112,17 @@ static func _cool_lava(state: Dictionary) -> void:
 	if state["day"] % 30 != 0:
 		return
 	var changed := false
-	for t in state["world"]["tiles"]:
-		if t["biome"] == "lava" and state["day"] - t.get("since", 0) >= LAVA_COOL_DAYS:
+	var lava: Dictionary = state["world"].get("lava", {})
+	for pos in lava.keys():
+		var t = WorldGen.tile_at(state["world"], pos.x, pos.y)
+		if t == null or t["biome"] != "lava":
+			lava.erase(pos)
+		elif state["day"] - t.get("since", 0) >= LAVA_COOL_DAYS:
 			t["biome"] = "rock"
 			t["fertility"] = 0.1
+			Nature.mark_food(state["world"], pos.x, pos.y)
+			lava.erase(pos)
 			changed = true
 	if changed:
-		Regions.invalidate()
+		Regions.invalidate(state["world"])
 		Journal.log_event(state, "paysage", "🪨 La lave refroidit et devient roche.", {"map": true})

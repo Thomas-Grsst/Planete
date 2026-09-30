@@ -12,6 +12,7 @@ const MIGRATION_CHANCE := 0.015
 
 
 static func create(state: Dictionary, rng: Rng, x: int, y: int, parent = null) -> Dictionary:
+	Exploration.reveal(state, rng, x, y, Exploration.SETTLER_SIGHT)
 	var taken := {}
 	for o in state["settlements"]:
 		taken[o["name"]] = true

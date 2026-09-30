@@ -10,20 +10,36 @@ const HUNT_RANGE := 6
 const HUNTABLE_MIN := 8.0
 const MOVE_CHANCE := 0.3
 const WOLF_FLOOR := 3.0
+const NEW_LAND_HERD := 0.35
+const NEW_LAND_WOLVES := 0.15
 
 
 static func seed_herds(state: Dictionary, rng: Rng) -> void:
 	for key in SPECIES:
-		var sp: Dictionary = SPECIES[key]
 		for n in (3 if key == "wolf" else 6):
 			for tries in 60:
-				var x := rng.range_int(0, WorldGen.SIZE - 1)
-				var y := rng.range_int(0, WorldGen.SIZE - 1)
-				var t = WorldGen.tile_at(state["world"], x, y)
-				if t != null and sp["biomes"].has(t["biome"]):
-					state["next_id"] += 1
-					state["herds"].append({"id": state["next_id"], "species": key, "x": x, "y": y, "count": float(rng.range_int(6, 14))})
+				var pos := WorldGen.random_known(state["world"], rng)
+				if _place(state, rng, key, pos):
 					break
+
+
+static func populate(state: Dictionary, rng: Rng, chunk_key: Vector2i) -> void:
+	for key in SPECIES:
+		if not rng.chance(NEW_LAND_HERD if key != "wolf" else NEW_LAND_WOLVES):
+			continue
+		for tries in 12:
+			var pos := WorldGen.origin(chunk_key) + Vector2i(rng.range_int(0, WorldGen.LOCAL), rng.range_int(0, WorldGen.LOCAL))
+			if _place(state, rng, key, pos):
+				break
+
+
+static func _place(state: Dictionary, rng: Rng, key: String, pos: Vector2i) -> bool:
+	var t = WorldGen.tile_at(state["world"], pos.x, pos.y)
+	if t == null or not SPECIES[key]["biomes"].has(t["biome"]):
+		return false
+	state["next_id"] += 1
+	state["herds"].append({"id": state["next_id"], "species": key, "x": pos.x, "y": pos.y, "count": float(rng.range_int(6, 14))})
+	return true
 
 
 static func huntable_near(state: Dictionary, s: Dictionary):

@@ -26,21 +26,26 @@ func setup(diagonal_tiles: Array) -> void:
 		sway_material.shader = load("res://shaders/sway.gdshader")
 	material = sway_material
 	var world: Dictionary = Sim.state["world"]
-	for i in tiles:
-		var t: Dictionary = world["tiles"][i]
-		conifers[i] = t["biome"] == "forest" and (i * 2654435761) % 3 != 0 or t["biome"] == "tundra" or t["biome"] == "mountain"
-		offsets[i] = Iso.ground(world, i % WorldGen.SIZE, i / WorldGen.SIZE) - position
+	for pos in tiles:
+		var t: Dictionary = WorldGen.tile_at(world, pos.x, pos.y)
+		conifers[pos] = t["biome"] == "forest" and _hash(pos) % 3 != 0 or t["biome"] == "tundra" or t["biome"] == "mountain"
+		offsets[pos] = Iso.ground(world, pos.x, pos.y) - position
 	refresh()
+
+
+static func _hash(pos: Vector2i) -> int:
+	return absi(pos.x * 7919 + pos.y * 104729)
 
 
 func refresh() -> void:
 	var world: Dictionary = Sim.state["world"]
 	var now := Weather.season(Sim.state["day"])
 	var changed := now != season
-	for i in tiles:
-		var n: int = min(MAX_TREES, world["tiles"][i]["trees"])
-		if counts.get(i, -1) != n:
-			counts[i] = n
+	for pos in tiles:
+		var t = WorldGen.tile_at(world, pos.x, pos.y)
+		var n: int = min(MAX_TREES, t["trees"]) if t != null else 0
+		if counts.get(pos, -1) != n:
+			counts[pos] = n
 			changed = true
 	season = now
 	if changed:
@@ -49,14 +54,15 @@ func refresh() -> void:
 
 func _draw() -> void:
 	_mesh = MeshBuilder.new()
-	for i in tiles:
-		var base: Vector2 = offsets[i]
-		for k in counts[i]:
-			var scale_k: float = 0.62 + 0.08 * ((i + k * 7) % 4)
-			if conifers[i]:
+	for pos in tiles:
+		var base: Vector2 = offsets[pos]
+		var h := _hash(pos)
+		for k in counts[pos]:
+			var scale_k: float = 0.62 + 0.08 * ((h + k * 7) % 4)
+			if conifers[pos]:
 				_pine(base + OFFSETS[k], 7.0 * scale_k)
 			else:
-				_leafy(base + OFFSETS[k], 6.5 * scale_k, i)
+				_leafy(base + OFFSETS[k], 6.5 * scale_k, h)
 	_built = _mesh.build()
 	if _built != null:
 		draw_mesh(_built, null)

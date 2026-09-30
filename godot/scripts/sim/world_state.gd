@@ -62,13 +62,9 @@ static func _land_colony(state: Dictionary, rng: Rng, s: Dictionary, colony: Dic
 
 
 static func _first_spot(state: Dictionary, rng: Rng) -> Vector2i:
-	var center := WorldGen.SIZE / 2
-	for radius in [10, 16, 22]:
-		var spot = Geography.find_spot(state, rng, center, center, radius, true)
+	var center: Vector2i = state["world"]["start"]
+	for radius in [4, 10, 16]:
+		var spot = Geography.find_spot(state, rng, center.x, center.y, radius, true)
 		if spot != null:
 			return spot
-	for i in WorldGen.SIZE * WorldGen.SIZE:
-		var t: Dictionary = state["world"]["tiles"][i]
-		if Biomes.walkable(t["biome"]) and t["biome"] != "river" and t["biome"] != "mountain":
-			return Vector2i(i % WorldGen.SIZE, i / WorldGen.SIZE)
-	return Vector2i(center, center)
+	return center

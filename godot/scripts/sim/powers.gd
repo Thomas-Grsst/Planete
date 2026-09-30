@@ -54,9 +54,10 @@ static func wake_dead(state: Dictionary, rng: Rng) -> String:
 
 
 static func _grow(state: Dictionary) -> void:
-	for t in state["world"]["tiles"]:
-		if t["fertility"] <= 0.3:
-			continue
-		t["food"] = max(t["food"], t["fertility"] * 12.0)
-		if t["biome"] == "forest" and t["trees"] < 9:
-			t["trees"] += 2
+	for key in state["world"]["chunks"]:
+		for t in state["world"]["chunks"][key]["tiles"]:
+			if t["fertility"] <= 0.3:
+				continue
+			t["food"] = max(t["food"], Nature.food_cap(t))
+			if t["biome"] == "forest" and t["trees"] < 9:
+				t["trees"] += 2
