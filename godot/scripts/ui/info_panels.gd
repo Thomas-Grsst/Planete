@@ -94,6 +94,7 @@ static func settlement(st: Dictionary, s: Dictionary) -> String:
 	var pop: int = e["pop"] if e != null else 0
 	var out := "[b]%s[/b]  %s\n" % [s["name"], muted(Settlements.level_name(s))]
 	out += "👥 %d habitants · 🏠 %d maisons · 🪵 %d bois · 🍖 %d vivres\n" % [pop, s["houses"], s["wood"], s["food"]]
+	out += resources(st, s)
 	out += muted("Fondé %s" % Journal.format_day(s["founded_day"])) + "\n"
 	if s["construction"] >= 0.0:
 		out += "🔨 Maison en construction : %d %%\n" % int(s["construction"] * 100)
@@ -109,6 +110,20 @@ static func settlement(st: Dictionary, s: Dictionary) -> String:
 		for p in e["people"].slice(0, 30):
 			out += "%s %s\n" % [link("person:%d" % p["id"], p["name"]), muted("· %d ans · %s" % [People.age_of(st, p), Jobs.label(p["job"], p["sex"])])]
 	return out
+
+
+static func resources(st: Dictionary, s: Dictionary) -> String:
+	var parts: Array = ["🌳 %d arbres" % Work.trees_near(st, s)]
+	if s["geo"]["water"] > 0:
+		parts.append("🐟 poissons %d %%" % int(round(Nature.fish_share(st["world"], s["x"], s["y"], Harvest.fish_radius(s)) * 100)))
+	if Techs.has_tech(s, "agriculture"):
+		parts.append("🌾 %d champs · sol %d %%" % [Harvest.fields(st, s, false)["count"], int(round(s.get("soil", 1.0) * 100))])
+	var ores: Array = s["geo"]["ores"].filter(func(o): return Mining.METAL_ORES.has(o)).map(func(o): return Biomes.ORES[o]["name"].to_lower())
+	if not ores.is_empty():
+		parts.append("⛏️ " + ", ".join(ores))
+	if s.get("metal", 0.0) >= 1.0:
+		parts.append("⚒️ %d métal" % int(s["metal"]))
+	return muted(" · ".join(parts)) + "\n"
 
 
 static func journal(st: Dictionary) -> String:

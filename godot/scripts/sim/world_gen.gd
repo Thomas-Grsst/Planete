@@ -33,8 +33,8 @@ static func generate(seed_value: int) -> Dictionary:
 			for j in neighbors(i):
 				if tiles[j]["biome"] == "river" and t["fertility"] > 0.1:
 					t["fertility"] = min(1.0, t["fertility"] + 0.3)
-		t["food"] = t["fertility"] * 10.0
-	var world := {"size": SIZE, "tiles": tiles}
+		t["food"] = t["fertility"] * Nature.FOOD_CAP
+	var world := {"size": SIZE, "tiles": tiles, "depleted": {}, "fished": {}}
 	_place_ores(world, Rng.new(seed_value ^ 0x5eed0e5))
 	return world
 
@@ -155,4 +155,5 @@ static func _place_vein(world: Dictionary, rng: Rng, key: String, biomes: Array)
 				var t = tile_at(world, cx + dx, cy + dy)
 				if absi(dx) + absi(dy) <= VEIN_RADIUS and rng.chance(0.55) and t != null and biomes.has(t["biome"]) and t["ore"] == "":
 					t["ore"] = key
+					t["ore_left"] = Mining.vein_amount(rng)
 		return

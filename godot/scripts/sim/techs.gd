@@ -21,6 +21,7 @@ const DATA := {
 	"fer": {"the": "le fer", "de": "du fer", "name": "Fer", "emoji": "⛓️", "needs": ["feu", "outils"], "any": [], "job": "forgeron", "mods": {"defense": ["mul", 1.4], "wood": ["mul", 1.3], "build": ["mul", 1.2]}},
 	"epee": {"the": "l'épée", "de": "de l'épée", "name": "Épée", "emoji": "🗡️", "needs": [], "any": METALS, "job": "gardien", "mods": {"defense": ["mul", 1.6], "hunt": ["mul", 1.2]}},
 	"charrue": {"the": "la charrue", "de": "de la charrue", "name": "Charrue", "emoji": "🚜", "needs": ["agriculture"], "any": METALS, "job": "fermier", "mods": {"farm": ["mul", 1.6]}},
+	"sylviculture": {"the": "la sylviculture", "de": "de la sylviculture", "name": "Sylviculture", "emoji": "🌳", "needs": ["agriculture"], "any": [], "job": "bâtisseur", "mods": {"wood": ["mul", 1.2]}},
 	"roue": {"the": "la roue", "de": "de la roue", "name": "Roue", "emoji": "☸️", "needs": ["outils"], "any": [], "job": "bâtisseur", "mods": {"wood": ["mul", 1.3], "farm": ["mul", 1.3], "migration": ["add", 4], "spread": ["mul", 1.5]}},
 	"navigation": {"the": "la navigation", "de": "de la navigation", "name": "Navigation", "emoji": "⛵", "needs": ["radeau"], "any": [], "job": "pêcheur", "mods": {"cross_water": ["set", 1], "migration": ["add", 8], "fish": ["mul", 1.5], "spread": ["mul", 1.5]}},
 	"ecriture": {"the": "l'écriture", "de": "de l'écriture", "name": "Écriture", "emoji": "📜", "needs": ["poterie"], "any": [], "job": "", "mods": {"research": ["mul", 1.5], "spread": ["mul", 2.0]}},
@@ -35,7 +36,7 @@ const DATA := {
 
 const ORDER := [
 	"feu", "outils", "peche", "radeau", "plantes", "agriculture", "poterie", "cuivre", "metallurgie", "fer", "epee", "charrue",
-	"roue", "navigation", "ecriture", "medecine", "architecture", "lois", "machines", "electricite", "fusee", "espace",
+	"sylviculture", "roue", "navigation", "ecriture", "medecine", "architecture", "lois", "machines", "electricite", "fusee", "espace",
 ]
 
 

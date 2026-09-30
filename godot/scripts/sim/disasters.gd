@@ -55,6 +55,7 @@ static func _wildfire(state: Dictionary, s: Dictionary) -> void:
 				burnt += t["trees"]
 				t["trees"] = 0
 				t["food"] *= 0.3
+				Nature.mark_food(state["world"], s["x"] + dx, s["y"] + dy)
 	if burnt > 5:
 		Journal.log_event(state, "catastrophe", "🔥 Un incendie ravage les forêts autour de %s." % s["name"], {"x": s["x"], "y": s["y"], "settlement": s["id"], "fire": true})
 
@@ -73,6 +74,7 @@ static func _flood(state: Dictionary, rng: Rng, alive: Array) -> void:
 			var t = WorldGen.tile_at(state["world"], s["x"] + dx, s["y"] + dy)
 			if t != null and Biomes.walkable(t["biome"]):
 				t["food"] *= 0.5
+				Nature.mark_food(state["world"], s["x"] + dx, s["y"] + dy)
 	var ruin := " et emporte une maison" if lost > 0 else ""
 	Journal.log_event(state, "catastrophe", "🌊 La rivière sort de son lit à %s : les réserves et les champs sont noyés%s." % [s["name"], ruin], {"x": s["x"], "y": s["y"], "settlement": s["id"], "flood": true, "houses_lost": lost, "highlight": true})
 

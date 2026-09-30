@@ -12,7 +12,7 @@ const LIST := [
 	["paix", "🕊️ Les mains tendues", "Voir une guerre finir en paix"],
 	["statue", "🗿 Mémoire de pierre", "Voir un habitant célèbre honoré d'une statue"],
 	["dynastie", "👑 Lignée royale", "Voir une dynastie régner sur 3 générations"],
-	["savoirs", "📚 Tous les savoirs", "Découvrir les 22 savoirs"],
+	["savoirs", "📚 Tous les savoirs", "Découvrir tous les savoirs"],
 	["espace", "🚀 Vers les étoiles", "Voir le grand départ"],
 	["apocalypses", "🧟 Survivants", "Survivre à 3 apocalypses zombies"],
 	["volcan", "🌋 Sous les cendres", "Survivre à l'éveil d'un volcan"],

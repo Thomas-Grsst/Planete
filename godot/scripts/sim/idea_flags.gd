@@ -5,6 +5,7 @@ const TRADE_RANGE := 14
 const LOST_LORE_DAYS := 720
 const STORM_DAMAGE_DAYS := 360
 const WOLF_REACH := 4
+const DEFORESTED_TREES := 12
 
 
 static func check(state: Dictionary, e: Dictionary, flag: String) -> bool:
@@ -46,6 +47,7 @@ static func check(state: Dictionary, e: Dictionary, flag: String) -> bool:
 		"stormDamage": return state["day"] - s.get("storm_damage_day", -99999) <= STORM_DAMAGE_DAYS
 		"council": return s.get("council", []).size() >= 3
 		"chef": return s.get("chef", -1) >= 0
+		"deforested": return s["houses"] >= 3 and Work.trees_near(state, s) < DEFORESTED_TREES
 	return geo["ores"].has(flag)
 
 

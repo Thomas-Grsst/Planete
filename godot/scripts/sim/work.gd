@@ -6,8 +6,6 @@ const GATHER_PER_WORKER := 1.6
 const HELPER_SHARE := 0.5
 const HUNT_PER_HUNTER := 2.6
 const HUNT_TAKE := 0.05
-const FISH_PER_FISHER := 1.6
-const FARM_PER_FARMER := 3.2
 const FARM_WEATHER := {"drought": 0.3, "rain": 1.2, "snow": 0.4}
 const ADULT_MEAL := 1.0
 const CHILD_MEAL := 0.5
@@ -17,30 +15,18 @@ const WOOD_CAP_BASE := 40.0
 const WOOD_PER_HOUSE := 10.0
 const HUNGER_STEP := 6.0
 const HUNGER_RELIEF := 12.0
-const REGROW_EVERY := 4
 const TREE_REGROW_EVERY := 10
-
-static var _offsets: Array = []
+const TREE_REGROW_CHANCE := 0.012
+const PLANTED_BOOST := 4.0
+const PLANTED_TREES := 5
 
 
 static func offsets() -> Array:
-	if _offsets.is_empty():
-		for dy in range(-GATHER_RADIUS, GATHER_RADIUS + 1):
-			for dx in range(-GATHER_RADIUS, GATHER_RADIUS + 1):
-				_offsets.append(Vector2i(dx, dy))
-		_offsets.sort_custom(func(a, b): return absi(a.x) + absi(a.y) < absi(b.x) + absi(b.y))
-	return _offsets
+	return Geography.offsets(GATHER_RADIUS)
 
 
 static func regrow(state: Dictionary) -> void:
-	if state["day"] % REGROW_EVERY != 0:
-		return
-	var w: String = state["weather"]
-	var rain := (1.5 if w == "rain" else (0.3 if w == "drought" else (0.4 if w == "snow" else 1.0))) * REGROW_EVERY
-	for t in state["world"]["tiles"]:
-		var cap: float = t["fertility"] * 12.0
-		if t["food"] < cap:
-			t["food"] = min(cap, t["food"] + t["fertility"] * 0.7 * rain)
+	Nature.regrow(state)
 
 
 static func step(state: Dictionary, rng: Rng, census: Dictionary) -> void:
@@ -55,23 +41,25 @@ static func step(state: Dictionary, rng: Rng, census: Dictionary) -> void:
 		var gain := _gather(state, s, gatherers * GATHER_PER_WORKER * m["gather"])
 		gain += _hunt(state, s, jobs.get("chasseur", 0), m["hunt"])
 		if s["geo"]["water"] > 0:
-			gain += jobs.get("pêcheur", 0) * FISH_PER_FISHER * m["fish"]
-		gain += jobs.get("fermier", 0) * FARM_PER_FARMER * m["farm"] * FARM_WEATHER.get(state["weather"], 1.0)
+			gain += Harvest.fish(state, s, jobs.get("pêcheur", 0), m["fish"])
+		gain += Harvest.farm(state, s, jobs.get("fermier", 0), m["farm"], FARM_WEATHER.get(state["weather"], 1.0))
 		_feed(s, e, gain, m)
 		_cut_wood(state, rng, s, jobs.get("bâtisseur", 0) + 1, m["wood"])
+		Mining.step(state, s, jobs.get("forgeron", 0))
 
 
 static func _gather(state: Dictionary, s: Dictionary, wanted: float) -> float:
 	var got := 0.0
+	var world: Dictionary = state["world"]
 	for o in offsets():
 		if got >= wanted:
 			break
-		var t = WorldGen.tile_at(state["world"], s["x"] + o.x, s["y"] + o.y)
+		var x: int = s["x"] + o.x
+		var y: int = s["y"] + o.y
+		var t = WorldGen.tile_at(world, x, y)
 		if t == null or t["food"] <= 0:
 			continue
-		var take: float = min(t["food"], wanted - got)
-		t["food"] -= take
-		got += take
+		got += Nature.take_food(world, x, y, t, wanted - got)
 	return got
 
 
@@ -114,8 +102,22 @@ static func _cut_wood(state: Dictionary, rng: Rng, s: Dictionary, workers: int, 
 		workers -= 1
 	if (state["day"] + s["id"]) % TREE_REGROW_EVERY != 0:
 		return
+	var planted := Techs.has_tech(s, "sylviculture")
+	var chance: float = TREE_REGROW_CHANCE * TREE_REGROW_EVERY * (PLANTED_BOOST if planted else 1.0)
 	for o in offsets():
 		var t = WorldGen.tile_at(state["world"], s["x"] + o.x, s["y"] + o.y)
 		var in_village: bool = max(absi(o.x), absi(o.y)) <= Settlements.clear_radius(s)
-		if t != null and not in_village and t["trees"] < (9 if t["biome"] == "forest" else 2) and t["fertility"] > 0.3 and rng.chance(0.012 * TREE_REGROW_EVERY):
+		if t == null or in_village or t["fertility"] <= 0.3 or not Biomes.walkable(t["biome"]) or t["biome"] == "river":
+			continue
+		var most: int = 9 if t["biome"] == "forest" else (PLANTED_TREES if planted else 2)
+		if t["trees"] < most and rng.chance(chance):
 			t["trees"] += 1
+
+
+static func trees_near(state: Dictionary, s: Dictionary) -> int:
+	var n := 0
+	for o in offsets():
+		var t = WorldGen.tile_at(state["world"], s["x"] + o.x, s["y"] + o.y)
+		if t != null and max(absi(o.x), absi(o.y)) > Settlements.clear_radius(s):
+			n += t["trees"]
+	return n

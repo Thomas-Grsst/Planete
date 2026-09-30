@@ -31,6 +31,7 @@ func start_new(world_name: String, seed_text: String = "", colony: Dictionary = 
 
 func load_existing(data: Dictionary) -> int:
 	state = data
+	WorldUpgrade.run(state)
 	state["pending_summary"] = {}
 	state["pending_highlights"] = []
 	_bind()

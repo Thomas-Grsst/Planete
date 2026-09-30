@@ -47,7 +47,7 @@ static func build(state: Dictionary) -> Dictionary:
 
 static func _job_mods(e: Dictionary) -> void:
 	var m: Dictionary = e["mods"]
-	if e["jobs"].get("forgeron", 0) >= 1:
+	if e["jobs"].get("forgeron", 0) >= 1 and Mining.has_metal(e["s"]):
 		m["defense"] *= 1.2
 		m["hunt"] *= 1.2
 		m["build"] *= 1.2

@@ -6,6 +6,19 @@ const MIN_SPACING := 6
 const FISHING_VALUE := 0.55
 const COAST_BONUS := 3.0
 
+static var _offsets := {}
+
+
+static func offsets(radius: int) -> Array:
+	if not _offsets.has(radius):
+		var out: Array = []
+		for dy in range(-radius, radius + 1):
+			for dx in range(-radius, radius + 1):
+				out.append(Vector2i(dx, dy))
+		out.sort_custom(func(a, b): return absi(a.x) + absi(a.y) < absi(b.x) + absi(b.y))
+		_offsets[radius] = out
+	return _offsets[radius]
+
 
 static func of(world: Dictionary, x: int, y: int) -> Dictionary:
 	var geo := {"water": 0, "coast": false, "river": false, "forest": 0, "swamp": 0, "mountain": 0, "fertile": 0, "ores": []}

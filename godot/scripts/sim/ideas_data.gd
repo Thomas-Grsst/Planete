@@ -46,6 +46,9 @@ const DATA := {
 		["hunger", 1.0, "🚜 La faim pousse {name} à fixer du métal à un soc de bois : la première charrue retourne la terre de {place}."],
 		["bigpop", 0.5, "🚜 Pour nourrir tout {place}, {name} invente la charrue."],
 		["dream", 0.1, "🚜 {name} invente la charrue à {place}."]]},
+	"sylviculture": {"mean": 600, "needs": {"hunger": 1.3}, "triggers": [
+		["deforested", 1.0, "🌳 Il ne reste presque plus d'arbres autour de {place}. {name} plante des glands et protège les jeunes pousses : la forêt reviendra."],
+		["dream", 0.01, "🌳 {name} apprend à replanter les arbres à {place}."]]},
 	"roue": {"mean": 5000, "needs": {"bigpop": 1.5}, "triggers": [
 		["tech:poterie", 1.0, "☸️ En regardant son tour de potier tourner, {name} a une idée à {place} : la roue."],
 		["stone", 0.4, "☸️ {name} voit un tronc dévaler la pente près de {place} : la roue."],

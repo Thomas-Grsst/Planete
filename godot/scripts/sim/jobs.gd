@@ -47,11 +47,11 @@ static func _desired(state: Dictionary, e: Dictionary) -> Dictionary:
 	if Herds.huntable_near(state, s) != null:
 		d["chasseur"] = int(round(workers * 0.15))
 	if s["geo"]["water"] > 0:
-		d["pêcheur"] = int(round(workers * (0.25 if Techs.has_tech(s, "peche") else 0.1)))
+		d["pêcheur"] = int(round(workers * (0.25 if Techs.has_tech(s, "peche") else 0.1) * clamp(s.get("fish_rate", 1.0) + 0.25, 0.3, 1.0)))
 	if Techs.has_tech(s, "agriculture"):
-		d["fermier"] = int(round(workers * 0.35))
+		d["fermier"] = mini(int(round(workers * 0.35)), int(ceil(Harvest.fields(state, s)["count"] * Harvest.FARMERS_PER_FIELD)))
 	d["guérisseur"] = (1 + (2 if not s.get("outbreak", {}).is_empty() else 0)) if Techs.has_tech(s, "plantes") and workers >= 8 else 0
-	d["forgeron"] = (1 if workers >= 8 else 0) + (1 if workers >= 30 else 0) if Techs.METALS.any(func(k): return Techs.has_tech(s, k)) else 0
+	d["forgeron"] = (1 if workers >= 8 else 0) + (1 if workers >= 30 else 0) if Techs.METALS.any(func(k): return Techs.has_tech(s, k)) and Mining.has_supply(s) else 0
 	d["gardien"] = (1 if workers >= 12 else 0) + (int(round(workers * 0.15)) if Threats.pressing(state, s) else 0)
 	return d
 
