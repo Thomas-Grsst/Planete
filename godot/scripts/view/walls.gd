@@ -51,7 +51,7 @@ func _draw() -> void:
 
 
 func _walls(stone: bool) -> void:
-	var height := 7.0 if stone else 6.0
+	var height := 9.0 if stone else 8.0
 	for i in POSTS:
 		var p := _point(float(i) / POSTS, radius)
 		var q := _point(float(i + 1) / POSTS, radius)
@@ -63,9 +63,10 @@ func _walls(stone: bool) -> void:
 			if i % 2 == 0:
 				draw_rect(Rect2(p + Vector2(-1, -height - 2), Vector2(2, 2)), STONE_TOP)
 		else:
-			draw_line(p, p + Vector2(0, -height), WOOD, 1.8)
+			draw_line(p, p + Vector2(0, -height), WOOD, 2.6)
 			draw_line(p + Vector2(0, -height), p + Vector2(0.4, -height - 1.2), WOOD_TOP, 1.2)
-			draw_line(p + Vector2(0, -height * 0.55), q + Vector2(0, -height * 0.55), WOOD, 1.0)
+			draw_line(p + Vector2(0, -height * 0.35), q + Vector2(0, -height * 0.35), WOOD, 1.6)
+			draw_line(p + Vector2(0, -height * 0.75), q + Vector2(0, -height * 0.75), WOOD, 1.6)
 
 
 func _camp(s: Dictionary) -> void:
@@ -73,6 +74,6 @@ func _camp(s: Dictionary) -> void:
 	var flag: Color = civ["color"] if civ != null else Color("ef5350")
 	for i in TENTS:
 		var p := _point(0.1 + float(i) / TENTS, radius + CAMP_GAP)
-		draw_colored_polygon(PackedVector2Array([p + Vector2(-4, 0), p + Vector2(4, 0), p + Vector2(0, -6)]), TENT_CLOTH)
-		draw_line(p + Vector2(0, -6), p + Vector2(0, -10), Color(0.35, 0.25, 0.15), 0.8)
-		draw_colored_polygon(PackedVector2Array([p + Vector2(0, -10), p + Vector2(3.5, -9), p + Vector2(0, -8)]), flag)
+		draw_colored_polygon(PackedVector2Array([p + Vector2(-6, 0), p + Vector2(6, 0), p + Vector2(0, -9)]), TENT_CLOTH)
+		draw_line(p + Vector2(0, -9), p + Vector2(0, -14), Color(0.35, 0.25, 0.15), 0.8)
+		draw_colored_polygon(PackedVector2Array([p + Vector2(0, -14), p + Vector2(5, -12.5), p + Vector2(0, -11)]), flag)

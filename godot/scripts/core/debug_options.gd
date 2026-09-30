@@ -49,6 +49,9 @@ static func schedule_shot(host: Node, options: Dictionary) -> void:
 	if options.has("pilgrim"):
 		await host.get_tree().create_timer(1.0).timeout
 		_fake_conversion()
+	if options.has("siege"):
+		await host.get_tree().create_timer(1.0).timeout
+		_fake_siege()
 	if options.has("tap"):
 		await host.get_tree().create_timer(after * 0.5).timeout
 		_tap(host, host.get_viewport().get_visible_rect().size * 0.5 + Vector2(0, float(options["tap"])))
@@ -60,3 +63,18 @@ static func schedule_shot(host: Node, options: Dictionary) -> void:
 		print(host.debug_report())
 	print("shot saved: ", options["shot"])
 	host.get_tree().quit()
+
+
+static func _fake_siege() -> void:
+	var st: Dictionary = Sim.state
+	var s: Dictionary = st["settlements"].filter(func(o): return o["abandoned"] < 0)[0]
+	var civ = Civs.of(st, s)
+	var by: int = civ["id"] if civ != null else -1
+	s["walls"] = st["day"]
+	s["stone_walls"] = Techs.has_tech(s, "architecture")
+	s["siege"] = {"by": by, "since": st["day"], "until": st["day"] + 90}
+	var spot = Ports._spot(st["world"], s)
+	if spot != null:
+		s["port"] = {"x": spot.x, "y": spot.y, "day": st["day"]}
+		s["blockade"] = {"by": by, "until": st["day"] + 90}
+	Sim.world_loaded.emit()
