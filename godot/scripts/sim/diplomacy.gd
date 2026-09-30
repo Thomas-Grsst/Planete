@@ -16,6 +16,7 @@ const TRUCE_DAYS := 1800
 const PEACE_MIN_DAYS := 120
 const TRADE_TECH_CHANCE := 0.003
 const SHARED_FAITH := 0.04
+const NAVAL_BORDER := 45
 
 
 static func _distance(state: Dictionary, a: Dictionary, b: Dictionary) -> int:
@@ -30,6 +31,10 @@ static func _chef_trait(state: Dictionary, civ: Dictionary, t: String) -> bool:
 	var capital = Settlements.by_id(state, civ["capital"])
 	var chef = Governance.chef_of(state, capital) if capital != null else null
 	return chef != null and chef["traits"].has(t)
+
+
+static func _naval(state: Dictionary, civ: Dictionary) -> bool:
+	return Civs.members(state, civ).any(func(s): return Ports.has_port(s) and Techs.has_tech(s, "navigation"))
 
 
 static func trades(state: Dictionary, civ: Dictionary) -> bool:
@@ -50,6 +55,8 @@ static func _drift(state: Dictionary, rng: Rng, a: Dictionary, b: Dictionary, re
 		delta += 0.03
 	if a.get("religion", -1) >= 0 and b.get("religion", -1) >= 0:
 		delta += SHARED_FAITH if a["religion"] == b["religion"] else -SHARED_FAITH
+	if d <= Covet.REACH and (not Covet.reason(state, a, b).is_empty() or not Covet.reason(state, b, a).is_empty()):
+		delta -= Covet.TENSION
 	rel["score"] = clamp(rel["score"] * DECAY + delta + (rng.next() - 0.5) * 0.3, -100.0, 100.0)
 
 
@@ -66,7 +73,8 @@ static func step(state: Dictionary, rng: Rng, census: Dictionary) -> void:
 			if war != null:
 				_try_peace(state, rng, war, rel, a, b)
 				continue
-			if rel["score"] < WAR_THRESHOLD and state["day"] >= rel["truce_until"] and d < BORDER + 6 and rng.chance(WAR_CHANCE):
+			var reach: int = NAVAL_BORDER if _naval(state, a) and _naval(state, b) else BORDER + 6
+			if rel["score"] < WAR_THRESHOLD and state["day"] >= rel["truce_until"] and d < reach and rng.chance(WAR_CHANCE):
 				rel["pact"] = ""
 				_declare(state, a, b, d)
 				continue
@@ -82,8 +90,11 @@ static func _declare(state: Dictionary, a: Dictionary, b: Dictionary, d: int) ->
 	var capital = Settlements.by_id(state, attacker["capital"])
 	var faith = Religions.by_id(state, attacker.get("religion", -1))
 	var why := "pour des terres frontalières" if d < CLOSE_BORDER else "après des années de méfiance"
+	var covet := Covet.reason(state, attacker, defender)
 	if faith != null and defender.get("religion", -1) >= 0 and defender["religion"] != faith["id"]:
 		why = "au nom %s" % FaithData.of_name(faith["deity"])
+	elif not covet.is_empty():
+		why = Covet.why(covet)
 	elif _chef_trait(state, attacker, "agressif"):
 		why = "sous l'impulsion %s" % Names.of_place(Governance.chef_of(state, capital)["name"])
 	state["next_id"] += 1

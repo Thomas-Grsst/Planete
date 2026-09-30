@@ -62,6 +62,8 @@ func _draw() -> void:
 	var count: int = mini(MAX_BOATS, 1 + village.settlement["houses"] / 6)
 	for i in count:
 		_boat(_boat_at(i), i)
+	if Sieges.blockaded(village.settlement):
+		_blockade()
 
 
 func _boat_at(i: int) -> Vector2:
@@ -87,3 +89,17 @@ func _boat(tile: Vector2, i: int) -> void:
 	draw_colored_polygon(PackedVector2Array([o + Vector2(-6, -1), o + Vector2(6, -1), o + Vector2(4, 2), o + Vector2(-4, 2)]), HULL)
 	draw_line(o + Vector2(0, -1), o + Vector2(0, -11), Color(0.35, 0.25, 0.15), 0.9)
 	draw_colored_polygon(PackedVector2Array([o + Vector2(0.8, -10.5), o + Vector2(5.5, -3), o + Vector2(0.8, -2.5)]), SAIL)
+
+
+func _blockade() -> void:
+	var civ = Civs.by_id(Sim.state, village.settlement["blockade"]["by"])
+	var flag: Color = civ["color"] if civ != null else Color("ef5350")
+	var along := (port - shore).normalized()
+	for k in [-1.0, 1.0]:
+		var o := _local(port + along * 2.6 + Vector2(-along.y, along.x) * k * 1.1)
+		var bob := sin(Time.get_ticks_msec() * 0.002 + k) * 0.8
+		o += Vector2(0, bob)
+		draw_colored_polygon(PackedVector2Array([o + Vector2(-9, -1), o + Vector2(9, -1), o + Vector2(6, 3), o + Vector2(-6, 3)]), Color(0.3, 0.2, 0.14))
+		draw_line(o + Vector2(0, -1), o + Vector2(0, -17), Color(0.3, 0.22, 0.14), 1.0)
+		draw_colored_polygon(PackedVector2Array([o + Vector2(1, -16), o + Vector2(8, -6), o + Vector2(1, -5)]), flag.lightened(0.45))
+		draw_colored_polygon(PackedVector2Array([o + Vector2(0, -17), o + Vector2(5, -15.5), o + Vector2(0, -14)]), flag)

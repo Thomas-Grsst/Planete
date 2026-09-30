@@ -8,6 +8,7 @@ var entities: Node2D
 var life: Node2D
 var map: Node2D
 var territory: Node2D
+var routes: Node2D
 var skip_flora := false
 var _season := -1
 
@@ -24,6 +25,10 @@ func build() -> void:
 	territory.set_script(load("res://scripts/view/territory_layer.gd"))
 	territory.z_index = -7
 	add_child(territory)
+	routes = Node2D.new()
+	routes.set_script(load("res://scripts/view/route_layer.gd"))
+	routes.z_index = -7
+	add_child(routes)
 	add_child(entities)
 	life = Node2D.new()
 	life.set_script(load("res://scripts/view/life.gd"))
@@ -47,6 +52,7 @@ func spawn_flora() -> void:
 func rotate_view() -> void:
 	map.rebuild()
 	territory.queue_redraw()
+	routes.queue_redraw()
 	life.relayout()
 
 

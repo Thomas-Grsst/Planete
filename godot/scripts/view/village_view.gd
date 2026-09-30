@@ -7,6 +7,7 @@ const FIELD_MIN_FERTILITY := 0.5
 const TEMPLE := preload("res://scripts/view/temple.gd")
 const EXTRAS := preload("res://scripts/view/village_extras.gd")
 const HARBOR := preload("res://scripts/view/harbor.gd")
+const WALLS := preload("res://scripts/view/walls.gd")
 const TEMPLE_OFFSET := Vector2(-0.95, -0.95)
 const TEMPLE_CLEARANCE := 0.75
 
@@ -20,6 +21,7 @@ var props
 var temple
 var extras
 var harbor
+var walls: Array = []
 var slots: Array = []
 
 
@@ -53,6 +55,12 @@ func setup(s: Dictionary, entity_root: Node2D, fx: Node2D) -> void:
 	extras.set_script(EXTRAS)
 	add_child(extras)
 	extras.setup(self)
+	for front in [false, true]:
+		var w := Node2D.new()
+		w.set_script(WALLS)
+		add_child(w)
+		w.setup(self, front)
+		walls.append(w)
 
 
 func _dry(world: Dictionary, tile: Vector2) -> bool:
@@ -111,6 +119,8 @@ func refresh() -> void:
 	temple.refresh()
 	extras.refresh()
 	_refresh_harbor()
+	for w in walls:
+		w.refresh()
 
 
 func _refresh_fields() -> void:

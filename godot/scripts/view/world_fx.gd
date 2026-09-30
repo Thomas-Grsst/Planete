@@ -6,6 +6,7 @@ signal map_changed
 const WALKER := preload("res://scripts/view/walker.gd")
 const SKY_OBJECT := preload("res://scripts/view/sky_object.gd")
 const CARAVAN_DAYS := 12
+const MAX_CARAVANS := 12
 const LABEL_LIFT := Vector2(0, -34)
 
 var life
@@ -55,7 +56,10 @@ func on_event(entry: Dictionary) -> void:
 	match entry["type"]:
 		"bataille":
 			var target = _tile_of(entry["settlement"])
-			_walk(_tile_of(entry["from"]), target, "soldiers", _civ_color(entry), 5, func(): _clash(Iso.ground(Sim.state["world"], target.x, target.y)))
+			var kind := "fleet" if entry.get("sea", false) else "soldiers"
+			_walk(_tile_of(entry["from"]), target, kind, _civ_color(entry), 5, func(): _clash(Iso.ground(Sim.state["world"], target.x, target.y)))
+		"bataille_navale":
+			_clash(at)
 		"commerce":
 			_walk(_tile_of(entry["from"]), _tile_of(entry["to"]), "caravan", _civ_color(entry), 1)
 		"migration":
@@ -127,12 +131,14 @@ func _impact(pos: Vector2, amount: float) -> void:
 func _on_day(day: int) -> void:
 	if day % CARAVAN_DAYS != 0:
 		return
-	for key in Sim.state.get("relations", {}):
-		var rel: Dictionary = Sim.state["relations"][key]
-		if rel["pact"] == "":
+	var sent := 0
+	for r in Sim.state.get("routes", []):
+		var a = Settlements.by_id(Sim.state, r["a"])
+		var b = Settlements.by_id(Sim.state, r["b"])
+		if a == null or b == null or sent >= MAX_CARAVANS:
 			continue
-		var ids: PackedStringArray = key.split("-")
-		var a = Civs.by_id(Sim.state, int(ids[0]))
-		var b = Civs.by_id(Sim.state, int(ids[1]))
-		if a != null and b != null and a["alive"] and b["alive"]:
-			_walk(_tile_of(a["capital"]), _tile_of(b["capital"]), "caravan", a["color"], 1)
+		var sea: bool = r["kind"] == "sea"
+		var there := [a, b] if (day / CARAVAN_DAYS + r["id"]) % 2 == 0 else [b, a]
+		var civ = Civs.of(Sim.state, there[0])
+		_walk(RouteLayer.ends(there[0], sea), RouteLayer.ends(there[1], sea), "boat" if sea else "caravan", civ["color"] if civ != null else Color("b0bec5"), 1)
+		sent += 1

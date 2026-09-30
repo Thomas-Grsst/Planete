@@ -109,6 +109,8 @@ func tick(announce: bool = true) -> void:
 	CivFormation.step(state, rng, census)
 	Diplomacy.step(state, rng, census)
 	Wars.step(state, rng, census)
+	Sieges.step(state)
+	Trade.step(state, census)
 	Lore.step(state, rng, census)
 	Ideas.step(state, rng, census)
 	World.step(state, rng, census)

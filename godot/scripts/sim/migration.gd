@@ -9,7 +9,7 @@ const ISLAND_SHARE := 0.4
 
 
 static func depart(state: Dictionary, rng: Rng, from: Dictionary, e: Dictionary) -> void:
-	var harbour := Ports.has_port(from)
+	var harbour := Ports.has_port(from) and not Sieges.blockaded(from)
 	var sailors: bool = e["mods"]["cross_water"] > 0 or harbour
 	var reach: int = RADIUS + e["mods"]["migration"] + (Exploration.PORT_REACH if harbour else 0)
 	var spot = Geography.find_spot(state, rng, from["x"], from["y"], reach, true, true) if sailors and rng.chance(ISLAND_SHARE) else null

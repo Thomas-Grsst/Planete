@@ -64,4 +64,4 @@ static func _exhaust(state: Dictionary, s: Dictionary, pos: Vector2i, t: Diction
 	for o in state["settlements"]:
 		if o["abandoned"] < 0 and absi(o["x"] - pos.x) + absi(o["y"] - pos.y) <= GEO_REFRESH_RADIUS:
 			o["geo"] = Geography.of(state["world"], o["x"], o["y"])
-	Journal.log_event(state, "filon", "⛏️ Le filon de %s près de %s est épuisé. Les forgerons devront chercher le métal plus loin." % [Biomes.ORES[ore]["name"].to_lower(), s["name"]], {"x": pos.x, "y": pos.y, "settlement": s["id"], "highlight": true})
+	Journal.log_event(state, "filon", "⛏️ Le filon %s près %s est épuisé. Les forgerons devront chercher le métal plus loin." % [Discovery._ore(ore).replace("le ", "de ").replace("l'", "d'"), Names.of_place(s["name"])], {"x": pos.x, "y": pos.y, "settlement": s["id"], "highlight": true})

@@ -8,6 +8,7 @@ var options := {}
 
 func _ready() -> void:
 	options = DebugOptions.parse()
+	Iso.turn = int(options.get("turn", "0")) % 4
 	_build_scene()
 	Sim.power_used.connect(_on_power)
 	var offline := Boot.start(options)
@@ -51,11 +52,19 @@ func _build_scene() -> void:
 	hud.set_script(load("res://scripts/ui/hud.gd"))
 	add_child(hud)
 	hud.focus_requested.connect(func(pos): camera.focus(pos))
+	hud.rotate_requested.connect(_rotate)
 	world_view.life.selected.connect(func(kind, id): hud.show_info(kind, id))
 	var phone := Node.new()
 	phone.name = "Phone"
 	phone.set_script(load("res://scripts/core/phone.gd"))
 	add_child(phone)
+
+
+func _rotate() -> void:
+	var tile := Iso.unproject(camera.target_pos)
+	Iso.turn = (Iso.turn + 1) % 4
+	world_view.rotate_view()
+	camera.jump(Iso.project(tile.x, tile.y))
 
 
 func _catch_up_screen() -> void:

@@ -87,8 +87,16 @@ Remplacer les « points de savoir » par des **idées déclenchées** : fini le 
 - [x] Monuments visibles de loin (pyramides, temples, observatoires).
 - [x] Légendes qui racontent tes interventions (« Le Grand Déluge de l'An 12 »).
 
+### 🌊 Monde ouvert
+- [x] **Ressources limitées** : poissons qui se reproduisent (surpêche possible), champs limités par les terres fertiles et sol qui s'épuise, filons qui se vident, sylviculture pour replanter.
+- [x] **Carte presque infinie** créée par morceaux quand on la découvre, brume aux limites des terres connues, rendu uniquement autour de la caméra.
+- [x] **Ports**, barques de pêche, expéditions à pied et en bateau (explorateurs perdus en mer), colonies sur les îles.
+- [x] **Routes commerciales** durables sur terre et sur mer, qui échangent vivres, bois et métal.
+- [x] **Guerres sur terre et sur mer** : débarquements, batailles navales, blocus, sièges, palissades et murailles, fronts qui avancent, guerres pour les ressources.
+- [x] **Rotation de la vue** par quarts de tour (↻).
+
 ### ⚔️ Après la V3
-- [x] Routes commerciales et caravanes visibles, bateaux (ports à venir).
+- [x] Routes commerciales et caravanes visibles, bateaux et ports.
 - [x] Révolutions contre les chefs impopulaires.
 - [x] Espions, pirates, barbares des terres sauvages.
 

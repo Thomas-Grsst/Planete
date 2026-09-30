@@ -3,7 +3,7 @@ extends RefCounted
 
 const FISH_PER_FISHER := 1.6
 const FISH_TAKE_SHARE := 0.3
-const FISH_BASE_RADIUS := 2
+const FISH_BASE_RADIUS := 3
 const OVERFISHED := 0.35
 const WARN_EVERY := 720
 const FARM_PER_FARMER := 3.2
@@ -47,7 +47,7 @@ static func fish(state: Dictionary, s: Dictionary, fishers: int, mod: float) -> 
 	s["fish_rate"] = lerp(float(s.get("fish_rate", 1.0)), got / wanted, 0.05)
 	if s["fish_rate"] < OVERFISHED and state["day"] - s.get("fish_warned", -99999) > WARN_EVERY:
 		s["fish_warned"] = state["day"]
-		Journal.log_event(state, "surpeche", "🐟 Les filets de %s reviennent presque vides : les poissons se font rares autour du village." % s["name"], {"x": s["x"], "y": s["y"], "settlement": s["id"]})
+		Journal.log_event(state, "surpeche", "🐟 Les filets %s reviennent presque vides : les poissons se font rares autour du village." % Names.of_place(s["name"]), {"x": s["x"], "y": s["y"], "settlement": s["id"]})
 	return got
 
 

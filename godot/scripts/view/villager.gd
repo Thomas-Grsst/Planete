@@ -165,7 +165,7 @@ func _move(delta: float, ts: float) -> void:
 		return
 	var stride: float = min(dist, speed * delta)
 	tile += to_goal / dist * stride
-	var screen_dir := to_goal.x - to_goal.y
+	var screen_dir := Iso.project(to_goal.x, to_goal.y).x
 	if absf(screen_dir) > 0.01:
 		facing = sign(screen_dir)
 	step += stride * 14.0

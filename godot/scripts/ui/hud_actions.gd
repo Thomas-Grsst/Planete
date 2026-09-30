@@ -65,3 +65,16 @@ static func _new_world(hud, seed_text: String) -> void:
 	Sim.save_now()
 	var from_seed := " (graine « %s »)" % seed_text if seed_text != "" else ""
 	hud.toast("🌱 Un nouveau monde vient de naître : %s%s." % [Sim.state["name"], from_seed])
+
+
+static func rotate_button(hud, root: Control) -> void:
+	var b := Button.new()
+	b.text = "↻"
+	b.custom_minimum_size = Vector2(52, 52)
+	b.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+	b.offset_left = -68
+	b.offset_right = -16
+	b.offset_top = 76
+	b.offset_bottom = 128
+	b.pressed.connect(func(): hud.rotate_requested.emit())
+	root.add_child(b)

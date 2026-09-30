@@ -39,11 +39,11 @@ static func step(state: Dictionary, rng: Rng, census: Dictionary) -> void:
 		var m: Dictionary = e["mods"]
 		var jobs: Dictionary = e["jobs"]
 		var gatherers: float = jobs.get("cueilleur", 0) + e["helpers"] * HELPER_SHARE
-		var gain := _gather(state, s, gatherers * GATHER_PER_WORKER * m["gather"], e["hungry"] > 0)
-		gain += _hunt(state, s, jobs.get("chasseur", 0), m["hunt"])
+		var gain := _gather(state, s, gatherers * GATHER_PER_WORKER * m["gather"] * Sieges.yield_factor(s), e["hungry"] > 0)
+		gain += _hunt(state, s, jobs.get("chasseur", 0), m["hunt"]) * Sieges.yield_factor(s)
 		if s["geo"]["water"] > 0:
-			gain += Harvest.fish(state, s, jobs.get("pêcheur", 0), m["fish"])
-		gain += Harvest.farm(state, s, jobs.get("fermier", 0), m["farm"], FARM_WEATHER.get(state["weather"], 1.0))
+			gain += Harvest.fish(state, s, jobs.get("pêcheur", 0), m["fish"] * Sieges.fish_factor(s))
+		gain += Harvest.farm(state, s, jobs.get("fermier", 0), m["farm"] * Sieges.yield_factor(s), FARM_WEATHER.get(state["weather"], 1.0))
 		_feed(s, e, gain, m)
 		_cut_wood(state, rng, s, jobs.get("bâtisseur", 0) + 1, m["wood"])
 		Mining.step(state, s, jobs.get("forgeron", 0))

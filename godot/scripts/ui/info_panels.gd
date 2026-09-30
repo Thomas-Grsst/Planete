@@ -5,7 +5,7 @@ const MUTED := "#8fa3b3"
 const LINK := "#8fd3ff"
 const GOLD := "#ffd54f"
 const JOURNAL_SHOWN := 60
-const WELCOME_TYPES := ["naissance", "deces", "couple", "construction", "decouverte", "fondation", "croissance", "migration", "diffusion", "religion", "conversion", "temple", "schisme", "civilisation", "guerre", "bataille", "conquete", "paix", "epidemie", "apocalypse", "raid", "cataclysme", "statue", "succes", "exploration", "port", "surpeche", "filon"]
+const WELCOME_TYPES := ["naissance", "deces", "couple", "construction", "decouverte", "fondation", "croissance", "migration", "diffusion", "religion", "conversion", "temple", "schisme", "civilisation", "guerre", "bataille", "conquete", "paix", "epidemie", "apocalypse", "raid", "cataclysme", "statue", "succes", "exploration", "port", "surpeche", "filon", "route", "siege", "blocus", "bataille_navale", "murailles"]
 const SUMMARY_LABELS := {
 	"naissance": "👶 naissances", "deces": "🕯️ décès", "couple": "💞 couples formés", "construction": "🏠 maisons construites",
 	"decouverte": "💡 découvertes", "fondation": "🏕️ colonies fondées", "croissance": "📈 colonies qui grandissent",
@@ -14,6 +14,7 @@ const SUMMARY_LABELS := {
 	"civilisation": "🏰 civilisations fondées", "guerre": "⚔️ guerres déclarées", "bataille": "🗡️ batailles", "conquete": "🏴 conquêtes", "paix": "🕊️ paix signées",
 	"epidemie": "🦠 épidémies", "apocalypse": "🧟 apocalypses", "raid": "🔥 raids", "cataclysme": "🌋 cataclysmes", "statue": "🗿 statues", "succes": "🏆 succès",
 	"exploration": "🗺️ expéditions", "port": "⚓ ports construits", "surpeche": "🐟 zones trop pêchées", "filon": "⛏️ filons épuisés",
+	"route": "🛤️ routes commerciales", "siege": "🏰 sièges", "blocus": "⛵ blocus", "bataille_navale": "⚓ batailles navales", "murailles": "🧱 murailles élevées",
 }
 
 
@@ -124,7 +125,20 @@ static func resources(st: Dictionary, s: Dictionary) -> String:
 		parts.append("⛏️ " + ", ".join(ores))
 	if s.get("metal", 0.0) >= 1.0:
 		parts.append("⚒️ %d métal" % int(s["metal"]))
-	return muted(" · ".join(parts)) + "\n"
+	var out := muted(" · ".join(parts)) + "\n"
+	var status: Array = []
+	if Ports.has_port(s):
+		status.append("⚓ port")
+	if s.get("walls", -1) >= 0:
+		status.append("🧱 murailles de pierre" if s.get("stone_walls", false) else "🧱 palissade")
+	var routes := Trade.partners(st, s).size()
+	if routes > 0:
+		status.append("🛤️ %d route%s commerciale%s" % [routes, "s" if routes > 1 else "", "s" if routes > 1 else ""])
+	if Sieges.besieged(s):
+		status.append("[color=#ef5350]🏰 assiégée[/color]")
+	if Sieges.blockaded(s):
+		status.append("[color=#ef5350]⛵ port bloqué[/color]")
+	return out + (" · ".join(status) + "\n" if not status.is_empty() else "")
 
 
 static func journal(st: Dictionary) -> String:

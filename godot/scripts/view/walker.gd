@@ -2,7 +2,7 @@ extends Node2D
 
 signal arrived
 
-const SPEEDS := {"soldiers": 1.0, "caravan": 0.6, "boat": 1.1, "scout": 0.9}
+const SPEEDS := {"soldiers": 1.0, "caravan": 0.6, "boat": 1.1, "scout": 0.9, "fleet": 1.0}
 const MAX_TIME_SCALE := 20.0
 
 var tile := Vector2.ZERO
@@ -49,13 +49,14 @@ func _process(delta: float) -> void:
 
 
 func _draw() -> void:
-	var lift := 0.0 if kind == "boat" else Iso.lift_at(Sim.state["world"], tile.x, tile.y)
+	var lift := 0.0 if kind == "boat" or kind == "fleet" else Iso.lift_at(Sim.state["world"], tile.x, tile.y)
 	draw_set_transform(Vector2(0, -lift))
 	match kind:
 		"soldiers": _soldiers()
 		"caravan": _caravan()
 		"boat": _boat()
 		"scout": _scout()
+		"fleet": _fleet()
 
 
 func _soldiers() -> void:
@@ -107,3 +108,16 @@ func _scout() -> void:
 	draw_circle(Vector2(0, -13), 2.1, Color(0.85, 0.7, 0.55, a))
 	draw_line(Vector2(-3, -15.2), Vector2(3, -15.2), Color(0.45, 0.32, 0.2, a), 1.4)
 	draw_line(Vector2(3.5 * f, -2), Vector2(4.2 * f, -16), Color(0.5, 0.38, 0.25, a), 1.0)
+
+
+func _fleet() -> void:
+	var a := alpha
+	var bob := sin(step * 0.3) * 1.0
+	draw_colored_polygon(PackedVector2Array([Vector2(-12, -1 + bob), Vector2(12, -1 + bob), Vector2(8, 4 + bob), Vector2(-8, 4 + bob)]), Color(0.4, 0.26, 0.17, a))
+	for i in 3:
+		var x := -6.0 + i * 5.0
+		draw_circle(Vector2(x, -3.5 + bob), 1.7, Color(0.85, 0.7, 0.55, a))
+		draw_arc(Vector2(x, -3.9 + bob), 1.9, PI, TAU, 6, Color(0.7, 0.72, 0.75, a), 1.2)
+	draw_line(Vector2(0, -1 + bob), Vector2(0, -22 + bob), Color(0.35, 0.25, 0.15, a), 1.1)
+	draw_colored_polygon(PackedVector2Array([Vector2(1, -21 + bob), Vector2(10 * facing + 1, -8 + bob), Vector2(1, -7 + bob)]), Color(color.lightened(0.5), a))
+	draw_colored_polygon(PackedVector2Array([Vector2(0, -22 + bob), Vector2(6, -20 + bob), Vector2(0, -18 + bob)]), Color(color, a))

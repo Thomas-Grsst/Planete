@@ -55,7 +55,7 @@ static func _traded(state: Dictionary, s: Dictionary, ore: String) -> bool:
 	for o in state["settlements"]:
 		if o["abandoned"] < 0 and o["id"] != s["id"] and absi(o["x"] - s["x"]) + absi(o["y"] - s["y"]) <= TRADE_RANGE and o["geo"]["ores"].has(ore):
 			return true
-	return false
+	return Trade.partners(state, s).any(func(o): return o["abandoned"] < 0 and o["geo"]["ores"].has(ore))
 
 
 static func _wolves_near(state: Dictionary, s: Dictionary) -> bool:

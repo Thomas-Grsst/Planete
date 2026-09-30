@@ -47,8 +47,8 @@ func _process(delta: float) -> void:
 	var stride: float = min(dist, SPEED * pow(max(ts, 1.0), 0.7) * delta * (1.0 if ts > 0.0 else 0.0))
 	tile += to_goal / dist * stride
 	step += stride * 14.0
-	if absf(to_goal.x - to_goal.y) > 0.01:
-		facing = sign(to_goal.x - to_goal.y)
+	if absf(Iso.project(to_goal.x, to_goal.y).x) > 0.3:
+		facing = sign(Iso.project(to_goal.x, to_goal.y).x)
 	_place()
 	queue_redraw()
 

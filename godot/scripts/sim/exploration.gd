@@ -60,7 +60,7 @@ static func _reach(s: Dictionary, sea: bool) -> int:
 
 static func _expedition(state: Dictionary, rng: Rng, e: Dictionary) -> void:
 	var s: Dictionary = e["s"]
-	var sea := Ports.has_port(s) and rng.chance(SEA_SHARE)
+	var sea := Ports.has_port(s) and not Sieges.blockaded(s) and rng.chance(SEA_SHARE)
 	var angle := rng.next() * TAU
 	var target = _walk(state["world"], s, Vector2(cos(angle), sin(angle)), _reach(s, sea), sea)
 	if target == null:

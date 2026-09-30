@@ -8,6 +8,7 @@ const MAX_LOSER_DEATHS := 6
 const LOSER_SHARE := 0.2
 const CONQUEST_RATIO := 1.5
 const CONQUEST_CHANCE := 0.35
+const SIEGE_CONQUEST_CHANCE := 0.6
 const HOLD_DAYS := 720
 
 
@@ -27,15 +28,20 @@ static func _front(state: Dictionary, attacker: Dictionary, defender: Dictionary
 	for s in Civs.members(state, attacker):
 		for o in Civs.members(state, defender):
 			var d: int = absi(s["x"] - o["x"]) + absi(s["y"] - o["y"])
-			if d <= FRONT_RANGE and (best == null or d < best["d"]) and (Regions.same_landmass(state["world"], s["x"], s["y"], o["x"], o["y"]) or Techs.has_tech(s, "navigation")):
-				best = {"from": s, "to": o, "d": d}
+			var land := Regions.same_landmass(state["world"], s["x"], s["y"], o["x"], o["y"])
+			var cost: int = d if land else d + Naval.SEA_PENALTY
+			if best != null and cost >= best["cost"]:
+				continue
+			if (land and d <= FRONT_RANGE) or (not land and Naval.can_land(s, d)):
+				best = {"from": s, "to": o, "d": d, "cost": cost, "sea": not land}
 	return best
 
 
 static func _power(state: Dictionary, rng: Rng, s: Dictionary, e: Dictionary, home: bool) -> float:
 	var chef = Governance.chef_of(state, s)
 	var fierce := 1.2 if chef != null and chef["traits"].has("agressif") else 1.0
-	return max(0.5, Threats.defense(state, e)) * fierce * (HOME_ADVANTAGE if home else 1.0) * (0.7 + rng.next() * 0.6)
+	var walls: float = Sieges.wall_bonus(s) if home else 1.0
+	return max(0.5, Threats.defense(state, e)) * fierce * walls * (HOME_ADVANTAGE if home else 1.0) * (0.7 + rng.next() * 0.6)
 
 
 static func _fighters(state: Dictionary, e: Dictionary) -> Array:
@@ -65,6 +71,8 @@ static func step(state: Dictionary, rng: Rng, census: Dictionary) -> void:
 		if rng.chance(BATTLE_CHANCE):
 			var pair := [a, b] if rng.chance(0.6) else [b, a]
 			_battle(state, rng, census, war, pair[0], pair[1])
+		Sieges.try_blockade(state, rng, a, b)
+		Sieges.try_blockade(state, rng, b, a)
 
 
 static func _battle(state: Dictionary, rng: Rng, census: Dictionary, war: Dictionary, attacker: Dictionary, defender: Dictionary) -> void:
@@ -74,6 +82,8 @@ static func _battle(state: Dictionary, rng: Rng, census: Dictionary, war: Dictio
 	var ea: Dictionary = census[f["from"]["id"]]
 	var ed: Dictionary = census[f["to"]["id"]]
 	if ea["pop"] < 3 or ed["pop"] < 1:
+		return
+	if f["sea"] and not Naval.cross(state, rng, war, f, attacker, defender, ea, ed):
 		return
 	var pa := _power(state, rng, f["from"], ea, false)
 	var pd := _power(state, rng, f["to"], ed, true)
@@ -91,16 +101,23 @@ static func _battle(state: Dictionary, rng: Rng, census: Dictionary, war: Dictio
 		Fame.add(hero, 2)
 	var verb := "les troupes %s l'emportent" % Civs.of_title(attacker) if wins else "%s repousse l'assaut %s" % [f["to"]["name"], Civs.of_title(attacker)]
 	var lead := ", menées par %s" % hero["name"] if wins and hero != null and hero["alive"] else ""
-	var extra := {"x": f["to"]["x"], "y": f["to"]["y"], "from": f["from"]["id"], "settlement": f["to"]["id"], "civ": (attacker if wins else defender)["id"]}
-	Journal.log_event(state, "bataille", "⚔️ Bataille %s : %s%s. %s." % [Names.of_place(f["to"]["name"]), verb, lead, Names.plural(dead, "mort")], extra)
+	var extra := {"x": f["to"]["x"], "y": f["to"]["y"], "from": f["from"]["id"], "settlement": f["to"]["id"], "civ": (attacker if wins else defender)["id"], "sea": f["sea"]}
+	var title := "⛵ Débarquement près %s" % Names.of_place(f["to"]["name"]) if f["sea"] else "⚔️ Bataille %s" % Names.of_place(f["to"]["name"])
+	Journal.log_event(state, "bataille", "%s : %s%s. %s." % [title, verb, lead, Names.plural(dead, "mort")], extra)
 	var held: bool = f["to"].get("conquered_day", -1) >= 0 and state["day"] - f["to"]["conquered_day"] < HOLD_DAYS
-	if wins and not held and ratio >= CONQUEST_RATIO and ed["pop"] - dead < ea["pop"] and rng.chance(CONQUEST_CHANCE):
+	var starving: bool = Sieges.besieged(f["to"]) and ed["hungry"] > ed["pop"] * 0.3
+	var chance: float = SIEGE_CONQUEST_CHANCE if starving else CONQUEST_CHANCE
+	if wins and not held and (ratio >= CONQUEST_RATIO or starving) and ed["pop"] - dead < ea["pop"] and rng.chance(chance):
 		_conquer(state, war, attacker, defender, f["to"])
+	elif wins:
+		Sieges.start(state, f["to"], attacker, f["from"])
 
 
 static func _conquer(state: Dictionary, war: Dictionary, winner: Dictionary, loser: Dictionary, s: Dictionary) -> void:
 	s["civ"] = winner["id"]
 	s["conquered_day"] = state["day"]
+	s.erase("siege")
+	s.erase("blockade")
 	winner["conquests"] += 1
 	var capital := " Sa capitale est tombée !" if s["id"] == loser["capital"] else ""
 	Journal.log_event(state, "conquete", "🏴 %s passe sous la bannière %s.%s" % [s["name"], Civs.of_title(winner), capital], {"x": s["x"], "y": s["y"], "civ": winner["id"], "settlement": s["id"], "highlight": true})

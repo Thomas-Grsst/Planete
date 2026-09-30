@@ -12,7 +12,8 @@ Le jeu est fait avec **Godot 4** (dossier [`godot/`](godot)). La première versi
 
 ## ✨ Ce que fait le jeu
 
-- **Un monde généré** : plaines, forêts, montagnes, déserts, marais, rivières, lacs et océans, avec des gisements (cuivre, étain, fer, charbon, obsidienne, argile) répartis différemment dans chaque monde.
+- **Un monde presque infini qui se découvre** : continents, mers, îles, plaines, forêts, montagnes, déserts, toundras, marais, rivières et lacs. Au début, seule la région des pionniers est connue ; le reste est dans la brume. Des explorateurs partent à pied ou en bateau et dévoilent de nouvelles terres, avec leurs gisements (cuivre, étain, fer, charbon, obsidienne, argile), leurs animaux et leurs îles à coloniser.
+- **Des ressources qui s'épuisent** : la cueillette et le gibier ne sont pas infinis, les poissons se reproduisent mais peuvent être surpêchés, les champs dépendent des terres fertiles et le sol s'épuise, les filons de métal se vident, et la sylviculture permet de replanter les forêts.
 - **Une vie quotidienne visible** : les habitants se lèvent, partent travailler (cueillette, bois, pêche, chasse, champs, forge, garde, soins), rapportent leur récolte, se retrouvent au feu le soir et rentrent dormir. Arbres qui ondulent, eau animée, fumée des cheminées, fenêtres allumées, saisons, rivières gelées, pluie, neige, orages et sons d'ambiance.
 - **Des habitants autonomes** : nom, âge, traits, famille, santé, bonheur, métier, amitiés, rivalités et duels, arbre généalogique.
 - **Des colonies qui grandissent** : camp → hameau → village → bourg → ville → grande ville, avec migrations et nouvelles colonies.
@@ -21,7 +22,9 @@ Le jeu est fait avec **Godot 4** (dossier [`godot/`](godot)). La première versi
 - **Des fléaux** : maladies, loups et loups mutants, barbares, pirates, machines rebelles, et une rare **🧟 apocalypse zombie**.
 - **Des catastrophes qui changent la carte** : volcans, séismes, crues, météorites, montée des eaux causée par une civilisation industrielle.
 - **Une gouvernance** : chefs, conseils, lois, dynasties, révoltes.
-- **Des civilisations** : royaumes, empires, républiques… avec territoires visibles, diplomatie, commerce et caravanes, espions, alliances, guerres, conquêtes et indépendances.
+- **La mer** : ports, barques de pêche qui sortent le jour, expéditions en bateau, colonies sur les îles, routes maritimes.
+- **Des civilisations** : royaumes, empires, républiques… avec territoires visibles, diplomatie, routes commerciales sur terre et sur mer qui échangent vivres, bois et métal, espions, alliances, conquêtes et indépendances.
+- **Des guerres sur terre et sur mer** : batailles aux frontières, débarquements, batailles navales, blocus des ports, sièges qui affament les villes et font reculer leurs frontières, palissades et murailles de pierre, guerres pour une mine, une forêt ou des eaux poissonneuses.
 - **Des religions** nées d'un orage, d'un deuil… ou de **tes pouvoirs, vus comme des miracles**. Prophètes, pèlerins, temples, religions officielles, guerres saintes et schismes.
 - **Une culture** : langues qui dérivent, monuments, personnages célèbres et statues, légendes qui racontent tes interventions.
 - **Une fin de partie spatiale** : fusée, exode, et nouvelle planète fondée par l'équipage du vaisseau. Contact extraterrestre et archéologie, très rares.
@@ -96,7 +99,7 @@ Le script simule un monde, affiche les notifications qui seraient programmées e
 
 ## 🎮 Comment jouer
 
-- **Glisser** pour déplacer la caméra, **pincer** ou **molette** pour zoomer.
+- **Glisser** pour déplacer la caméra, **pincer** ou **molette** pour zoomer, **↻** pour tourner la vue d'un quart de tour.
 - **Toucher** un habitant, un village ou une case pour voir ses informations.
 - **📜 Journal** : toute l'histoire du monde. Touche un événement pour y aller.
 - **✨ Pouvoirs** : intervenir ponctuellement. Chaque action a des conséquences.

@@ -1,6 +1,7 @@
 extends CanvasLayer
 
 signal focus_requested(world_pos: Vector2)
+signal rotate_requested
 
 const SPEEDS := [[0.0, "⏸"], [1.0, "▶"], [10.0, "▶▶"], [100.0, "▶▶▶"]]
 const QUIET := ["couple", "meteo", "migration"]
@@ -23,6 +24,7 @@ func _ready() -> void:
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(root)
 	_build_top()
+	HudActions.rotate_button(self, root)
 	_build_bottom()
 	_build_feed()
 	_build_panel()

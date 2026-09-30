@@ -42,6 +42,10 @@ func setup(entity_root: Node2D) -> void:
 	_reset()
 
 
+func relayout() -> void:
+	_reset()
+
+
 func _reset() -> void:
 	for group in [villagers, villages, herds, troops]:
 		for n in group.values():

@@ -15,12 +15,12 @@ static var _land_sig := ""
 static func _sig(state: Dictionary) -> String:
 	var parts := PackedStringArray()
 	for s in state["settlements"]:
-		parts.append("x" if s["abandoned"] >= 0 else "%d:%d:%d" % [s["id"], s.get("civ", -1), radius(s)])
+		parts.append("x" if s["abandoned"] >= 0 else "%d:%d:%d" % [s["id"], s.get("civ", -1), radius(state, s)])
 	return "|".join(parts)
 
 
-static func radius(s: Dictionary) -> int:
-	return max(1, BASE_RADIUS + s["level"] - (1 if not s.get("siege", {}).is_empty() else 0))
+static func radius(state: Dictionary, s: Dictionary) -> int:
+	return max(1, BASE_RADIUS + s["level"] - (1 if Sieges.besieged(s) else 0) + (1 if Sieges.advancing(state, s) else 0))
 
 
 static func map_of(state: Dictionary) -> Dictionary:
@@ -40,7 +40,7 @@ static func _compute(state: Dictionary) -> Dictionary:
 	for s in state["settlements"]:
 		if s["abandoned"] >= 0 or s.get("civ", -1) < 0:
 			continue
-		var r := radius(s)
+		var r := radius(state, s)
 		for dy in range(-r, r + 1):
 			for dx in range(-r, r + 1):
 				var d: int = absi(dx) + absi(dy)

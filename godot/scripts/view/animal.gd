@@ -39,8 +39,8 @@ func _process(delta: float) -> void:
 			var stride: float = min(to_goal.length(), SPEED * pow(max(ts, 1.0), 0.7) * delta * (2.0 if species == "wolf" else 1.0))
 			tile += to_goal.normalized() * stride
 			step += stride * 18.0
-			if absf(to_goal.x - to_goal.y) > 0.01:
-				facing = sign(to_goal.x - to_goal.y)
+			if absf(Iso.project(to_goal.x, to_goal.y).x) > 0.3:
+				facing = sign(Iso.project(to_goal.x, to_goal.y).x)
 	position = Iso.project(tile.x, tile.y)
 	lift = Iso.lift_at(Sim.state["world"], tile.x, tile.y)
 	queue_redraw()
