@@ -52,18 +52,18 @@ Ou ouvre `godot/project.godot` dans l'éditeur Godot 4.7 puis F5.
 
 ## 📱 Android : APK, notifications et widget
 
-L'export produit `godot/build/PetitePlanete.apk` (Android 7 et plus, ARM64 et x86_64). Il faut OpenJDK 17, le kit Android (build-tools 35.0.1, plateforme 35) et les modèles d'export Godot 4.7.
+L'export produit `godot/build/PetitePlanete.apk` (Android 7 et plus, ARM64 et x86_64). Il faut OpenJDK 17, le kit Android (platform-tools, build-tools et plateforme 36 : Gradle installe tout seul ce qui manque une fois les licences acceptées) et les modèles d'export Godot 4.7.
 
 Les notifications et le widget utilisent du code Android natif (le plugin `godot/addons/petite_planete_android`). L'export passe donc par la **compilation Gradle**. Il faut installer une fois le modèle de compilation Android :
 
 - dans l'éditeur : **Projet → Installer le modèle de compilation Android…**
-- ou en ligne de commande :
+- ou en ligne de commande, en même temps que l'export (l'option ne marche qu'avec lui) :
 
 ```bash
-godot --headless --path godot --install-android-build-template
+godot --headless --path godot --install-android-build-template --export-debug "Android" build/PetitePlanete.apk
 ```
 
-Puis exporter :
+Ensuite, pour les exports suivants :
 
 ```bash
 godot --headless --path godot --export-debug "Android" build/PetitePlanete.apk
@@ -75,7 +75,7 @@ La première compilation télécharge Gradle, elle prend quelques minutes. Copie
 
 La simulation est déterministe : quand tu quittes le jeu, il sait déjà ce qui va se passer. Il calcule en avance les 3 prochains jours réels (864 jours de jeu), choisit les grands événements (guerre, épidémie, découverte, apocalypse, fin du monde…) et programme une notification à l'heure exacte où ils arriveront.
 
-- Au plus 6 notifications à l'avance, espacées d'au moins 4 h.
+- Au plus 6 notifications à l'avance, espacées d'au moins 4 h, et à l'heure pile (alarmes exactes).
 - Rien entre 22 h et 8 h : un événement de la nuit est annoncé à 8 h.
 - Quand tu rouvres le jeu, les notifications en attente sont annulées.
 - Le jeu demande l'autorisation d'envoyer des notifications au premier lancement (Android 13 et plus).
@@ -83,6 +83,8 @@ La simulation est déterministe : quand tu quittes le jeu, il sait déjà ce qui
 ### 🪟 Widget
 
 Appui long sur l'écran d'accueil → **Widgets** → **Petite Planète**. Il affiche le nom du monde, le jour (☀️ ou 🌙), la population et le dernier grand événement, grâce à la même prévision. Il se met à jour toutes les 30 min et à chaque notification. Le toucher ouvre le jeu.
+
+Testé sur un téléphone virtuel Android 15 : autorisation des notifications, notification à l'heure prévue, widget à jour, et écran « Bon retour » avec l'événement annoncé.
 
 ### 🧪 Vérifier la prévision sur PC
 

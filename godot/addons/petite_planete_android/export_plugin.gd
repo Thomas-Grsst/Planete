@@ -30,6 +30,8 @@ func _get_android_manifest_element_contents(_platform: EditorExportPlatform, _de
 	return """
 	<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+	<uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" android:maxSdkVersion="32" />
+	<uses-permission android:name="android.permission.USE_EXACT_ALARM" />
 """
 
 

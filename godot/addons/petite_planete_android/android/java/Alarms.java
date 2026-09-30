@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 
 final class Alarms {
     private Alarms() {}
@@ -22,6 +23,10 @@ final class Alarms {
             return;
         }
         long at = Math.max(next, System.currentTimeMillis() + 1000L);
-        alarms.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, intent(ctx));
+        if (Build.VERSION.SDK_INT < 31 || alarms.canScheduleExactAlarms()) {
+            alarms.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, intent(ctx));
+        } else {
+            alarms.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, intent(ctx));
+        }
     }
 }
