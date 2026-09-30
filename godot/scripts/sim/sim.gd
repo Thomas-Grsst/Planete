@@ -8,8 +8,8 @@ signal caught_up(days: int)
 signal power_used(name: String, answered: Array)
 signal resumed(days: int)
 
-const MS_PER_DAY := 600000.0
-const MAX_OFFLINE_DAYS := 4320
+const MS_PER_DAY := 300000.0
+const MAX_OFFLINE_DAYS := 8640
 const MAX_TICKS_PER_FRAME := 30
 const AUTOSAVE_SECONDS := 20.0
 const CATCH_UP_BUDGET_MS := 14

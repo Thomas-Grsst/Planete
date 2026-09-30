@@ -12,7 +12,6 @@ import org.json.JSONObject;
 import java.util.Locale;
 
 public class PlanetWidget extends AppWidgetProvider {
-    private static final long MS_PER_DAY = 600000L;
     private static final int DAYS_PER_YEAR = 360;
 
     @Override
@@ -41,10 +40,11 @@ public class PlanetWidget extends AppWidgetProvider {
             views.setTextViewText(res(ctx, "planete_event", "id"), "Ouvre le jeu une fois pour réveiller ton monde.");
             return views;
         }
+        long msPerDay = Math.max(1L, w.optLong("ms", 300000L));
         long elapsed = Math.max(0L, System.currentTimeMillis() - w.optLong("t0"));
-        int passed = (int) Math.min(w.optLong("max", 4320L), elapsed / MS_PER_DAY);
+        int passed = (int) Math.min(w.optLong("max", 8640L), elapsed / msPerDay);
         int day = w.optInt("day0") + passed;
-        double hour = (6.0 + (elapsed % MS_PER_DAY) * 24.0 / MS_PER_DAY) % 24.0;
+        double hour = (6.0 + (elapsed % msPerDay) * 24.0 / msPerDay) % 24.0;
         String sky = hour >= 6.0 && hour < 20.0 ? "☀️" : "🌙";
         views.setTextViewText(res(ctx, "planete_title", "id"), "🌍 " + w.optString("name"));
         views.setTextViewText(res(ctx, "planete_day", "id"), String.format(Locale.FRANCE, "%s An %d, jour %d", sky, day / DAYS_PER_YEAR + 1, day % DAYS_PER_YEAR + 1));

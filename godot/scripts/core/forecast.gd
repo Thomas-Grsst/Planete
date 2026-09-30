@@ -1,7 +1,7 @@
 class_name Forecast
 extends RefCounted
 
-const HORIZON_DAYS := 432
+const HORIZON_DAYS := 864
 const SIM_SCRIPT := "res://scripts/sim/sim.gd"
 
 var runner = null

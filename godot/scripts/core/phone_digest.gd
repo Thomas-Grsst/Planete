@@ -60,7 +60,7 @@ static func widget(state: Dictionary, forecast: Forecast, now: float, now_day: i
 	for e in forecast.events:
 		if e["day"] > now_day and events.size() < MAX_WIDGET_EVENTS:
 			events.append({"d": e["day"], "x": e["text"]})
-	return {"name": state["name"], "t0": int(now * 1000.0 - float(state["acc_ms"])), "day0": now_day, "max": SIM.MAX_OFFLINE_DAYS, "pops": pops, "events": events}
+	return {"name": state["name"], "t0": int(now * 1000.0 - float(state["acc_ms"])), "day0": now_day, "ms": int(SIM.MS_PER_DAY), "max": SIM.MAX_OFFLINE_DAYS, "pops": pops, "events": events}
 
 
 static func _last_highlight(state: Dictionary):

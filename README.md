@@ -31,10 +31,14 @@ Le jeu est fait avec **Godot 4** (dossier [`godot/`](godot)). La première versi
 
 | Temps réel | Temps dans le jeu |
 |---|---|
-| 10 min | 1 jour (5 min de jour, 5 min de nuit) |
-| 1 journée | 144 jours |
-| 1 mois | ≈ 12 ans |
-| 1 an | ≈ 146 ans |
+| 5 min | 1 jour (2 min 30 de jour, 2 min 30 de nuit) |
+| 1 h | 12 jours |
+| 1 journée | 288 jours (≈ 10 mois) |
+| 1 semaine | ≈ 5 ans et demi |
+| 1 mois | 24 ans |
+| 1 an | ≈ 292 ans |
+
+Une année de jeu (360 jours) dure 30 h réelles, et une vie d'habitant d'environ 60 ans dure à peu près 2 mois et demi.
 
 Quand l'application est fermée, le monde continue au rythme normal (jusqu'à 30 jours d'absence rattrapés), et ce, même si tu la mets simplement en arrière-plan.
 
@@ -69,7 +73,7 @@ La première compilation télécharge Gradle, elle prend quelques minutes. Copie
 
 ### 🔔 Notifications
 
-La simulation est déterministe : quand tu quittes le jeu, il sait déjà ce qui va se passer. Il calcule en avance les 3 prochains jours réels (432 jours de jeu), choisit les grands événements (guerre, épidémie, découverte, apocalypse, fin du monde…) et programme une notification à l'heure exacte où ils arriveront.
+La simulation est déterministe : quand tu quittes le jeu, il sait déjà ce qui va se passer. Il calcule en avance les 3 prochains jours réels (864 jours de jeu), choisit les grands événements (guerre, épidémie, découverte, apocalypse, fin du monde…) et programme une notification à l'heure exacte où ils arriveront.
 
 - Au plus 6 notifications à l'avance, espacées d'au moins 4 h.
 - Rien entre 22 h et 8 h : un événement de la nuit est annoncé à 8 h.

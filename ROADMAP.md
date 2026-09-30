@@ -1,6 +1,6 @@
 # Petite Planète — Feuille de route
 
-État actuel : **version Godot 4 complète + APK Android avec notifications et widget** (la version web est figée dans `web/`) : civilisations, territoires, diplomatie et guerres, religions nées de tes miracles, en plus des métiers, des 22 savoirs découverts par causes, des maladies, de l'apocalypse zombie et du cycle jour/nuit de 10 min.
+État actuel : **version Godot 4 complète + APK Android avec notifications et widget** (la version web est figée dans `web/`) : civilisations, territoires, diplomatie et guerres, religions nées de tes miracles, en plus des métiers, des 22 savoirs découverts par causes, des maladies, de l'apocalypse zombie et du cycle jour/nuit de 5 min.
 
 ---
 
@@ -22,7 +22,7 @@ Objectif : un monde **qui bouge sous tes yeux**, pas seulement dans le journal, 
 
 ## ⏱️ Rythme du temps (à faire en premier)
 
-- [x] 1 jour de jeu = **10 min réelles** (5 min de jour + 5 min de nuit) → ~146 ans de jeu par an réel.
+- [x] 1 jour de jeu = **5 min réelles** (2 min 30 de jour + 2 min 30 de nuit) → ~292 ans de jeu par an réel.
 - [x] Vrai **cycle jour/nuit visible** : lumière, nuit sombre, fenêtres et feux allumés.
 - [x] Revoir les vitesses ▶▶ / ▶▶▶ (ajouter un ×100 pour voir le monde bouger).
 - [x] Ajuster `MAX_OFFLINE_DAYS` au nouveau rythme.
