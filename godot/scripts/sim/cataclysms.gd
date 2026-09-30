@@ -55,8 +55,14 @@ static func quake(state: Dictionary, rng: Rng, census: Dictionary) -> void:
 	var lost: int = min(s["houses"] - 1, rng.range_int(0, 1) if solid else rng.range_int(1, 3))
 	s["houses"] -= lost
 	var dead := _victims(state, rng, e, 0 if solid else rng.range_int(0, 2), "écrasé sous les décombres")
-	var detail := "les murs solides tiennent bon" if solid else "%s effondrées, %s" % [Names.plural(lost, "maison"), Names.plural(dead, "mort")]
+	var detail := "les murs solides tiennent bon" if solid else "%s, %s" % [_quake_houses(lost), Names.plural(dead, "mort") if dead > 0 else "aucun mort"]
 	Journal.log_event(state, "cataclysme", "🌍 La terre tremble à %s : %s." % [s["name"], detail], {"x": s["x"], "y": s["y"], "settlement": s["id"], "quake": true, "houses_lost": lost, "highlight": true})
+
+
+static func _quake_houses(lost: int) -> String:
+	if lost <= 0:
+		return "aucune maison effondrée"
+	return "%s effondrée%s" % [Names.plural(lost, "maison"), "s" if lost > 1 else ""]
 
 
 static func meteor(state: Dictionary, rng: Rng, census: Dictionary) -> void:
