@@ -9,6 +9,7 @@ const CUES := {
 }
 const CUE_GAP := 1.5
 const FADE := 1.5
+const LOOP_DB: Dictionary = {"ambient_day": -20.0, "ambient_night": -22.0, "rain": -12.0, "fire": -22.0}
 
 var loops := {}
 var cues := {}
@@ -58,7 +59,7 @@ func _target_levels() -> Dictionary:
 		"ambient_day": (1.0 - night) * (1.0 - 0.7 * wet),
 		"ambient_night": night * (1.0 - 0.6 * wet),
 		"rain": wet,
-		"fire": 0.35 + 0.4 * night,
+		"fire": night,
 	}
 
 
@@ -68,7 +69,7 @@ func _process(delta: float) -> void:
 	var levels := _target_levels()
 	for key in loops:
 		var level: float = 0.0 if muted else levels[key]
-		var db := linear_to_db(max(level, 0.001)) - 8.0
+		var db: float = linear_to_db(max(level, 0.001)) + LOOP_DB[key]
 		loops[key].volume_db = move_toward(loops[key].volume_db, db, delta * 60.0 / FADE)
 
 

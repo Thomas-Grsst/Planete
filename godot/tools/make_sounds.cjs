@@ -33,26 +33,35 @@ function noise(seconds, seed) { const r = rng(seed); return Float32Array.from({ 
 function env(i, n, attack, release) { const t = i / RATE; const left = (n - i) / RATE; return Math.min(1, t / attack) * Math.min(1, left / release); }
 
 function birds() {
-  const n = 24 * RATE; const s = lowpass(noise(24, 7), 0.02).map((v) => v * 0.15); const r = rng(11);
-  for (let k = 0; k < 40; k++) {
-    const start = Math.floor(r() * (n - RATE)); const len = Math.floor((0.08 + r() * 0.12) * RATE); const f0 = 2400 + r() * 2200; const chirps = 1 + Math.floor(r() * 4);
-    for (let c = 0; c < chirps; c++) for (let i = 0; i < len; i++) {
-      const j = start + c * Math.floor(len * 1.4) + i; if (j >= n) break;
-      const t = i / len; const f = f0 * (1 + 0.35 * Math.sin(t * Math.PI)); s[j] += Math.sin(2 * Math.PI * f * i / RATE) * Math.sin(Math.PI * t) * 0.35;
+  const n = 30 * RATE; const s = lowpass(lowpass(noise(30, 7), 0.004), 0.004).map((v) => v * 2.5); const r = rng(11);
+  for (let k = 0; k < 9; k++) {
+    const start = Math.floor(r() * (n - 3 * RATE)); const notes = 2 + Math.floor(r() * 3); const f0 = 1700 + r() * 1100;
+    let j0 = start;
+    for (let c = 0; c < notes; c++) {
+      const len = Math.floor((0.14 + r() * 0.16) * RATE); const f = f0 * (1 + (r() - 0.5) * 0.25); const glide = (r() - 0.5) * 0.12; let ph = 0;
+      for (let i = 0; i < len && j0 + i < n; i++) {
+        const t = i / len; ph += 2 * Math.PI * f * (1 + glide * t + 0.015 * Math.sin(2 * Math.PI * 28 * i / RATE)) / RATE;
+        s[j0 + i] += Math.sin(ph) * Math.sin(Math.PI * t) ** 2 * 0.12;
+      }
+      j0 += len + Math.floor((0.08 + r() * 0.15) * RATE);
     }
   }
   return loopify(s, RATE);
 }
 
 function crickets() {
-  const n = 20 * RATE; const s = lowpass(noise(20, 3), 0.01).map((v) => v * 0.08);
-  for (let i = 0; i < n; i++) { const t = i / RATE; const pulse = Math.max(0, Math.sin(2 * Math.PI * 14 * t)) ** 6 * (0.5 + 0.5 * Math.sin(2 * Math.PI * 0.7 * t)); s[i] += Math.sin(2 * Math.PI * 4300 * t) * pulse * 0.3 + Math.sin(2 * Math.PI * 3900 * (t + 0.37)) * Math.max(0, Math.sin(2 * Math.PI * 11 * t + 1)) ** 8 * 0.2; }
-  return loopify(s, RATE);
+  const n = 24 * RATE; const s = lowpass(lowpass(noise(24, 3), 0.004), 0.004).map((v) => v * 2.0);
+  for (let i = 0; i < n; i++) {
+    const t = i / RATE; const group = Math.max(0, Math.sin(2 * Math.PI * 0.35 * t)) ** 2;
+    const pulse = Math.max(0, Math.sin(2 * Math.PI * 9 * t)) ** 4 * group;
+    s[i] += Math.sin(2 * Math.PI * 3200 * t) * pulse * 0.06;
+  }
+  return loopify(lowpass(s, 0.5), RATE);
 }
 
 function rain() { const s = lowpass(noise(16, 5), 0.25); const r = rng(9); for (let k = 0; k < 900; k++) { const j = Math.floor(r() * (s.length - 200)); for (let i = 0; i < 120; i++) s[j + i] += (r() * 2 - 1) * Math.exp(-i / 18) * 0.6; } return loopify(s, RATE); }
 
-function fire() { const s = lowpass(noise(14, 13), 0.05).map((v) => v * 0.6); const r = rng(17); for (let k = 0; k < 500; k++) { const j = Math.floor(r() * (s.length - 400)); const amp = 0.3 + r() * 0.9; for (let i = 0; i < 300; i++) s[j + i] += (r() * 2 - 1) * Math.exp(-i / (20 + r() * 40)) * amp; } return loopify(s, RATE); }
+function fire() { const s = lowpass(lowpass(noise(14, 13), 0.02), 0.05); const r = rng(17); for (let k = 0; k < 90; k++) { const j = Math.floor(r() * (s.length - 600)); const amp = 0.05 + r() * 0.12; for (let i = 0; i < 500; i++) s[j + i] += (r() * 2 - 1) * Math.exp(-i / 60) * amp; } return loopify(lowpass(s, 0.2), RATE); }
 
 function tone(seconds, parts, attack, release) { const n = Math.floor(seconds * RATE); const s = new Float32Array(n); for (let i = 0; i < n; i++) { const t = i / RATE; let v = 0; for (const [f, a, d] of parts) v += Math.sin(2 * Math.PI * f * t) * a * Math.exp(-t / d); s[i] = v * env(i, n, attack, release); } return s; }
 
