@@ -82,7 +82,7 @@ La simulation est déterministe : quand tu quittes le jeu, il sait déjà ce qui
 
 ### 🪟 Widget
 
-Appui long sur l'écran d'accueil → **Widgets** → **Petite Planète**. Il affiche le nom du monde, le jour (☀️ ou 🌙), la population et le dernier grand événement, grâce à la même prévision. Il se met à jour toutes les 30 min et à chaque notification. Le toucher ouvre le jeu.
+Appui long sur l'écran d'accueil → **Widgets** → **Petite Planète**. Il affiche le nom du monde, le jour, la population et le dernier grand événement, grâce à la même prévision, sur un paysage qui suit l'heure du jeu : plaine ensoleillée le jour, ciel orangé à l'aube et au crépuscule, lune, étoiles et fenêtres allumées la nuit. Le paysage change pile au lever et au coucher du soleil (sans réveiller le téléphone), les chiffres toutes les 30 min et à chaque notification. Le toucher ouvre le jeu.
 
 Testé sur un téléphone virtuel Android 15 : autorisation des notifications, notification à l'heure prévue, widget à jour, et écran « Bon retour » avec l'événement annoncé.
 

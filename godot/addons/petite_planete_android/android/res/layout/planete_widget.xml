@@ -1,56 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/planete_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center_vertical"
-    android:padding="14dp"
-    android:background="@drawable/planete_widget_bg">
+    android:background="@drawable/planete_widget_bg"
+    android:clipToOutline="true">
+
+    <ImageView
+        android:id="@+id/planete_scene"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:importantForAccessibility="no"
+        android:scaleType="centerCrop"
+        android:src="@drawable/planete_scene_day" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:importantForAccessibility="no"
+        android:scaleType="fitXY"
+        android:src="@drawable/planete_widget_scrim" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="14dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/planete_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="🌍 Noria"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:shadowColor="#CC000000"
+                android:shadowDy="1"
+                android:shadowRadius="4"
+                android:textColor="#FFFFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/planete_day"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="☀️ An 12, jour 45"
+                android:shadowColor="#CC000000"
+                android:shadowDy="1"
+                android:shadowRadius="4"
+                android:textColor="#FFF2F6FA"
+                android:textSize="12sp" />
+        </LinearLayout>
 
         <TextView
-            android:id="@+id/planete_title"
-            android:text="🌍 Noria"
-            android:layout_width="0dp"
+            android:id="@+id/planete_pop"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:maxLines="1"
-            android:ellipsize="end"
-            android:textColor="#FFFFFFFF"
-            android:textSize="16sp"
+            android:layout_marginTop="4dp"
+            android:text="👥 1 248 habitants"
+            android:shadowColor="#CC000000"
+            android:shadowDy="1"
+            android:shadowRadius="4"
+            android:textColor="#FFFFE7A3"
+            android:textSize="14sp"
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/planete_day"
-            android:text="☀️ An 12, jour 45"
-            android:layout_width="wrap_content"
+            android:id="@+id/planete_event"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#FFB8C7D6"
-            android:textSize="12sp" />
+            android:layout_marginTop="6dp"
+            android:text="⚔️ Le Royaume d’Elmont déclare la guerre à la République de Belrek."
+            android:maxLines="3"
+            android:ellipsize="end"
+            android:shadowColor="#E6000000"
+            android:shadowDy="1"
+            android:shadowRadius="5"
+            android:textColor="#FFFFFFFF"
+            android:textSize="13sp" />
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/planete_pop"
-        android:text="👥 1 248 habitants"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:textColor="#FFFFE7A3"
-        android:textSize="14sp" />
-
-    <TextView
-        android:id="@+id/planete_event"
-        android:text="⚔️ Le Royaume d’Elmont déclare la guerre à la République de Belrek."
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:maxLines="3"
-        android:ellipsize="end"
-        android:textColor="#FFE3EAF2"
-        android:textSize="13sp" />
-</LinearLayout>
+</FrameLayout>

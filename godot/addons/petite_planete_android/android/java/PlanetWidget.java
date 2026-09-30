@@ -4,6 +4,7 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.widget.RemoteViews;
 
 import org.json.JSONArray;
@@ -15,18 +16,37 @@ public class PlanetWidget extends AppWidgetProvider {
     private static final int DAYS_PER_YEAR = 360;
 
     @Override
+    public void onReceive(Context ctx, Intent intent) {
+        if (WidgetClock.TICK.equals(intent.getAction())) refreshAll(ctx);
+        else super.onReceive(ctx, intent);
+    }
+
+    @Override
     public void onUpdate(Context ctx, AppWidgetManager manager, int[] ids) {
-        manager.updateAppWidget(ids, build(ctx));
+        refreshAll(ctx);
+    }
+
+    @Override
+    public void onDisabled(Context ctx) {
+        WidgetClock.cancel(ctx);
     }
 
     static void refreshAll(Context ctx) {
         AppWidgetManager manager = AppWidgetManager.getInstance(ctx);
         int[] ids = manager.getAppWidgetIds(new ComponentName(ctx, PlanetWidget.class));
-        if (ids != null && ids.length > 0) manager.updateAppWidget(ids, build(ctx));
+        if (ids == null || ids.length == 0) {
+            WidgetClock.cancel(ctx);
+            return;
+        }
+        manager.updateAppWidget(ids, build(ctx));
     }
 
     private static int res(Context ctx, String name, String type) {
         return Res.id(ctx, name, type);
+    }
+
+    private static void text(Context ctx, RemoteViews views, String id, String value) {
+        views.setTextViewText(res(ctx, id, "id"), value);
     }
 
     private static RemoteViews build(Context ctx) {
@@ -34,22 +54,25 @@ public class PlanetWidget extends AppWidgetProvider {
         views.setOnClickPendingIntent(res(ctx, "planete_root", "id"), Notifier.openGame(ctx));
         JSONObject w = Store.widget(ctx);
         if (!w.has("name")) {
-            views.setTextViewText(res(ctx, "planete_title", "id"), "🌍 Petite Planète");
-            views.setTextViewText(res(ctx, "planete_day", "id"), "");
-            views.setTextViewText(res(ctx, "planete_pop", "id"), "");
-            views.setTextViewText(res(ctx, "planete_event", "id"), "Ouvre le jeu une fois pour réveiller ton monde.");
+            views.setImageViewResource(res(ctx, "planete_scene", "id"), res(ctx, "planete_scene_day", "drawable"));
+            text(ctx, views, "planete_title", "🌍 Petite Planète");
+            text(ctx, views, "planete_day", "");
+            text(ctx, views, "planete_pop", "");
+            text(ctx, views, "planete_event", "Ouvre le jeu une fois pour réveiller ton monde.");
             return views;
         }
         long msPerDay = Math.max(1L, w.optLong("ms", 300000L));
-        long elapsed = Math.max(0L, System.currentTimeMillis() - w.optLong("t0"));
+        long raw = System.currentTimeMillis() - w.optLong("t0");
+        long elapsed = Math.max(0L, raw);
         int passed = (int) Math.min(w.optLong("max", 8640L), elapsed / msPerDay);
         int day = w.optInt("day0") + passed;
-        double hour = (6.0 + (elapsed % msPerDay) * 24.0 / msPerDay) % 24.0;
-        String sky = hour >= 6.0 && hour < 20.0 ? "☀️" : "🌙";
-        views.setTextViewText(res(ctx, "planete_title", "id"), "🌍 " + w.optString("name"));
-        views.setTextViewText(res(ctx, "planete_day", "id"), String.format(Locale.FRANCE, "%s An %d, jour %d", sky, day / DAYS_PER_YEAR + 1, day % DAYS_PER_YEAR + 1));
-        views.setTextViewText(res(ctx, "planete_pop", "id"), population(w.optJSONArray("pops"), passed));
-        views.setTextViewText(res(ctx, "planete_event", "id"), lastEvent(w.optJSONArray("events"), day));
+        double hour = WidgetClock.hour(elapsed, msPerDay);
+        views.setImageViewResource(res(ctx, "planete_scene", "id"), res(ctx, "planete_scene_" + WidgetClock.scene(hour), "drawable"));
+        text(ctx, views, "planete_title", "🌍 " + w.optString("name"));
+        text(ctx, views, "planete_day", String.format(Locale.FRANCE, "%s An %d, jour %d", WidgetClock.sky(hour), day / DAYS_PER_YEAR + 1, day % DAYS_PER_YEAR + 1));
+        text(ctx, views, "planete_pop", population(w.optJSONArray("pops"), passed));
+        text(ctx, views, "planete_event", lastEvent(w.optJSONArray("events"), day));
+        WidgetClock.scheduleNext(ctx, raw, msPerDay);
         return views;
     }
 
