@@ -45,6 +45,10 @@ static func world(st: Dictionary) -> String:
 	var out := "[b]🌍 %s[/b]\n%s\n\n" % [st["name"], InfoPanels.muted("Jour %d · %s" % [st["day"], Weather.LABELS.get(st["weather"], "")])]
 	if st.has("origin"):
 		out += InfoPanels.muted("Planète fondée par les voyageurs venus de %s." % st["origin"]) + "\n\n"
+	var alive: Array = st["settlements"].filter(func(s): return s["abandoned"] < 0)
+	var ports: int = alive.filter(func(s): return Ports.has_port(s)).size()
+	out += "🗺️ Terres connues : %d arpents · ⚓ %s · 🐪 %s\n" % [Territory.known_land(st["world"]), Names.plural(ports, "port"), Names.plural(st.get("routes", []).size(), "route")]
+	out += InfoPanels.muted("Le reste du monde est encore dans la brume : les explorateurs le découvrent peu à peu.") + "\n\n"
 	out += "🌱 Graine du monde : [b]%s[/b]\n" % st.get("seed_text", "?")
 	out += InfoPanels.muted("Partage-la : la même graine donne la même planète.") + "\n\n"
 	out += InfoPanels.link("chronicle:0", "📖 Le Livre du monde") + "   " + InfoPanels.link("pantheon:0", "🗿 Panthéon") + "   " + InfoPanels.link("achievements:0", "🏆 Succès") + "\n\n"

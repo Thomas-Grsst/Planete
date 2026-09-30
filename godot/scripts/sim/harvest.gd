@@ -5,7 +5,8 @@ const FISH_PER_FISHER := 1.6
 const FISH_TAKE_SHARE := 0.3
 const FISH_BASE_RADIUS := 3
 const OVERFISHED := 0.35
-const WARN_EVERY := 720
+const RECOVERED := 0.6
+const WARN_EVERY := 1800
 const FARM_PER_FARMER := 3.2
 const FIELD_RADIUS := 3
 const FIELD_MIN_FERTILITY := 0.35
@@ -35,20 +36,35 @@ static func fish(state: Dictionary, s: Dictionary, fishers: int, mod: float) -> 
 	var world: Dictionary = state["world"]
 	var wanted: float = fishers * FISH_PER_FISHER * mod
 	var got := 0.0
-	for o in Geography.offsets(fish_radius(s)):
+	for pos in _waters(state, s):
 		if got >= wanted:
 			break
-		var x: int = s["x"] + o.x
-		var y: int = s["y"] + o.y
-		var t = WorldGen.tile_at(world, x, y)
+		var t = WorldGen.tile_at(world, pos.x, pos.y)
 		if t == null or Nature.fish_cap(t) <= 0.0:
 			continue
-		got += Nature.take_fish(world, x, y, t, min(Nature.fish_of(t) * FISH_TAKE_SHARE, wanted - got))
+		got += Nature.take_fish(world, pos.x, pos.y, t, min(Nature.fish_of(t) * FISH_TAKE_SHARE, wanted - got))
 	s["fish_rate"] = lerp(float(s.get("fish_rate", 1.0)), got / wanted, 0.05)
-	if s["fish_rate"] < OVERFISHED and state["day"] - s.get("fish_warned", -99999) > WARN_EVERY:
+	if s["fish_rate"] > RECOVERED:
+		s.erase("fish_low")
+	if s["fish_rate"] < OVERFISHED and not s.has("fish_low") and state["day"] - s.get("fish_warned", -99999) > WARN_EVERY:
+		s["fish_low"] = true
 		s["fish_warned"] = state["day"]
 		Journal.log_event(state, "surpeche", "🐟 Les filets %s reviennent presque vides : les poissons se font rares autour du village." % Names.of_place(s["name"]), {"x": s["x"], "y": s["y"], "settlement": s["id"]})
 	return got
+
+
+static func _waters(state: Dictionary, s: Dictionary) -> Array:
+	var r := fish_radius(s)
+	var cached: Dictionary = s.get("waters", {})
+	if not cached.is_empty() and cached["r"] == r and state["day"] - cached["day"] < FIELD_REFRESH:
+		return cached["tiles"]
+	var tiles: Array = []
+	for o in Geography.offsets(r):
+		var t = WorldGen.tile_at(state["world"], s["x"] + o.x, s["y"] + o.y)
+		if t != null and Nature.fish_cap(t) > 0.0:
+			tiles.append(Vector2i(s["x"] + o.x, s["y"] + o.y))
+	s["waters"] = {"r": r, "day": state["day"], "tiles": tiles}
+	return tiles
 
 
 static func fields(state: Dictionary, s: Dictionary, store: bool = true) -> Dictionary:

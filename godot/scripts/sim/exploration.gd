@@ -13,6 +13,8 @@ const PORT_REACH := 10
 const LAND_SIGHT := 7
 const SEA_SIGHT := 9
 const SEA_SHARE := 0.6
+const LEAD_RADIUS := 6
+const MAX_LEADS := 3
 const LOST := {"raft": 0.06, "ship": 0.02}
 const DIRECTIONS := ["à l'est", "au sud-est", "au sud", "au sud-ouest", "à l'ouest", "au nord-ouest", "au nord", "au nord-est"]
 
@@ -82,6 +84,13 @@ static func _expedition(state: Dictionary, rng: Rng, e: Dictionary) -> void:
 	extra["highlight"] = found["island"]
 	Fame.add(explorer, 2 if found["island"] else 1)
 	Journal.log_event(state, "exploration", Discovery.story(explorer, s, dir, sea, found), extra)
+	if found["land"] >= Discovery.MIN_LAND:
+		var lead = Geography.find_spot(state, rng, target.x, target.y, LEAD_RADIUS, true)
+		if lead != null:
+			var leads: Array = s.get_or_add("leads", [])
+			leads.append({"x": lead.x, "y": lead.y, "by": explorer["id"]})
+			if leads.size() > MAX_LEADS:
+				leads.pop_front()
 
 
 static func _walk(world: Dictionary, s: Dictionary, dir: Vector2, reach: int, sea: bool) -> Variant:

@@ -17,6 +17,7 @@ const HUNGER_STEP := 6.0
 const HUNGER_RELIEF := 12.0
 const TREE_REGROW_EVERY := 10
 const HUNGRY_REACH := 2
+const TREES_SEEN_DAYS := 10
 const TREE_REGROW_CHANCE := 0.012
 const PLANTED_BOOST := 4.0
 const PLANTED_TREES := 5
@@ -122,3 +123,11 @@ static func trees_near(state: Dictionary, s: Dictionary) -> int:
 		if t != null and max(absi(o.x), absi(o.y)) > Settlements.clear_radius(s):
 			n += t["trees"]
 	return n
+
+
+static func cached_trees(state: Dictionary, s: Dictionary) -> int:
+	var c: Dictionary = s.get("trees_seen", {})
+	if c.is_empty() or state["day"] - c["day"] >= TREES_SEEN_DAYS:
+		c = {"day": state["day"], "n": trees_near(state, s)}
+		s["trees_seen"] = c
+	return c["n"]

@@ -17,6 +17,7 @@ const PEACE_MIN_DAYS := 120
 const TRADE_TECH_CHANCE := 0.003
 const SHARED_FAITH := 0.04
 const NAVAL_BORDER := 45
+const COVET_DAYS := 10
 
 
 static func _distance(state: Dictionary, a: Dictionary, b: Dictionary) -> int:
@@ -31,6 +32,13 @@ static func _chef_trait(state: Dictionary, civ: Dictionary, t: String) -> bool:
 	var capital = Settlements.by_id(state, civ["capital"])
 	var chef = Governance.chef_of(state, capital) if capital != null else null
 	return chef != null and chef["traits"].has(t)
+
+
+static func _covets(state: Dictionary, a: Dictionary, b: Dictionary, rel: Dictionary) -> bool:
+	if state["day"] - rel.get("covet_day", -99999) >= COVET_DAYS:
+		rel["covet_day"] = state["day"]
+		rel["covet"] = not Covet.reason(state, a, b).is_empty() or not Covet.reason(state, b, a).is_empty()
+	return rel.get("covet", false)
 
 
 static func _naval(state: Dictionary, civ: Dictionary) -> bool:
@@ -55,7 +63,7 @@ static func _drift(state: Dictionary, rng: Rng, a: Dictionary, b: Dictionary, re
 		delta += 0.03
 	if a.get("religion", -1) >= 0 and b.get("religion", -1) >= 0:
 		delta += SHARED_FAITH if a["religion"] == b["religion"] else -SHARED_FAITH
-	if d <= Covet.REACH and (not Covet.reason(state, a, b).is_empty() or not Covet.reason(state, b, a).is_empty()):
+	if d <= Covet.REACH and _covets(state, a, b, rel):
 		delta -= Covet.TENSION
 	rel["score"] = clamp(rel["score"] * DECAY + delta + (rng.next() - 0.5) * 0.3, -100.0, 100.0)
 

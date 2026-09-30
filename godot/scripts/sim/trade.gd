@@ -39,12 +39,22 @@ static func kind_between(state: Dictionary, a: Dictionary, b: Dictionary) -> Str
 
 static func partners(state: Dictionary, s: Dictionary) -> Array:
 	var out: Array = []
-	for r in routes(state):
-		if r["a"] == s["id"] or r["b"] == s["id"]:
-			var o = Settlements.by_id(state, r["b"] if r["a"] == s["id"] else r["a"])
-			if o != null:
-				out.append(o)
+	for id in s.get("partners", []):
+		var o = Settlements.by_id(state, id)
+		if o != null:
+			out.append(o)
 	return out
+
+
+static func _index(state: Dictionary) -> void:
+	for s in state["settlements"]:
+		s.erase("partners")
+	for r in routes(state):
+		var a = Settlements.by_id(state, r["a"])
+		var b = Settlements.by_id(state, r["b"])
+		if a != null and b != null:
+			a.get_or_add("partners", []).append(b["id"])
+			b.get_or_add("partners", []).append(a["id"])
 
 
 static func _plan(state: Dictionary, census: Dictionary) -> void:
@@ -66,6 +76,7 @@ static func _plan(state: Dictionary, census: Dictionary) -> void:
 		var pair = _closest(state, census, Civs.by_id(state, int(ids[0])), Civs.by_id(state, int(ids[1])))
 		if pair != null:
 			_link(state, pair[0], pair[1])
+	_index(state)
 
 
 static func _closest(state: Dictionary, census: Dictionary, a, b) -> Variant:
@@ -97,7 +108,7 @@ static func _link(state: Dictionary, a: Dictionary, b: Dictionary) -> void:
 		return
 	state["next_id"] += 1
 	routes(state).append({"id": state["next_id"], "a": a["id"], "b": b["id"], "kind": kind, "since": state["day"], "goods": 0.0})
-	var text := "⛵ Une route maritime relie désormais %s et %s." if kind == "sea" else "🛤️ Une route relie désormais %s à %s."
+	var text := "⛵ Une route maritime relie désormais %s et %s." if kind == "sea" else "🐪 Une route relie désormais %s à %s."
 	Journal.log_event(state, "route", text % [a["name"], b["name"]], {"x": a["x"], "y": a["y"], "from": a["id"], "to": b["id"], "sea": kind == "sea"})
 
 

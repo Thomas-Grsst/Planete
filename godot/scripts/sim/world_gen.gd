@@ -14,6 +14,7 @@ const LAND_SHARE := 0.55
 const HOME_BIOMES := ["plain"]
 const HOME_REACH := 5
 const HOME_FERTILE := 30
+const SEA_REACH := 10
 
 
 static func generate(seed_value: int) -> Dictionary:
@@ -101,7 +102,7 @@ static func _good_start(seed_value: int, x: int, y: int) -> bool:
 		for i in range(-half, half + 1):
 			if TerrainGen.height(seed_value, x + i * LAND_SPACING, y + j * LAND_SPACING) >= 0.41:
 				land += 1
-	if land < LAND_SAMPLES * LAND_SAMPLES * LAND_SHARE:
+	if land < LAND_SAMPLES * LAND_SAMPLES * LAND_SHARE or not _sea_near(seed_value, x, y):
 		return false
 	var water := false
 	var fertile := 0
@@ -113,3 +114,11 @@ static func _good_start(seed_value: int, x: int, y: int) -> bool:
 			if t["fertility"] >= 0.8:
 				fertile += 1
 	return water and fertile >= HOME_FERTILE
+
+
+static func _sea_near(seed_value: int, x: int, y: int) -> bool:
+	for j in range(-SEA_REACH, SEA_REACH + 1, 2):
+		for i in range(-SEA_REACH, SEA_REACH + 1, 2):
+			if absi(i) + absi(j) <= SEA_REACH and TerrainGen.height(seed_value, x + i, y + j) < 0.38:
+				return true
+	return false

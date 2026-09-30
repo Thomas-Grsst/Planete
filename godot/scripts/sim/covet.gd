@@ -35,7 +35,7 @@ static func _needs(state: Dictionary, members: Array) -> Array:
 		out.append("metal")
 	if members.any(func(s): return s["geo"]["water"] > 0 and s.get("fish_rate", 1.0) < OVERFISHED):
 		out.append("fish")
-	if members.any(func(s): return s["houses"] >= Sieges.WALL_MIN_HOUSES and Work.trees_near(state, s) < BARE_TREES):
+	if members.any(func(s): return s["houses"] >= Sieges.WALL_MIN_HOUSES and Work.cached_trees(state, s) < BARE_TREES):
 		out.append("wood")
 	return out
 

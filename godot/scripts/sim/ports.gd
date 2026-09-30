@@ -3,7 +3,7 @@ extends RefCounted
 
 const CHECK_DAYS := 30
 const MIN_HOUSES := 3
-const REACH := 3
+const REACH := 6
 
 
 static func has_port(s: Dictionary) -> bool:

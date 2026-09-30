@@ -101,6 +101,12 @@ static func discover(state: Dictionary, s: Dictionary, key: String, who, source,
 
 static func _spread(state: Dictionary, rng: Rng, census: Dictionary, e: Dictionary) -> void:
 	var s: Dictionary = e["s"]
+	var learnable := {}
+	for k in Techs.ORDER:
+		if Techs.can_learn(s, k):
+			learnable[k] = true
+	if learnable.is_empty():
+		return
 	var pool: Array = []
 	var best := 0.0
 	var sources := {}
@@ -110,7 +116,7 @@ static func _spread(state: Dictionary, rng: Rng, census: Dictionary, e: Dictiona
 		if o["id"] == s["id"] or absi(o["x"] - s["x"]) + absi(o["y"] - s["y"]) > (KIN_SPREAD_RANGE if kin else SPREAD_RANGE) or Wars.at_war(state, o, s):
 			continue
 		for k in o["techs"]:
-			if not pool.has(k) and Techs.can_learn(s, k):
+			if learnable.has(k) and not pool.has(k):
 				pool.append(k)
 				sources[k] = o
 		best = max(best, census[id]["mods"]["spread"] * (KIN_SPREAD_BONUS if kin else 1.0))
