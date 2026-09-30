@@ -30,6 +30,7 @@ var bedtime := 21.0
 var wake := 6.0
 var lift := 0.0
 var cheer := 0.0
+var dance_turn := 0.0
 
 
 func setup(p: Dictionary, manager) -> void:
@@ -89,6 +90,13 @@ func _process(delta: float) -> void:
 		_move(delta, ts)
 		if not walking:
 			timer -= delta * ts
+		if activity == "dance" and not walking:
+			var village = _village()
+			if village != null:
+				dance_turn += delta * 0.35
+				tile = village.dance_spot(person_id, dance_turn)
+				facing = 1.0 if sin(dance_turn * 3.0 + person_id) > 0.0 else -1.0
+				_place()
 	var target_alpha := 0.0 if activity == "sleep" and not walking else 1.0
 	alpha = move_toward(alpha, target_alpha, delta * 1.5)
 	visible = alpha > 0.01
@@ -117,13 +125,18 @@ func _think() -> void:
 	if activity == "sleep":
 		activity = "idle"
 		timer = 0.0
-	if h >= EVENING_HOUR and activity not in ["sit", "pray", "drop"]:
+	if h >= EVENING_HOUR and activity not in ["sit", "pray", "drop", "dance", "mourn"]:
+		var fete: String = village.festive()
 		if carrying != "":
 			_walk(village.storage_spot(person_id), "drop")
+		elif fete == "funerailles":
+			_walk(village.grave_spot(person_id), "mourn")
+		elif fete != "":
+			_walk(village.dance_spot(person_id, dance_turn), "dance")
 		else:
 			_walk(village.sit_spot(person_id), "pray" if village.praying() else "sit")
 		return
-	if timer > 0.0 or (activity in ["sit", "pray"] and h >= EVENING_HOUR):
+	if timer > 0.0 or (activity in ["sit", "pray", "dance", "mourn"] and h >= EVENING_HOUR):
 		return
 	_finish(village)
 

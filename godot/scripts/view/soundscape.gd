@@ -1,7 +1,7 @@
 extends Node
 
 const SETTINGS := "user://settings.cfg"
-const LOOPS := ["ambient_day", "ambient_night", "rain", "fire"]
+const LOOPS := ["ambient_day", "ambient_night", "rain", "fire", "music_day", "music_night"]
 const CUES := {
 	"decouverte": "chime", "religion": "bell", "temple": "bell", "miracle": "miracle", "statue": "bell",
 	"guerre": "horn", "bataille": "horn", "raid": "horn", "apocalypse": "zombie", "zombie": "zombie", "naissance": "birth",
@@ -9,7 +9,7 @@ const CUES := {
 }
 const CUE_GAP := 1.5
 const FADE := 1.5
-const LOOP_DB: Dictionary = {"ambient_day": -20.0, "ambient_night": -22.0, "rain": -12.0, "fire": -22.0}
+const LOOP_DB: Dictionary = {"ambient_day": -20.0, "ambient_night": -22.0, "rain": -12.0, "fire": -22.0, "music_day": -15.0, "music_night": -15.0}
 
 var loops := {}
 var cues := {}
@@ -60,6 +60,8 @@ func _target_levels() -> Dictionary:
 		"ambient_night": night * (1.0 - 0.6 * wet),
 		"rain": wet,
 		"fire": night,
+		"music_day": 1.0 - night,
+		"music_night": night,
 	}
 
 

@@ -55,5 +55,5 @@ static func story(p: Dictionary, s: Dictionary, dir: String, sea: bool, found: D
 
 
 static func _ore(key: String) -> String:
-	var the := {"cuivre": "le cuivre", "etain": "l'étain", "fer": "le fer", "charbon": "le charbon", "obsidienne": "l'obsidienne", "argile": "l'argile"}
+	var the := {"cuivre": "le cuivre", "etain": "l'étain", "fer": "le fer", "charbon": "le charbon", "obsidienne": "l'obsidienne", "argile": "l'argile", "pierre": "la pierre", "or": "l'or", "diamant": "le diamant"}
 	return the.get(key, Biomes.ORES[key]["name"].to_lower())

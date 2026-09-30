@@ -48,6 +48,33 @@ static func apply_era(options: Dictionary) -> void:
 		s["techs"] = s["techs"].filter(func(k): return k == "feu")
 	s["level"] = int(options.get("level", str(era[1])))
 	s["houses"] = int(options.get("houses", str(4 + s["level"] * 4)))
+	if options.has("sea"):
+		_dress_port(s)
+	if options.has("mine"):
+		for k in ["outils", "cuivre", "metallurgie", "fer"]:
+			if not s["techs"].has(k):
+				s["techs"].append(k)
+		s["stock"] = {"pierre": 30.0, "charbon": 12.0, "cuivre": 10.0, "fer": 8.0, "or": 3.0, "diamant": 1.0}
+		if Mining.site(Sim.state, s) != null:
+			s["mine_day"] = 0
+
+
+# --sea (avec --era) : port, phare, chantier naval et une épave au large du premier village.
+static func _dress_port(s: Dictionary) -> void:
+	for k in ["radeau", "navigation"]:
+		if not s["techs"].has(k):
+			s["techs"].append(k)
+	if not Ports.has_port(s):
+		var spot = Ports._spot(Sim.state["world"], s)
+		if spot == null:
+			return
+		s["port"] = {"x": spot.x, "y": spot.y, "day": 0}
+	s["port"]["lighthouse"] = 0
+	s["port"]["shipyard"] = 0
+	var p := Ports.tile(s)
+	var sea = Seafaring._sea_tile(Sim.state["world"], p + (p - Vector2i(s["x"], s["y"])).sign() * 2)
+	if sea != null:
+		Seafaring.wrecks(Sim.state).append({"id": 999, "x": sea.x, "y": sea.y, "day": 0, "from": s["name"], "cargo": 20.0})
 
 
 static func panel_id(kind: String) -> int:

@@ -11,6 +11,8 @@ const SCAFFOLD := Color("a07a4a")
 const PATH := Color("a58d6a")
 const PAVED := Color("9e978c")
 const PLAZA_RADIUS := 0.7
+const FLAGS := [Color("e57373"), Color("fff176"), Color("64b5f6"), Color("81c784"), Color("ba68c8")]
+const FLAGS_SOLSTICE := [Color("ffb74d"), Color("fff3c4"), Color("e53935")]
 const MAX_LOGS := 8
 const MAX_BASKETS := 6
 
@@ -87,11 +89,16 @@ func _draw() -> void:
 	for i in 7:
 		var a := TAU * i / 7.0
 		draw_circle(Vector2(cos(a) * 5.0, sin(a) * 2.4), 1.3, STONE)
+	var fete: String = village.festive()
+	var party: bool = fete != "" and fete != "funerailles" and Sim.hour() >= 16.0
+	if party:
+		_draw_bunting(fete)
 	if has_fire():
 		var t := Time.get_ticks_msec() / 1000.0
+		var big := 1.7 if party else 1.0
 		for i in 3:
 			var sway := sin(t * 9.0 + i * 2.1) * 1.2
-			var hgt := 6.0 + sin(t * 11.0 + i) * 1.5
+			var hgt := (6.0 + sin(t * 11.0 + i) * 1.5) * big
 			var x := (i - 1) * 1.8
 			draw_colored_polygon(PackedVector2Array([Vector2(x - 2, -1), Vector2(x + 2, -1), Vector2(x + sway, -1 - hgt)]), FLAME)
 			draw_colored_polygon(PackedVector2Array([Vector2(x - 1, -1), Vector2(x + 1, -1), Vector2(x + sway * 0.6, -1 - hgt * 0.55)]), FLAME_CORE)
@@ -186,3 +193,21 @@ func _draw_streets() -> void:
 			var f := (k + 1) / 4.0
 			ground.draw_line(c + Vector2(-hw * (1.0 - f), -hh * f), c + Vector2(hw * f, hh * (1.0 - f)), PAVED.darkened(0.12), 0.6)
 			ground.draw_line(c + Vector2(-hw * f, hh * (1.0 - f)), c + Vector2(hw * (1.0 - f), -hh * f), PAVED.darkened(0.12), 0.6)
+
+
+# Guirlandes de fanions en cercle autour de la place les soirs de fête.
+func _draw_bunting(fete: String) -> void:
+	var colors: Array = FLAGS_SOLSTICE if fete == "solstice" else FLAGS
+	var n := 14
+	for i in n:
+		var a := TAU * i / n
+		var b := TAU * (i + 1) / n
+		var p := Vector2(cos(a) * 26.0, sin(a) * 13.0 - 10.0)
+		var q := Vector2(cos(b) * 26.0, sin(b) * 13.0 - 10.0)
+		draw_line(p, q, Color(0.3, 0.25, 0.2, 0.8), 0.6)
+		var mid := (p + q) * 0.5
+		draw_colored_polygon(PackedVector2Array([mid + Vector2(-1.8, 0), mid + Vector2(1.8, 0), mid + Vector2(0, 3.2)]), colors[i % colors.size()])
+	for i in 4:
+		var a := TAU * i / 4.0 + 0.4
+		var foot := Vector2(cos(a) * 26.0, sin(a) * 13.0)
+		draw_line(foot, foot + Vector2(0, -10.0), Color("6d4c41"), 1.0)

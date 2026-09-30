@@ -47,6 +47,7 @@ static func check(state: Dictionary, e: Dictionary, flag: String) -> bool:
 		"stormDamage": return state["day"] - s.get("storm_damage_day", -99999) <= STORM_DAMAGE_DAYS
 		"council": return s.get("council", []).size() >= 3
 		"chef": return s.get("chef", -1) >= 0
+		"mine": return s.has("mine_day") and e["jobs"].get("mineur", 0) > 0
 		"deforested": return s["houses"] >= 3 and Work.cached_trees(state, s) < DEFORESTED_TREES
 	return geo["ores"].has(flag)
 

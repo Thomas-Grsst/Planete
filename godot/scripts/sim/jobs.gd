@@ -12,11 +12,15 @@ const DATA := {
 	"forgeron": {"emoji": "⚒️", "label": "forgeron", "fem": "forgeronne"},
 	"gardien": {"emoji": "🛡️", "label": "gardien", "fem": "gardienne"},
 	"chef": {"emoji": "👑", "label": "chef", "fem": "cheffe"},
+	"bûcheron": {"emoji": "🪵", "label": "bûcheron", "fem": "bûcheronne"},
+	"mineur": {"emoji": "⛏️", "label": "mineur", "fem": "mineuse"},
+	"explorateur": {"emoji": "🧭", "label": "explorateur", "fem": "exploratrice"},
 }
 const REVIEW_DAYS := 15
 const FAVORED := {
 	"chasseur": ["courageux", "aventurier"], "pêcheur": ["prudent", "aventurier"], "bâtisseur": ["travailleur", "inventif"], "fermier": ["travailleur", "prudent"],
 	"guérisseur": ["sociable", "prudent", "curieux"], "forgeron": ["inventif", "travailleur"], "gardien": ["courageux", "agressif"],
+	"bûcheron": ["travailleur", "courageux"], "mineur": ["travailleur", "prudent"], "explorateur": ["aventurier", "curieux"],
 }
 
 
@@ -53,6 +57,11 @@ static func _desired(state: Dictionary, e: Dictionary) -> Dictionary:
 	d["guérisseur"] = (1 + (2 if not s.get("outbreak", {}).is_empty() else 0)) if Techs.has_tech(s, "plantes") and workers >= 8 else 0
 	d["forgeron"] = (1 if workers >= 8 else 0) + (1 if workers >= 30 else 0) if Techs.METALS.any(func(k): return Techs.has_tech(s, k)) and Mining.has_supply(s) else 0
 	d["gardien"] = (1 if workers >= 12 else 0) + (int(round(workers * 0.15)) if Threats.pressing(state, s) else 0)
+	# Quand on mange à sa faim, on peut envoyer des bras au bois, à la mine et au-delà des collines.
+	var fed: bool = e["hungry"] <= max(1, e["pop"] * 0.1) and s["food"] >= Trade.food_cap(e) * 0.25
+	d["bûcheron"] = (clampi(int(round(workers * 0.12)), 1, 4) if fed else 1) if workers >= 5 and Work.cached_trees(state, s) >= 8 else 0
+	d["mineur"] = (clampi(int(round(workers * 0.12)), 1, 4) if fed else 1) if workers >= 5 and Mining.site(state, s) != null and not Mining.available(s).is_empty() else 0
+	d["explorateur"] = (1 + (1 if workers >= 25 else 0)) if fed and workers >= 6 else 0
 	return d
 
 

@@ -16,7 +16,7 @@ static func build(state: Dictionary) -> Dictionary:
 		}
 		census[s["id"]]["mods"]["happiness"] += Religions.happiness_of(state, s)
 	for p in state["people"]:
-		if not p["alive"] or not census.has(p["home"]):
+		if not p["alive"] or not census.has(p["home"]) or p.get("quest", -1) >= 0:
 			continue
 		var e: Dictionary = census[p["home"]]
 		e["people"].append(p)

@@ -29,6 +29,10 @@ func build() -> void:
 	routes.set_script(load("res://scripts/view/route_layer.gd"))
 	routes.z_index = -7
 	add_child(routes)
+	var sea := Node2D.new()
+	sea.set_script(load("res://scripts/view/sea_life.gd"))
+	sea.z_index = -7
+	add_child(sea)
 	add_child(entities)
 	life = Node2D.new()
 	life.set_script(load("res://scripts/view/life.gd"))

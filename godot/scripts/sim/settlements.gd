@@ -4,6 +4,8 @@ extends RefCounted
 const LEVELS := [[0, "Camp", "un camp"], [8, "Hameau", "un hameau"], [20, "Village", "un village"], [50, "Bourg", "un bourg"], [120, "Ville", "une ville"], [300, "Grande ville", "une grande ville"]]
 const DEMOTE_RATIO := 0.8
 const BUILD_COST := 8.0
+# Avec de la pierre de la mine, une maison demande moitié moins de bois.
+const STONE_COST := 5.0
 const BUILD_BASE_SPEED := 0.12
 const BUILD_PER_BUILDER := 0.1
 const MIGRATION_MIN_POP := 12
@@ -75,7 +77,12 @@ static func step(state: Dictionary, rng: Rng, census: Dictionary) -> void:
 static func _build(state: Dictionary, s: Dictionary, e: Dictionary) -> void:
 	var capacity: int = s["houses"] * e["mods"]["capacity"]
 	if s["construction"] < 0:
-		if e["pop"] > capacity and s["wood"] >= BUILD_COST:
+		var stone: Dictionary = Mining.stock(s)
+		if e["pop"] > capacity and stone.get("pierre", 0.0) >= STONE_COST and s["wood"] >= BUILD_COST * 0.5:
+			stone["pierre"] -= STONE_COST
+			s["wood"] -= BUILD_COST * 0.5
+			s["construction"] = 0.0
+		elif e["pop"] > capacity and s["wood"] >= BUILD_COST:
 			s["wood"] -= BUILD_COST
 			s["construction"] = 0.0
 		return

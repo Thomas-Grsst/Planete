@@ -4,7 +4,7 @@ signal focus_requested(world_pos: Vector2)
 signal rotate_requested
 
 const SPEEDS := [[0.0, "⏸"], [1.0, "▶"], [10.0, "▶▶"], [100.0, "▶▶▶"]]
-const QUIET := ["couple", "meteo", "migration"]
+const QUIET := ["couple", "meteo", "migration", "fete"]
 
 var root: Control
 var clock: Label

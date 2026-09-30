@@ -14,7 +14,9 @@ const LAKE_LEVEL := 0.86
 const CONTRAST := 2.3
 const SHIFT := -0.12
 const CLIMATE_CONTRAST := 1.8
-const ORE_CHANCE := {"cuivre": 0.35, "etain": 0.22, "fer": 0.3, "charbon": 0.22, "obsidienne": 0.15, "argile": 0.5}
+const ORE_CHANCE := {"cuivre": 0.35, "etain": 0.22, "fer": 0.3, "charbon": 0.22, "obsidienne": 0.15, "argile": 0.5, "pierre": 0.9, "or": 0.1, "diamant": 0.35}
+# Le diamant ne se forme que sur les îles : un morceau de carte surtout couvert d'océan.
+const ISLAND_LAND_SHARE := 0.35
 const VEIN_RADIUS := 2
 const VEIN_TRIES := 30
 
@@ -116,8 +118,13 @@ static func chunk(seed_value: int, cx: int, cy: int) -> Dictionary:
 
 
 static func _place_ores(tiles: Array, rng: Rng) -> void:
+	var land := 0
+	for t in tiles:
+		if not Biomes.is_water(t["biome"]):
+			land += 1
+	var island: bool = land < tiles.size() * ISLAND_LAND_SHARE
 	for key in Biomes.ORES:
-		if not rng.chance(ORE_CHANCE[key]):
+		if not rng.chance(ORE_CHANCE[key]) or (key == "diamant" and not island):
 			continue
 		var biomes: Array = Biomes.ORES[key]["biomes"]
 		for tries in VEIN_TRIES:

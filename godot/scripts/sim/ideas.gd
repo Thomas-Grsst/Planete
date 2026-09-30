@@ -11,6 +11,10 @@ const KIN_SPREAD_BONUS := 3.0
 const SPREAD_BASE_CHANCE := 0.004
 const SPREAD_MAX_CHANCE := 0.5
 const EXODUS_DELAY := 60
+# Rythme des découvertes : les savoirs lents sont accélérés davantage (feu ÷3, écriture ÷6), sans toucher à la durée du jour.
+const PACE_MIN := 3.0
+const PACE_MAX := 6.0
+const PACE_DIVISOR := 10.0
 
 
 static func step(state: Dictionary, rng: Rng, census: Dictionary) -> void:
@@ -56,12 +60,16 @@ static func _think(state: Dictionary, rng: Rng, e: Dictionary, share: float) -> 
 			if IdeaFlags.check(state, e, flag):
 				need *= idea["needs"][flag]
 		var factor := APOCALYPSE_FACTOR if apocalypse and key != "epee" else 1.0
-		if not rng.chance(min(MAX_DAILY_CHANCE, best[1] * need * pf * share * factor / idea["mean"])):
+		if not rng.chance(min(MAX_DAILY_CHANCE, best[1] * need * pf * share * factor / paced_mean(idea["mean"]))):
 			continue
 		var who = _thinker(state, rng, e, Techs.DATA[key]["job"])
 		if who != null:
 			discover(state, s, key, who, null, _tell(best[2], who, s))
 		return
+
+
+static func paced_mean(mean: float) -> float:
+	return mean / clamp(sqrt(mean) / PACE_DIVISOR, PACE_MIN, PACE_MAX)
 
 
 static func _thinker(state: Dictionary, rng: Rng, e: Dictionary, boost_job: String) -> Variant:

@@ -97,6 +97,14 @@ Remplacer les « points de savoir » par des **idées déclenchées** : fini le 
 - [x] **Rotation de la vue** par quarts de tour (↻).
 - [x] **Famines moins brutales** : rationnement (les morts s'étalent au lieu de vider le village d'un coup), voisins qui envoient des vivres, familles affamées qui se réfugient chez un voisin. Sur 8 mondes et 50 ans : plus aucun monde éteint (1 avant) et 4 fois moins de morts de faim.
 - [x] **Villes qui évoluent à l'œil** : tentes de peaux, chaumières, tuiles, maisons de pierre à étages, immeubles de brique ; enduits et toits propres à chaque civilisation ; puits, chemins puis rues pavées, place et marché au bourg, beffroi en ville.
+- [x] **Vie de la mer** : chantiers navals, phares allumés la nuit, naufrages dans les tempêtes et épaves fouillées des années plus tard, baleines qui soufflent au large, dauphins près des côtes.
+- [x] **Musique de fond** générée (harpe le jour, flûte la nuit), en fondu avec le cycle jour/nuit.
+- [x] **Métiers variés** : bûcherons, mineurs et explorateurs en plus des cueilleurs, chasseurs, pêcheurs, fermiers et bâtisseurs ; chacun part vers sa tâche le matin.
+- [x] **Ressources visibles et mines** : pierre, charbon, cuivre, étain, fer, or (rare) et diamant (seulement sur les îles) affleurent sur la carte ; les villages creusent une mine où chaque minerai a sa rareté et ne sort que si le village connaît le savoir qui va avec ; la pierre remplace la moitié du bois des maisons ; les mineurs peuvent découvrir le cuivre, le bronze et le fer.
+- [x] **Terrain ordonné** : champs, maisons, mine et cimetière ont chacun leur case ; arbres abattus et plus de repousse sur les champs, pas de maison sur un gisement.
+- [x] **Découvertes plus rapides** (3 fois pour les premiers savoirs, 6 fois pour les derniers), sans changer la durée du jour.
+- [x] **Fêtes et vie quotidienne** : fête des moissons, feux du solstice, danse en ronde les soirs de mariage, funérailles des grands personnages et cimetière qui grandit.
+- [x] **Épopées** : un héros part avec ses compagnons chercher une terre légendaire ; épreuves, rencontres et pertes racontées étape par étape ; il fonde une colonie, rentre avec un savoir ou un trésor, ou disparaît dans la légende.
 
 ### ⚔️ Après la V3
 - [x] Routes commerciales et caravanes visibles, bateaux et ports.

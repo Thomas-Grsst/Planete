@@ -30,14 +30,17 @@ const DATA := {
 		["dream", 0.05, "🏺 {name} façonne les premières poteries à {place}."]]},
 	"cuivre": {"mean": 150, "needs": {}, "triggers": [
 		["cuivre", 1.0, "🟢 {name} ramasse une pierre verte dans la montagne près de {place}. Chauffée dans le feu, elle suinte un métal rouge : le cuivre."],
-		["trade:cuivre", 0.3, "🟢 Des voyageurs montrent à {name} une pierre verte qui fond au feu : le cuivre arrive à {place}."]]},
+		["trade:cuivre", 0.3, "🟢 Des voyageurs montrent à {name} une pierre verte qui fond au feu : le cuivre arrive à {place}."],
+		["mine", 0.3, "⛏️ Au fond de la mine de {place}, {name} tombe sur une veine de pierre verte. Chauffée dans le feu, elle donne un métal rouge : le cuivre."]]},
 	"metallurgie": {"mean": 1000, "needs": {"wolves": 1.5, "zombies": 2.0}, "triggers": [
 		["etain", 1.0, "⚒️ {name} mêle le cuivre à un métal gris et mou trouvé près de {place} : le bronze, plus dur que tout."],
-		["trade:etain", 0.4, "⚒️ Grâce à un métal gris venu d'ailleurs, {name} invente le bronze à {place}."]]},
+		["trade:etain", 0.4, "⚒️ Grâce à un métal gris venu d'ailleurs, {name} invente le bronze à {place}."],
+		["mine", 0.12, "⚒️ Les mineurs de {place} remontent un métal gris et mou. {name} le mêle au cuivre : le bronze, plus dur que tout."]]},
 	"fer": {"mean": 3000, "needs": {"tech:metallurgie": 3.0, "charbon": 1.5}, "triggers": [
 		["fer", 1.0, "⛓️ {name} chauffe une roche rouge et lourde plus fort que jamais à {place} : le fer."],
 		["trade:fer", 0.3, "⛓️ Avec une roche rouge rapportée par des voyageurs, {name} obtient le fer à {place}."],
-		["dream", 0.03, "☄️ Une pierre tombe du ciel près de {place}. {name} en tire un métal inconnu : le fer."]]},
+		["dream", 0.03, "☄️ Une pierre tombe du ciel près de {place}. {name} en tire un métal inconnu : le fer."],
+		["mine", 0.08, "⛓️ Dans la mine de {place}, {name} trouve une roche rouge et lourde qui, chauffée très fort, donne le fer."]]},
 	"epee": {"mean": 200, "needs": {}, "triggers": [
 		["zombies", 2.0, "🗡️ Face aux morts qui marchent, {name} forge la première épée à {place}."],
 		["wolves", 1.0, "🗡️ Après une attaque de loups, {name} forge la première lame à {place}."],

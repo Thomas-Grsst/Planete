@@ -108,5 +108,8 @@ static func _explorer(state: Dictionary, rng: Rng, e: Dictionary) -> Variant:
 	var pool: Array = e["people"].filter(func(p): return p["alive"] and People.age_of(state, p) >= People.MIGRANT_MIN_AGE and p["job"] != "chef")
 	if pool.is_empty():
 		return null
+	var scouts: Array = pool.filter(func(p): return p["job"] == "explorateur")
+	if not scouts.is_empty():
+		return rng.pick(scouts)
 	var bold: Array = pool.filter(func(p): return p["traits"].has("aventurier") or p["traits"].has("curieux"))
 	return rng.pick(bold if not bold.is_empty() else pool)

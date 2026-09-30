@@ -28,6 +28,14 @@ static func start(options: Dictionary) -> int:
 			Sim.speed = float(options["speed"])
 		if options.has("era"):
 			DebugOptions.apply_era(options)
+			Sim.tick(false)
+			Journal.take_fresh()
+			if options.has("fete"):
+				var s: Dictionary = Sim.state["settlements"][0]
+				s["fete"] = {"kind": options["fete"], "day": Sim.state["day"]}
+				s["burials"] = 14
+				s["graves"] = [{"name": "Aster", "day": 0, "person": -1}, {"name": "Nilo", "day": 0, "person": -1}]
+				Festivals.cemetery(Sim.state, s)
 		Sim.world_loaded.emit()
 		return 0
 	var id := SaveStore.current_id()

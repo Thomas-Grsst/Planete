@@ -132,6 +132,7 @@ static func _find_partner(state: Dictionary, rng: Rng, p: Dictionary, entry: Dic
 	p["happiness"] = min(100.0, p["happiness"] + 15)
 	q["happiness"] = min(100.0, q["happiness"] + 15)
 	Journal.log_event(state, "couple", "💞 %s et %s forment un couple." % [p["name"], q["name"]], {"person": p["id"], "other": q["id"]})
+	Festivals.wedding(state, p)
 	Journal.remember(state, q, "💞 %s et %s forment un couple." % [q["name"], p["name"]])
 
 
@@ -168,5 +169,6 @@ static func kill(state: Dictionary, p: Dictionary, cause: String) -> void:
 	p["sick"] = {}
 	p["bitten"] = -1
 	Fame.on_death(state, p, home)
+	Festivals.funeral(state, p, home)
 	var where := " à %s" % home["name"] if home != null else ""
 	Journal.log_event(state, "deces", "🕯️ %s meurt %s à %d ans%s." % [p["name"], cause, age, where], {"person": p["id"]})

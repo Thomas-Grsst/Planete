@@ -5,8 +5,10 @@ const HAIRS := [Color("2b1d14"), Color("5a3a22"), Color("a0662f"), Color("d8b05a
 const CLOTHES := {
 	"cueilleur": Color("5d9b4a"), "fermier": Color("d8b64a"), "chasseur": Color("8a5a36"), "pêcheur": Color("3f7fbf"),
 	"bâtisseur": Color("d9803a"), "enfant": Color("e8a0bf"), "chef": Color("8e5cc7"),
+	"bûcheron": Color("a33b2b"), "mineur": Color("6d6258"), "explorateur": Color("b08d57"), "forgeron": Color("4e4a47"),
+	"gardien": Color("607d8b"), "guérisseur": Color("f2f2f2"),
 }
-const CARRY := {"wood": Color("8b5a2b"), "berries": Color("c0392b"), "fish": Color("b8c7d6"), "meat": Color("9b3b2e"), "grain": Color("e3c565"), "herbs": Color("66bb6a")}
+const CARRY := {"wood": Color("8b5a2b"), "berries": Color("c0392b"), "fish": Color("b8c7d6"), "meat": Color("9b3b2e"), "grain": Color("e3c565"), "herbs": Color("66bb6a"), "ore": Color("7e7870"), "water": Color("64b5f6")}
 const SHADOW := Color(0, 0, 0, 0.22)
 const TOOL := Color("5b4636")
 const LINE := Color(1, 1, 1, 0.55)
@@ -45,6 +47,10 @@ func draw_on(node: Node2D, st: Dictionary) -> void:
 		crouch = 4.5
 	elif act == "play":
 		bob = absf(sin(t * 7.0 + node.person_id)) * 3.0
+	elif act == "dance" and not st["walking"]:
+		bob = absf(sin(t * 6.0 + node.person_id)) * 2.5
+	elif act == "mourn":
+		crouch = 1.2
 	if st["cheer"] > 0.0:
 		bob = absf(sin(t * 9.0 + node.person_id)) * 4.0
 	if st["selected"]:
@@ -92,6 +98,11 @@ func _arms(node: Node2D, st: Dictionary, a: float, crouch: float, t: float, f: f
 	var shoulder := Vector2(1.8 * f, -9.5 + crouch)
 	var arm := Color(skin, a)
 	var act: String = st["activity"]
+	if act == "dance" and not st["walking"]:
+		var wave := sin(t * 6.0 + node.person_id)
+		node.draw_line(shoulder, shoulder + Vector2(2.5 * f, -3.5 - wave * 1.5), arm, 1.2)
+		node.draw_line(shoulder + Vector2(-3.6 * f, 0), shoulder + Vector2(-6.0 * f, -3.0 + wave * 1.5), arm, 1.2)
+		return
 	if st["cheer"] > 0.0 or act == "pray":
 		var lift_arm := 5.5 if st["cheer"] > 0.0 else 4.0 + sin(t * 1.5) * 0.6
 		node.draw_line(shoulder, shoulder + Vector2(1.5 * f, -lift_arm), arm, 1.2)
@@ -102,6 +113,17 @@ func _arms(node: Node2D, st: Dictionary, a: float, crouch: float, t: float, f: f
 		node.draw_line(shoulder, shoulder + Vector2(s * f, 4.5), arm, 1.2)
 		return
 	match act:
+		"mine":
+			var swing := sin(t * 6.0)
+			var hand := shoulder + Vector2((2.2 + swing * 1.2) * f, -2.0 + swing * 3.5)
+			node.draw_line(shoulder, hand, arm, 1.2)
+			var head := hand + Vector2(3.0 * f, -3.0 + swing * 2.0)
+			node.draw_line(hand, head, Color(TOOL, a), 1.2)
+			node.draw_line(head + Vector2(-1.8, -1.0), head + Vector2(1.8, 1.0), Color(0.55, 0.55, 0.6, a), 1.1)
+		"scout":
+			var look := sin(t * 0.8)
+			node.draw_line(shoulder, shoulder + Vector2(1.2 * f, -3.2), arm, 1.2)
+			node.draw_line(shoulder + Vector2(1.2 * f, -3.2), shoulder + Vector2((2.6 + look) * f, -3.6), arm, 1.2)
 		"chop", "build", "farm", "forge":
 			var swing := sin(t * (7.0 if act != "farm" else 4.0))
 			var hand := shoulder + Vector2((2.5 + swing * 1.5) * f, -1.0 + swing * 3.0)

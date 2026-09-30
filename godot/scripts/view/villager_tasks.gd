@@ -32,6 +32,14 @@ static func choose(v, village) -> Dictionary:
 			if s["construction"] >= 0.0:
 				return _task(village.construction_spot(seed_value), "build", 10.0, "")
 			return _tile_task(world, s, seed_value, func(t): return t["trees"] > 0, "chop", 9.0, "wood", village)
+		"bûcheron":
+			return _tile_task(world, s, seed_value, func(t): return t["trees"] > 0, "chop", 11.0, "wood", village)
+		"mineur":
+			var mine = village.mine_tile()
+			if mine != null:
+				return _task(mine + _jitter(seed_value, 0.25), "mine", 14.0, "ore")
+		"explorateur":
+			return _task(_far_spot(world, s, seed_value, village), "scout", 9.0, "")
 		"pêcheur":
 			var shore = _shore(world, s, seed_value)
 			if shore != null:
@@ -43,7 +51,22 @@ static func choose(v, village) -> Dictionary:
 		"fermier":
 			if not village.fields.is_empty():
 				return _task(village.fields[seed_value % village.fields.size()] + _jitter(seed_value, 0.3), "farm", 12.0, "grain")
+	if seed_value % 5 == 0:
+		var water = _shore(world, s, seed_value)
+		if water != null:
+			return _task(water, "gather", 4.0, "water")
 	return _tile_task(world, s, seed_value, func(t): return t["food"] > 1.0, "gather", 10.0, "berries", village)
+
+
+# Un point loin du village, au-delà des champs, pour l'explorateur qui guette l'horizon.
+static func _far_spot(world: Dictionary, s: Dictionary, seed_value: int, village) -> Vector2:
+	for k in 8:
+		var a := float(absi(seed_value * 2654435 + k * 977) % 628) / 100.0
+		var r := 5.5 + float(absi(seed_value * 31 + k) % 30) / 10.0
+		var p := Vector2(s["x"], s["y"]) + Vector2(cos(a), sin(a)) * r
+		if WorldGen.is_walkable(world, int(round(p.x)), int(round(p.y))):
+			return p
+	return village.patrol_spot(seed_value)
 
 
 static func _task(goal: Vector2, activity: String, duration: float, carry: String) -> Dictionary:

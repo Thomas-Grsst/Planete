@@ -67,6 +67,10 @@ func on_event(entry: Dictionary) -> void:
 				_walk(_tile_of(entry["from"]), _tile_of(entry["to"]), "boat", Color("ffffff"), 1)
 		"exploration":
 			_expedition(entry)
+		"epopee":
+			if entry.has("to_x"):
+				_walk(_tile_of(entry["settlement"]), Vector2(entry["to_x"], entry["to_y"]), "scout", Color("ffe082"), 1)
+			effects.float_text(at + LABEL_LIFT, "🗺️", Color("ffe082"), true)
 		"cataclysme":
 			if entry.get("meteor", false):
 				_sky("meteor", at)
@@ -79,6 +83,11 @@ func on_event(entry: Dictionary) -> void:
 		"catastrophe":
 			if entry.get("fire", false) or entry.get("flood", false):
 				effects.burst(at + LABEL_LIFT * 0.5, Color("ff7043") if entry.get("fire", false) else Color("64b5f6"))
+		"naufrage":
+			effects.burst(at + LABEL_LIFT * 0.3, Color("64b5f6"))
+			effects.float_text(at + LABEL_LIFT, "🌊", Color("bbdefb"), true)
+		"phare", "chantier", "epave":
+			effects.float_text(at + LABEL_LIFT, {"phare": "🗼", "chantier": "🛠️", "epave": "🐚"}[entry["type"]], Color.WHITE, true)
 		"contact":
 			_sky("ufo", at)
 		"exode":

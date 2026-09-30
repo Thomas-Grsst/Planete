@@ -3,7 +3,6 @@ extends Node2D
 const HOUSE := preload("res://scripts/view/house.gd")
 const PROPS := preload("res://scripts/view/village_props.gd")
 const RINGS := [[0.95, 6, 0.3], [1.65, 10, 0.1], [2.35, 14, 0.5], [3.0, 18, 0.2]]
-const FIELD_MIN_FERTILITY := 0.5
 const TEMPLE := preload("res://scripts/view/temple.gd")
 const EXTRAS := preload("res://scripts/view/village_extras.gd")
 const HARBOR := preload("res://scripts/view/harbor.gd")
@@ -37,7 +36,7 @@ func setup(s: Dictionary, entity_root: Node2D, fx: Node2D) -> void:
 		for i in ring[1]:
 			var a: float = TAU * i / ring[1] + ring[2]
 			var offset: Vector2 = Vector2(cos(a), sin(a)) * ring[0]
-			if _dry(world, center() + offset) and offset.distance_to(TEMPLE_OFFSET) >= TEMPLE_CLEARANCE:
+			if _dry(world, center() + offset) and _free(world, center() + offset) and offset.distance_to(TEMPLE_OFFSET) >= TEMPLE_CLEARANCE:
 				slots.append(offset)
 	if slots.is_empty():
 		slots.append(Vector2(0.6, 0.0))
@@ -69,6 +68,15 @@ func _dry(world: Dictionary, tile: Vector2) -> bool:
 		if t == null or not Biomes.walkable(t["biome"]) or t["biome"] == "river":
 			return false
 	return true
+
+
+# Pas de maison sur un gisement ni sur la mine.
+func _free(world: Dictionary, tile: Vector2) -> bool:
+	var pos := Vector2i(int(round(tile.x)), int(round(tile.y)))
+	var t = WorldGen.tile_at(world, pos.x, pos.y)
+	if t == null or t["ore"] != "":
+		return false
+	return not (settlement.get("mine") is Vector2i and settlement["mine"] == pos)
 
 
 func _land(point: Vector2) -> Vector2:
@@ -128,15 +136,8 @@ func _refresh_fields() -> void:
 	if not Techs.has_tech(settlement, "agriculture") or not alive():
 		props.queue_redraw()
 		return
-	var world: Dictionary = Sim.state["world"]
-	var wanted: int = clampi(2 + settlement["houses"] / 2, 2, 9)
-	for o in Work.offsets():
-		var d: int = absi(o.x) + absi(o.y)
-		if d < 2 or fields.size() >= wanted:
-			continue
-		var t = WorldGen.tile_at(world, settlement["x"] + o.x, settlement["y"] + o.y)
-		if t != null and Biomes.walkable(t["biome"]) and t["biome"] != "river" and t["fertility"] >= FIELD_MIN_FERTILITY:
-			fields.append(center() + Vector2(o))
+	for pos in Harvest.field_tiles(Sim.state, settlement, Harvest.shown_fields(settlement)):
+		fields.append(Vector2(pos))
 
 
 func slot_tile(index: int) -> Vector2:
@@ -178,6 +179,32 @@ func patrol_spot(seed_value: int) -> Vector2:
 
 func forge_spot(person_id: int) -> Vector2:
 	return _land(center() + Vector2(-0.55, 0.45) + Vector2(0.08 * (person_id % 2), 0))
+
+
+func festive() -> String:
+	return Festivals.today(Sim.state, settlement) if alive() else ""
+
+
+# Ronde autour du feu : chacun a sa place sur le cercle, qui tourne lentement.
+func dance_spot(person_id: int, turn: float) -> Vector2:
+	var a := float(person_id % 16) / 16.0 * TAU + turn
+	var r := 0.55 + 0.12 * float(person_id % 2)
+	return center() + Vector2(cos(a), sin(a)) * r
+
+
+func grave_spot(person_id: int) -> Vector2:
+	var c = settlement.get("cemetery")
+	if not c is Vector2i:
+		return sit_spot(person_id)
+	var a := float(person_id % 10) / 10.0 * TAU
+	return Vector2(c) + Vector2(cos(a), sin(a)) * 0.45
+
+
+func mine_tile() -> Variant:
+	var m = settlement.get("mine")
+	if m is Vector2i and settlement.has("mine_day"):
+		return Vector2(m) + (center() - Vector2(m)).normalized() * 0.35
+	return null
 
 
 func receive(item: String) -> void:

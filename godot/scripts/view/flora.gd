@@ -7,6 +7,7 @@ const LEAF := Color("4f9e3a")
 const AUTUMN_LEAF := Color("d9822b")
 const WINTER_LEAF := Color("7d8f74")
 const TRUNK := Color("6d4c33")
+const DEPOSIT_SPOTS := [Vector2(6, -1), Vector2(-6, 3), Vector2(1, -4), Vector2(-3, -3), Vector2(4, 4)]
 
 static var sway_material: ShaderMaterial
 
@@ -14,6 +15,7 @@ var tiles: Array = []
 var counts: Dictionary = {}
 var conifers: Dictionary = {}
 var offsets: Dictionary = {}
+var ores: Dictionary = {}
 var season := -1
 var _mesh: MeshBuilder
 var _built: ArrayMesh
@@ -47,6 +49,10 @@ func refresh() -> void:
 		if counts.get(pos, -1) != n:
 			counts[pos] = n
 			changed = true
+		var ore: String = t["ore"] if t != null else ""
+		if ores.get(pos, "") != ore:
+			ores[pos] = ore
+			changed = true
 	season = now
 	if changed:
 		queue_redraw()
@@ -57,6 +63,8 @@ func _draw() -> void:
 	for pos in tiles:
 		var base: Vector2 = offsets[pos]
 		var h := _hash(pos)
+		if ores.get(pos, "") != "":
+			_deposit(base, ores[pos], h)
 		for k in counts[pos]:
 			var scale_k: float = 0.62 + 0.08 * ((h + k * 7) % 4)
 			if conifers[pos]:
@@ -96,3 +104,25 @@ func _leafy(o: Vector2, r: float, tile_index: int) -> void:
 		uvs.append(Vector2(0, clamp(0.55 - sin(a) * 0.45, 0.0, 1.0)))
 		cols.append(leaf.darkened(0.12) if sin(a) > 0.2 else leaf.lightened(0.06))
 	_mesh.shaded(pts, cols, uvs)
+
+
+# Gisement visible : rochers qui affleurent, veinés de la couleur du minerai (pierre, charbon, fer, or, diamant…).
+func _deposit(base: Vector2, ore: String, h: int) -> void:
+	var tint: Color = Biomes.ORES[ore]["color"]
+	var rock := Color("8a847c") if ore != "charbon" else Color("4a4642")
+	for k in 3:
+		var o: Vector2 = base + DEPOSIT_SPOTS[(h + k) % DEPOSIT_SPOTS.size()]
+		var r: float = 3.0 + ((h >> k) % 3) * 0.8
+		if ore == "pierre":
+			r += 1.2
+		_mesh.poly(PackedVector2Array([o + Vector2(-r, 0), o + Vector2(-r * 0.6, -r * 0.9), o + Vector2(r * 0.3, -r * 1.1), o + Vector2(r, -r * 0.3), o + Vector2(r * 0.8, r * 0.4), o + Vector2(-r * 0.5, r * 0.5)]), rock)
+		_mesh.poly(PackedVector2Array([o + Vector2(-r * 0.6, -r * 0.9), o + Vector2(r * 0.3, -r * 1.1), o + Vector2(r * 0.1, -r * 0.5)]), rock.lightened(0.18))
+		if ore == "pierre":
+			continue
+		for d in 2:
+			var c: Vector2 = o + Vector2(-r * 0.3 + d * r * 0.55, -r * 0.35 + d * 0.3)
+			_mesh.poly(PackedVector2Array([c + Vector2(-0.9, 0), c + Vector2(0, -0.9), c + Vector2(0.9, 0), c + Vector2(0, 0.9)]), tint)
+		if ore == "diamant" or ore == "or":
+			var c: Vector2 = o + Vector2(0, -r * 1.3)
+			_mesh.line(c + Vector2(-1.6, 0), c + Vector2(1.6, 0), Color(1, 1, 1, 0.85), 0.5)
+			_mesh.line(c + Vector2(0, -1.6), c + Vector2(0, 1.6), Color(1, 1, 1, 0.85), 0.5)

@@ -18,6 +18,8 @@ static func travel(state: Dictionary, rng: Rng, census: Dictionary, r: Dictionar
 	var from: Dictionary = pair[0]
 	var to: Dictionary = pair[1]
 	var sea: bool = r["kind"] == "sea"
+	if sea and Seafaring.voyage_risk(state, rng, census, from, to):
+		return
 	_disease(state, rng, census, from, to, sea)
 	if rng.chance(IDEA_CHANCE):
 		_idea(state, rng, census, from, to, sea)
@@ -102,4 +104,5 @@ static func _marriage(state: Dictionary, rng: Rng, census: Dictionary, from: Dic
 	var extra := {"x": to["x"], "y": to["y"], "settlement": to["id"], "person": p["id"], "other": q["id"]}
 	extra.merge(_trip(from, to, sea, "💞"))
 	Journal.log_event(state, "couple", text, extra)
+	Festivals.wedding(state, q)
 	Journal.remember(state, q, "💞 %s épouse %s, %s %s." % [q["name"], p["name"], "venue" if p["sex"] == "F" else "venu", Names.of_place(from["name"])])

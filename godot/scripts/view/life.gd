@@ -82,7 +82,7 @@ func _sync_villages(state: Dictionary) -> void:
 func _sync_villagers(state: Dictionary) -> void:
 	var seen := {}
 	for p in state["people"]:
-		if not p["alive"]:
+		if not p["alive"] or p.get("quest", -1) >= 0:
 			continue
 		var id: int = p["id"]
 		seen[id] = true

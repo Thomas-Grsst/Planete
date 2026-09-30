@@ -23,6 +23,9 @@ const ORES := {
 	"charbon": {"name": "Charbon", "color": Color("222222"), "biomes": ["mountain", "forest"], "veins": [0, 3]},
 	"obsidienne": {"name": "Obsidienne", "color": Color("5b4a8b"), "biomes": ["mountain", "desert"], "veins": [0, 2]},
 	"argile": {"name": "Argile", "color": Color("c77a45"), "biomes": ["swamp", "beach"], "veins": [2, 6]},
+	"pierre": {"name": "Pierre", "color": Color("a7a39c"), "biomes": ["mountain", "rock", "tundra", "desert"], "veins": [2, 6]},
+	"or": {"name": "Or", "color": Color("f2c230"), "biomes": ["mountain", "desert"], "veins": [0, 1]},
+	"diamant": {"name": "Diamant", "color": Color("b9f6ff"), "biomes": ["mountain", "rock", "beach"], "veins": [0, 1]},
 }
 
 const STILL_WATER := ["ocean", "lake"]

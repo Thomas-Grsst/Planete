@@ -128,7 +128,7 @@ func _plant(key: Vector2i, root: Node2D) -> void:
 	for i in tiles.size():
 		var t: Dictionary = tiles[i]
 		var grows: bool = t["fertility"] > 0.3 and Biomes.walkable(t["biome"]) and t["biome"] != "river"
-		if t["trees"] <= 0 and not grows:
+		if t["trees"] <= 0 and not grows and t["ore"] == "":
 			continue
 		var pos := o + Vector2i(i & WorldGen.LOCAL, i >> WorldGen.SHIFT)
 		var d := roundi(Iso.depth(pos.x, pos.y))

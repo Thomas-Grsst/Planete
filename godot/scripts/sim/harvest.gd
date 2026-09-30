@@ -67,26 +67,66 @@ static func _waters(state: Dictionary, s: Dictionary) -> Array:
 	return tiles
 
 
+static func _field_radius(s: Dictionary) -> int:
+	return FIELD_RADIUS + (1 if s["level"] >= 3 else 0) + (1 if s["level"] >= 4 else 0)
+
+
+# Une case peut devenir un champ : hors du cœur du village (les maisons), ni gisement, ni mine, ni port.
+static func can_farm(s: Dictionary, pos: Vector2i, t) -> bool:
+	if t == null or not Biomes.walkable(t["biome"]) or NO_FIELDS.has(t["biome"]) or t["fertility"] < FIELD_MIN_FERTILITY or t["ore"] != "" or t.has("cemetery"):
+		return false
+	if max(absi(pos.x - s["x"]), absi(pos.y - s["y"])) <= Settlements.clear_radius(s):
+		return false
+	if s.get("mine") is Vector2i and s["mine"] == pos:
+		return false
+	return not (Ports.has_port(s) and Ports.tile(s) == pos)
+
+
+# Les champs réellement tracés autour du village, les plus proches d'abord (le même choix pour la vue et la simulation).
+static func field_tiles(state: Dictionary, s: Dictionary, limit: int) -> Array:
+	var out: Array = []
+	for o in Geography.offsets(_field_radius(s)):
+		if out.size() >= limit:
+			break
+		var pos := Vector2i(s["x"] + o.x, s["y"] + o.y)
+		if can_farm(s, pos, WorldGen.tile_at(state["world"], pos.x, pos.y)):
+			out.append(pos)
+	return out
+
+
+static func shown_fields(s: Dictionary) -> int:
+	return clampi(2 + s["houses"] / 2, 2, 9)
+
+
 static func fields(state: Dictionary, s: Dictionary, store: bool = true) -> Dictionary:
 	var cached: Dictionary = s.get("fields", {})
 	if not cached.is_empty() and state["day"] - cached["day"] < FIELD_REFRESH and cached["houses"] == s["houses"]:
 		return cached
-	var r: int = FIELD_RADIUS + (1 if s["level"] >= 3 else 0) + (1 if s["level"] >= 4 else 0)
-	var core := Settlements.clear_radius(s)
 	var count := 0
 	var fert := 0.0
-	for o in Geography.offsets(r):
-		if max(absi(o.x), absi(o.y)) <= core:
-			continue
-		var t = WorldGen.tile_at(state["world"], s["x"] + o.x, s["y"] + o.y)
-		if t == null or not Biomes.walkable(t["biome"]) or NO_FIELDS.has(t["biome"]) or t["fertility"] < FIELD_MIN_FERTILITY:
+	for o in Geography.offsets(_field_radius(s)):
+		var pos := Vector2i(s["x"] + o.x, s["y"] + o.y)
+		var t = WorldGen.tile_at(state["world"], pos.x, pos.y)
+		if not can_farm(s, pos, t):
 			continue
 		count += 1
 		fert += t["fertility"]
 	cached = {"count": count, "fert": fert / max(1, count), "day": state["day"], "houses": s["houses"]}
 	if store:
 		s["fields"] = cached
+		if Techs.has_tech(s, "agriculture"):
+			_plough(state, s)
 	return cached
+
+
+# On défriche les champs tracés : leurs arbres donnent du bois et ne repoussent plus.
+static func _plough(state: Dictionary, s: Dictionary) -> void:
+	for pos in field_tiles(state, s, shown_fields(s)):
+		var t: Dictionary = WorldGen.tile_at(state["world"], pos.x, pos.y)
+		if t["trees"] > 0:
+			s["wood"] += t["trees"]
+			t["trees"] = 0
+		t["field"] = s["id"]
 
 
 static func farm(state: Dictionary, s: Dictionary, farmers: int, mod: float, weather: float) -> float:

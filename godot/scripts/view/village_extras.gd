@@ -52,6 +52,12 @@ func _draw() -> void:
 	var s: Dictionary = village.settlement
 	if not village.alive():
 		return
+	var yard = s.get("cemetery")
+	if yard is Vector2i and s.get("burials", 0) > 0:
+		_cemetery(Vector2(yard), s)
+	var mine = s.get("mine")
+	if mine is Vector2i and s.has("mine_day"):
+		_mine(Vector2(mine), s)
 	if s["level"] >= 2:
 		_well(_local(village.center() + WELL_SPOT))
 	if s["level"] >= HouseStyle.TOWN_LEVEL:
@@ -138,3 +144,44 @@ func _belfry(p: Vector2, style: Dictionary) -> void:
 	draw_circle(p + Vector2(2, -24), 1.4, Color("fff3c4"))
 	draw_colored_polygon(PackedVector2Array([p + Vector2(-5, -29.5), p + Vector2(0, -40), p + Vector2(0, -27)]), style["roof"].lightened(0.1))
 	draw_colored_polygon(PackedVector2Array([p + Vector2(0, -27), p + Vector2(0, -40), p + Vector2(5, -29.5)]), style["roof"].darkened(0.12))
+
+
+# Entrée de mine creusée dans la roche : cadre de bois, rails, wagonnet et tas des minerais remontés.
+func _mine(tile: Vector2, s: Dictionary) -> void:
+	var p := Iso.ground(Sim.state["world"], tile.x, tile.y) - global_position
+	draw_colored_polygon(PackedVector2Array([p + Vector2(-11, 2), p + Vector2(-8, -9), p + Vector2(0, -13), p + Vector2(8, -9), p + Vector2(11, 2)]), Color("7d756c"))
+	draw_colored_polygon(PackedVector2Array([p + Vector2(-4, 1), p + Vector2(-4, -6), p + Vector2(0, -8.5), p + Vector2(4, -6), p + Vector2(4, 1)]), Color("1e1a17"))
+	draw_line(p + Vector2(-4.5, 1), p + Vector2(-4.5, -6.5), Color("8d6e63"), 1.4)
+	draw_line(p + Vector2(4.5, 1), p + Vector2(4.5, -6.5), Color("8d6e63"), 1.4)
+	draw_line(p + Vector2(-5.5, -6.5), p + Vector2(5.5, -6.5), Color("8d6e63"), 1.6)
+	draw_line(p + Vector2(-1.5, 1), p + Vector2(-5, 9), Color("5d4037"), 0.8)
+	draw_line(p + Vector2(1.5, 1), p + Vector2(-2, 9), Color("5d4037"), 0.8)
+	var cart := p + Vector2(-3.5, 6)
+	draw_colored_polygon(PackedVector2Array([cart + Vector2(-3, -3), cart + Vector2(3, -3), cart + Vector2(2.3, 0), cart + Vector2(-2.3, 0)]), Color("5f5a55"))
+	draw_circle(cart + Vector2(-1.6, 0.6), 0.9, Color("333333"))
+	draw_circle(cart + Vector2(1.6, 0.6), 0.9, Color("333333"))
+	var store: Dictionary = s.get("stock", {})
+	var k := 0
+	for ore in Mining.YIELDS:
+		var n: int = mini(4, int(ceil(store.get(ore, 0.0) / 6.0)))
+		for i in n:
+			var q := p + Vector2(7 + (k % 4) * 2.4, 5 - (k / 4) * 1.8)
+			draw_circle(q, 1.3, Biomes.ORES[ore]["color"])
+			if ore == "diamant" or ore == "or":
+				draw_circle(q + Vector2(-0.4, -0.4), 0.45, Color(1, 1, 1, 0.9))
+			k += 1
+
+
+# Cimetière : une pierre de plus toutes les quelques morts, et une tombe haute pour chaque grand personnage.
+func _cemetery(tile: Vector2, s: Dictionary) -> void:
+	var p := Iso.ground(Sim.state["world"], tile.x, tile.y) - global_position
+	var stones: int = mini(12, 1 + s.get("burials", 0) / 4)
+	for i in stones:
+		var q := p + Vector2((i % 4) * 5.0 - 7.5, (i / 4) * 3.0 - 3.0 + (i % 4) * 0.8)
+		draw_rect(Rect2(q + Vector2(-1.2, -3.4), Vector2(2.4, 3.4)), Color("9e9a94"))
+		draw_circle(q + Vector2(0, -3.4), 1.2, Color("9e9a94"))
+	var famous: Array = s.get("graves", []).slice(-3)
+	for i in famous.size():
+		var q := p + Vector2(i * 7.0 - 7.0, 7.0)
+		draw_rect(Rect2(q + Vector2(-2.5, -1.5), Vector2(5, 1.5)), Color("8d8781"))
+		draw_colored_polygon(PackedVector2Array([q + Vector2(-1.5, -1.5), q + Vector2(1.5, -1.5), q + Vector2(1.0, -9.0), q + Vector2(0, -10.5), q + Vector2(-1.0, -9.0)]), Color("cfc8bb"))

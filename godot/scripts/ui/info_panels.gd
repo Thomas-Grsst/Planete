@@ -5,7 +5,7 @@ const MUTED := "#8fa3b3"
 const LINK := "#8fd3ff"
 const GOLD := "#ffd54f"
 const JOURNAL_SHOWN := 60
-const WELCOME_TYPES := ["naissance", "deces", "couple", "construction", "decouverte", "fondation", "croissance", "migration", "diffusion", "religion", "conversion", "temple", "schisme", "civilisation", "guerre", "bataille", "conquete", "paix", "epidemie", "apocalypse", "raid", "cataclysme", "statue", "succes", "exploration", "port", "surpeche", "filon", "route", "siege", "blocus", "bataille_navale", "murailles", "entraide", "refuge"]
+const WELCOME_TYPES := ["naissance", "deces", "couple", "construction", "decouverte", "fondation", "croissance", "migration", "diffusion", "religion", "conversion", "temple", "schisme", "civilisation", "guerre", "bataille", "conquete", "paix", "epidemie", "apocalypse", "raid", "cataclysme", "statue", "succes", "exploration", "port", "surpeche", "filon", "route", "siege", "blocus", "bataille_navale", "murailles", "entraide", "refuge", "chantier", "phare", "naufrage", "epave", "mine", "minerai", "fete", "funerailles", "epopee"]
 const SUMMARY_LABELS := {
 	"naissance": "👶 naissances", "deces": "🕯️ décès", "couple": "💞 couples formés", "construction": "🏠 maisons construites",
 	"decouverte": "💡 découvertes", "fondation": "🏕️ colonies fondées", "croissance": "📈 colonies qui grandissent",
@@ -16,6 +16,8 @@ const SUMMARY_LABELS := {
 	"exploration": "🗺️ expéditions", "port": "⚓ ports construits", "surpeche": "🐟 zones trop pêchées", "filon": "⛏️ filons épuisés",
 	"route": "🐪 routes commerciales", "siege": "🏰 sièges", "blocus": "⛵ blocus", "bataille_navale": "⚓ batailles navales", "murailles": "🧱 murailles élevées",
 	"entraide": "🌾 vivres envoyés aux affamés", "refuge": "🥣 familles réfugiées",
+	"chantier": "🛠️ chantiers navals", "phare": "🗼 phares élevés", "naufrage": "🌊 naufrages", "epave": "🐚 épaves fouillées",
+	"mine": "⛏️ mines ouvertes", "minerai": "💎 minerais trouvés", "fete": "🎉 fêtes", "funerailles": "⚱️ funérailles", "epopee": "🗺️ épisodes d'épopée",
 }
 
 
@@ -121,9 +123,16 @@ static func resources(st: Dictionary, s: Dictionary) -> String:
 		parts.append("🐟 poissons %d %%" % int(round(Nature.fish_share(st["world"], s["x"], s["y"], Harvest.fish_radius(s)) * 100)))
 	if Techs.has_tech(s, "agriculture"):
 		parts.append("🌾 %d champs · sol %d %%" % [Harvest.fields(st, s, false)["count"], int(round(s.get("soil", 1.0) * 100))])
-	var ores: Array = s["geo"]["ores"].filter(func(o): return Mining.METAL_ORES.has(o)).map(func(o): return Biomes.ORES[o]["name"].to_lower())
+	var ores: Array = s["geo"]["ores"].map(func(o): return Biomes.ORES[o]["name"].to_lower())
 	if not ores.is_empty():
-		parts.append("⛏️ " + ", ".join(ores))
+		parts.append("🪨 gisements : " + ", ".join(ores))
+	var store: Dictionary = s.get("stock", {})
+	var dug: Array = []
+	for ore in Mining.YIELDS:
+		if store.get(ore, 0.0) >= 1.0:
+			dug.append("%s %d" % [Biomes.ORES[ore]["name"].to_lower(), int(store[ore])])
+	if not dug.is_empty():
+		parts.append("⛏️ mine : " + ", ".join(dug))
 	if s.get("metal", 0.0) >= 1.0:
 		parts.append("⚒️ %d métal" % int(s["metal"]))
 	var out := muted(" · ".join(parts)) + "\n"

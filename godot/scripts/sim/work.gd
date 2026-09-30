@@ -47,8 +47,8 @@ static func step(state: Dictionary, rng: Rng, census: Dictionary) -> void:
 			gain += Harvest.fish(state, s, jobs.get("pêcheur", 0), m["fish"] * Sieges.fish_factor(s))
 		gain += Harvest.farm(state, s, jobs.get("fermier", 0), m["farm"] * Sieges.yield_factor(s), FARM_WEATHER.get(state["weather"], 1.0))
 		_feed(s, e, gain, m)
-		_cut_wood(state, rng, s, jobs.get("bâtisseur", 0) + 1, m["wood"])
-		Mining.step(state, s, jobs.get("forgeron", 0))
+		_cut_wood(state, rng, s, jobs.get("bâtisseur", 0) + jobs.get("bûcheron", 0) * 2 + 1, m["wood"])
+		Mining.step(state, rng, s, jobs.get("mineur", 0), jobs.get("forgeron", 0))
 
 
 static func _gather(state: Dictionary, s: Dictionary, wanted: float, far: bool) -> float:
@@ -120,7 +120,7 @@ static func _cut_wood(state: Dictionary, rng: Rng, s: Dictionary, workers: int, 
 	for o in offsets():
 		var t = WorldGen.tile_at(state["world"], s["x"] + o.x, s["y"] + o.y)
 		var in_village: bool = max(absi(o.x), absi(o.y)) <= Settlements.clear_radius(s)
-		if t == null or in_village or t["fertility"] <= 0.3 or not Biomes.walkable(t["biome"]) or t["biome"] == "river":
+		if t == null or in_village or t.has("field") or t.has("cemetery") or t["fertility"] <= 0.3 or not Biomes.walkable(t["biome"]) or t["biome"] == "river":
 			continue
 		var most: int = 9 if t["biome"] == "forest" else (PLANTED_TREES if planted else 2)
 		if t["trees"] < most and rng.chance(chance):
