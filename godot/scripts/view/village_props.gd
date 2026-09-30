@@ -11,6 +11,8 @@ const SCAFFOLD := Color("a07a4a")
 const PATH := Color("a58d6a")
 const PAVED := Color("9e978c")
 const PLAZA_RADIUS := 0.7
+# Rues en anneau entre les rangées de maisons : [rayon en cases, nombre de maisons à partir duquel on la trace].
+const RING_ROADS := [[1.3, 6], [2.0, 16]]
 const FLAGS := [Color("e57373"), Color("fff176"), Color("64b5f6"), Color("81c784"), Color("ba68c8")]
 const FLAGS_SOLSTICE := [Color("ffb74d"), Color("fff3c4"), Color("e53935")]
 const MAX_LOGS := 8
@@ -173,19 +175,43 @@ func _draw_label() -> void:
 
 
 # Chemins de terre au village, puis rues pavées et place centrale au bourg.
+# Quelques grandes rues partent de la place, des rues en anneau passent devant les maisons,
+# et chaque maison n'a qu'un petit bout de chemin jusqu'à la rue la plus proche.
 func _draw_streets() -> void:
 	var s: Dictionary = village.settlement
+	var mid: Vector2 = village.center()
 	if not village.alive() or s["level"] < 2:
 		return
-	var world: Dictionary = Sim.state["world"]
 	var paved: bool = s["level"] >= HouseStyle.TOWN_LEVEL
 	var ink := PAVED if paved else PATH
-	var c: Vector2 = Iso.ground(world, s["x"], s["y"]) - global_position
-	for i in village.houses.size():
+	var width := 3.0 if paved else 2.0
+	var houses: int = village.houses.size()
+	var rings: Array = []
+	for r in RING_ROADS:
+		if houses > r[1]:
+			rings.append(r[0])
+	var outer: float = (rings[-1] if not rings.is_empty() else PLAZA_RADIUS) + 0.9
+	var spokes: Array = []
+	var turn := float(s["id"] % 7) * 0.37
+	for k in (4 if houses > 6 else 3):
+		spokes.append(turn + TAU * k / (4 if houses > 6 else 3))
+	for a in spokes:
+		_street(mid + Vector2(cos(a), sin(a)) * PLAZA_RADIUS, mid + Vector2(cos(a), sin(a)) * outer, ink, width)
+	for r in rings:
+		var prev: Vector2 = mid + Vector2(r, 0)
+		for k in range(1, 33):
+			var a := TAU * k / 32.0
+			var next: Vector2 = mid + Vector2(cos(a), sin(a)) * r
+			_street(prev, next, ink, width)
+			prev = next
+	for i in houses:
 		var tile: Vector2 = village.slot_tile(i)
-		var door: Vector2 = tile + (village.center() - tile) * 0.22
-		ground.draw_line(c, Iso.ground(world, door.x, door.y) - global_position, ink, 3.0 if paved else 2.0, true)
+		var door: Vector2 = tile + (mid - tile) * 0.22
+		var join: Vector2 = _nearest_street(door, rings, spokes, outer)
+		if door.distance_to(join) > 0.05:
+			_street(door, join, ink, width * 0.7)
 	if paved:
+		var c: Vector2 = _ground_at(mid)
 		var hw := Iso.TILE_W * PLAZA_RADIUS
 		var hh := Iso.TILE_H * PLAZA_RADIUS
 		ground.draw_colored_polygon(PackedVector2Array([c + Vector2(0, -hh), c + Vector2(hw, 0), c + Vector2(0, hh), c + Vector2(-hw, 0)]), PAVED)
@@ -193,6 +219,33 @@ func _draw_streets() -> void:
 			var f := (k + 1) / 4.0
 			ground.draw_line(c + Vector2(-hw * (1.0 - f), -hh * f), c + Vector2(hw * f, hh * (1.0 - f)), PAVED.darkened(0.12), 0.6)
 			ground.draw_line(c + Vector2(-hw * f, hh * (1.0 - f)), c + Vector2(hw * (1.0 - f), -hh * f), PAVED.darkened(0.12), 0.6)
+
+
+func _ground_at(tile: Vector2) -> Vector2:
+	return Iso.ground(Sim.state["world"], tile.x, tile.y) - global_position
+
+
+func _street(a: Vector2, b: Vector2, ink: Color, width: float) -> void:
+	ground.draw_line(_ground_at(a), _ground_at(b), ink, width, true)
+
+
+# Le point de rue le plus proche d'une porte : la place, un anneau ou une grande rue.
+func _nearest_street(door: Vector2, rings: Array, spokes: Array, outer: float) -> Vector2:
+	var mid: Vector2 = village.center()
+	var rel := door - mid
+	var dist := rel.length()
+	var best := mid + rel.normalized() * PLAZA_RADIUS
+	for r in rings:
+		var p: Vector2 = mid + rel.normalized() * r
+		if door.distance_to(p) < door.distance_to(best):
+			best = p
+	for a in spokes:
+		var dir := Vector2(cos(a), sin(a))
+		var along: float = clamp(rel.dot(dir), PLAZA_RADIUS, outer)
+		var p: Vector2 = mid + dir * along
+		if door.distance_to(p) < door.distance_to(best):
+			best = p
+	return best if dist > PLAZA_RADIUS else door
 
 
 # Guirlandes de fanions en cercle autour de la place les soirs de fête.
