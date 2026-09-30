@@ -6,6 +6,7 @@ const RINGS := [[0.95, 6, 0.3], [1.65, 10, 0.1], [2.35, 14, 0.5], [3.0, 18, 0.2]
 const FIELD_MIN_FERTILITY := 0.5
 const TEMPLE := preload("res://scripts/view/temple.gd")
 const EXTRAS := preload("res://scripts/view/village_extras.gd")
+const HARBOR := preload("res://scripts/view/harbor.gd")
 const TEMPLE_OFFSET := Vector2(-0.95, -0.95)
 const TEMPLE_CLEARANCE := 0.75
 
@@ -18,6 +19,7 @@ var fields: Array = []
 var props
 var temple
 var extras
+var harbor
 var slots: Array = []
 
 
@@ -108,6 +110,7 @@ func refresh() -> void:
 	props.refresh()
 	temple.refresh()
 	extras.refresh()
+	_refresh_harbor()
 
 
 func _refresh_fields() -> void:
@@ -170,3 +173,12 @@ func forge_spot(person_id: int) -> Vector2:
 func receive(item: String) -> void:
 	if item != "":
 		props.bump(item)
+
+
+func _refresh_harbor() -> void:
+	if harbor != null or not Ports.has_port(settlement):
+		return
+	harbor = Node2D.new()
+	harbor.set_script(HARBOR)
+	add_child(harbor)
+	harbor.setup(self, Ports.tile(settlement))

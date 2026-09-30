@@ -5,7 +5,7 @@ const MUTED := "#8fa3b3"
 const LINK := "#8fd3ff"
 const GOLD := "#ffd54f"
 const JOURNAL_SHOWN := 60
-const WELCOME_TYPES := ["naissance", "deces", "couple", "construction", "decouverte", "fondation", "croissance", "migration", "diffusion", "religion", "conversion", "temple", "schisme", "civilisation", "guerre", "bataille", "conquete", "paix", "epidemie", "apocalypse", "raid", "cataclysme", "statue", "succes"]
+const WELCOME_TYPES := ["naissance", "deces", "couple", "construction", "decouverte", "fondation", "croissance", "migration", "diffusion", "religion", "conversion", "temple", "schisme", "civilisation", "guerre", "bataille", "conquete", "paix", "epidemie", "apocalypse", "raid", "cataclysme", "statue", "succes", "exploration", "port", "surpeche", "filon"]
 const SUMMARY_LABELS := {
 	"naissance": "👶 naissances", "deces": "🕯️ décès", "couple": "💞 couples formés", "construction": "🏠 maisons construites",
 	"decouverte": "💡 découvertes", "fondation": "🏕️ colonies fondées", "croissance": "📈 colonies qui grandissent",
@@ -13,6 +13,7 @@ const SUMMARY_LABELS := {
 	"religion": "🙏 religions fondées", "conversion": "🕯️ conversions", "temple": "🛕 temples élevés", "schisme": "⚡ schismes",
 	"civilisation": "🏰 civilisations fondées", "guerre": "⚔️ guerres déclarées", "bataille": "🗡️ batailles", "conquete": "🏴 conquêtes", "paix": "🕊️ paix signées",
 	"epidemie": "🦠 épidémies", "apocalypse": "🧟 apocalypses", "raid": "🔥 raids", "cataclysme": "🌋 cataclysmes", "statue": "🗿 statues", "succes": "🏆 succès",
+	"exploration": "🗺️ expéditions", "port": "⚓ ports construits", "surpeche": "🐟 zones trop pêchées", "filon": "⛏️ filons épuisés",
 }
 
 

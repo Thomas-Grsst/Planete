@@ -2,7 +2,7 @@ extends Node2D
 
 signal arrived
 
-const SPEEDS := {"soldiers": 1.0, "caravan": 0.6, "boat": 1.1}
+const SPEEDS := {"soldiers": 1.0, "caravan": 0.6, "boat": 1.1, "scout": 0.9}
 const MAX_TIME_SCALE := 20.0
 
 var tile := Vector2.ZERO
@@ -42,8 +42,8 @@ func _process(delta: float) -> void:
 	var stride: float = min(to_goal.length(), SPEEDS[kind] * pow(max(ts, 1.0), 0.7) * delta * (1.0 if ts > 0.0 else 0.0))
 	tile += to_goal.normalized() * stride
 	step += stride * 14.0
-	if absf(to_goal.x - to_goal.y) > 0.01:
-		facing = sign(to_goal.x - to_goal.y)
+	if absf((Iso.project(goal.x, goal.y) - Iso.project(tile.x, tile.y)).x) > 0.5:
+		facing = sign((Iso.project(goal.x, goal.y) - Iso.project(tile.x, tile.y)).x)
 	position = Iso.project(tile.x, tile.y)
 	queue_redraw()
 
@@ -55,6 +55,7 @@ func _draw() -> void:
 		"soldiers": _soldiers()
 		"caravan": _caravan()
 		"boat": _boat()
+		"scout": _scout()
 
 
 func _soldiers() -> void:
@@ -93,3 +94,16 @@ func _boat() -> void:
 	draw_line(Vector2(0, -1 + bob), Vector2(0, -17 + bob), Color(0.35, 0.25, 0.15, a), 1.0)
 	draw_colored_polygon(PackedVector2Array([Vector2(1, -16 + bob), Vector2(8 * facing + 1, -5 + bob), Vector2(1, -4 + bob)]), Color(0.95, 0.93, 0.85, a))
 	draw_colored_polygon(PackedVector2Array([Vector2(0, -17 + bob), Vector2(5, -15.5 + bob), Vector2(0, -14 + bob)]), Color(color, a))
+
+
+func _scout() -> void:
+	var a := alpha
+	var swing := sin(step) * 1.6
+	var f := facing
+	draw_line(Vector2(-1, -5), Vector2(-1 + swing, 0), Color(0.35, 0.28, 0.2, a), 1.2)
+	draw_line(Vector2(1, -5), Vector2(1 - swing, 0), Color(0.35, 0.28, 0.2, a), 1.2)
+	draw_colored_polygon(PackedVector2Array([Vector2(-2.2, -11), Vector2(2.2, -11), Vector2(2.6, -5), Vector2(-2.6, -5)]), Color(0.36, 0.52, 0.36, a))
+	draw_rect(Rect2(Vector2(-4.5 * f - (0.0 if f > 0 else 3.0), -10), Vector2(3, 4)), Color(0.55, 0.38, 0.22, a))
+	draw_circle(Vector2(0, -13), 2.1, Color(0.85, 0.7, 0.55, a))
+	draw_line(Vector2(-3, -15.2), Vector2(3, -15.2), Color(0.45, 0.32, 0.2, a), 1.4)
+	draw_line(Vector2(3.5 * f, -2), Vector2(4.2 * f, -16), Color(0.5, 0.38, 0.25, a), 1.0)

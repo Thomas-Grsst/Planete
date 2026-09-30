@@ -61,6 +61,8 @@ func on_event(entry: Dictionary) -> void:
 		"migration":
 			if entry.get("boat", false):
 				_walk(_tile_of(entry["from"]), _tile_of(entry["to"]), "boat", Color("ffffff"), 1)
+		"exploration":
+			_expedition(entry)
 		"cataclysme":
 			if entry.get("meteor", false):
 				_sky("meteor", at)
@@ -97,6 +99,16 @@ func _color_for(entry: Dictionary) -> Color:
 
 func _icon_for(type: String) -> String:
 	return {"guerre": "⚔️", "conquete": "🏴", "revolution": "✊", "independance": "✊", "civilisation": "🏰", "raid": "🔥", "apocalypse": "🧟", "statue": "🗿", "savoir_perdu": "🕯️"}.get(type, "")
+
+
+func _expedition(entry: Dictionary) -> void:
+	var home = _tile_of(entry.get("settlement", -1))
+	if home == null or not entry.has("to_x"):
+		return
+	var far := Vector2(entry["to_x"], entry["to_y"])
+	var kind := "boat" if entry.get("boat", false) else "scout"
+	var back: Callable = Callable() if entry.get("lost", false) else func(): _walk(far, home, kind, Color("ffffff"), 1)
+	_walk(home, far, kind, Color("ffffff"), 1, back)
 
 
 func _clash(pos: Vector2) -> void:

@@ -13,7 +13,7 @@ const SCORES := {
 	"extinction": 100, "apocalypse": 90, "guerre": 80, "chute": 75, "conquete": 70, "exode": 70, "epidemie": 65, "cataclysme": 65,
 	"grande_famine": 60, "civilisation": 60, "apocalypse_fin": 55, "religion": 55, "decouverte": 50, "paix": 50, "revolution": 50,
 	"independance": 50, "contact": 50, "mutant": 45, "savoir_perdu": 45, "climat": 45, "alliance": 40, "monument": 40, "schisme": 40,
-	"trahison": 40, "raid": 35, "dynastie": 35, "religion_etat": 35, "religion_fin": 35, "archeologie": 35,
+	"trahison": 40, "raid": 35, "exploration": 30, "dynastie": 35, "religion_etat": 35, "religion_fin": 35, "archeologie": 35,
 }
 
 

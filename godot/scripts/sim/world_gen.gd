@@ -11,7 +11,9 @@ const START_STEP := 4
 const LAND_SAMPLES := 9
 const LAND_SPACING := 4
 const LAND_SHARE := 0.55
-const HOME_BIOMES := ["plain", "forest"]
+const HOME_BIOMES := ["plain"]
+const HOME_REACH := 5
+const HOME_FERTILE := 30
 
 
 static func generate(seed_value: int) -> Dictionary:
@@ -99,4 +101,15 @@ static func _good_start(seed_value: int, x: int, y: int) -> bool:
 		for i in range(-half, half + 1):
 			if TerrainGen.height(seed_value, x + i * LAND_SPACING, y + j * LAND_SPACING) >= 0.41:
 				land += 1
-	return land >= LAND_SAMPLES * LAND_SAMPLES * LAND_SHARE
+	if land < LAND_SAMPLES * LAND_SAMPLES * LAND_SHARE:
+		return false
+	var water := false
+	var fertile := 0
+	for j in range(-HOME_REACH, HOME_REACH + 1):
+		for i in range(-HOME_REACH, HOME_REACH + 1):
+			var t := TerrainGen.tile(seed_value, x + i, y + j)
+			if t["biome"] in ["river", "lake", "ocean"]:
+				water = true
+			if t["fertility"] >= 0.8:
+				fertile += 1
+	return water and fertile >= HOME_FERTILE

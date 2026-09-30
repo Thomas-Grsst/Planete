@@ -79,7 +79,7 @@ static func is_coastal(world: Dictionary, x: int, y: int) -> bool:
 	return false
 
 
-static func find_spot(state: Dictionary, rng: Rng, cx: int, cy: int, radius: int, any_land: bool = false) -> Variant:
+static func find_spot(state: Dictionary, rng: Rng, cx: int, cy: int, radius: int, any_land: bool = false, other_land: bool = false) -> Variant:
 	var world: Dictionary = state["world"]
 	var best = null
 	var best_score := 0.0
@@ -90,6 +90,8 @@ static func find_spot(state: Dictionary, rng: Rng, cx: int, cy: int, radius: int
 		if t == null or not Biomes.walkable(t["biome"]) or t["biome"] == "river" or t["biome"] == "mountain":
 			continue
 		if not any_land and not Regions.same_landmass(world, cx, cy, x, y):
+			continue
+		if other_land and Regions.same_landmass(world, cx, cy, x, y):
 			continue
 		if _too_close(state, x, y):
 			continue

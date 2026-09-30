@@ -101,6 +101,7 @@ func tick(announce: bool = true) -> void:
 	Zombies.step(state, rng, census)
 	Herds.step(state, rng)
 	Settlements.step(state, rng, census)
+	Exploration.step(state, rng, census)
 	Wolves.step(state, rng, census)
 	Jobs.step(state, rng, census)
 	Governance.step(state, rng, census)

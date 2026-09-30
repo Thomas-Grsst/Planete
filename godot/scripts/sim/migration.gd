@@ -5,11 +5,16 @@ const RADIUS := 10
 const MAX_GROUP := 8
 const FOLLOW_CHANCE := 0.25
 const MIN_COLONISTS := 3
+const ISLAND_SHARE := 0.4
 
 
 static func depart(state: Dictionary, rng: Rng, from: Dictionary, e: Dictionary) -> void:
-	var sailors: bool = e["mods"]["cross_water"] > 0
-	var spot = Geography.find_spot(state, rng, from["x"], from["y"], RADIUS + e["mods"]["migration"], sailors)
+	var harbour := Ports.has_port(from)
+	var sailors: bool = e["mods"]["cross_water"] > 0 or harbour
+	var reach: int = RADIUS + e["mods"]["migration"] + (Exploration.PORT_REACH if harbour else 0)
+	var spot = Geography.find_spot(state, rng, from["x"], from["y"], reach, true, true) if sailors and rng.chance(ISLAND_SHARE) else null
+	if spot == null:
+		spot = Geography.find_spot(state, rng, from["x"], from["y"], reach, sailors)
 	if spot == null:
 		return
 	var adults: Array = e["people"].filter(func(p): return People.age_of(state, p) >= People.MIGRANT_MIN_AGE and not p["traits"].has("prudent"))

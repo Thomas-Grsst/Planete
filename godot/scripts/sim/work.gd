@@ -16,6 +16,7 @@ const WOOD_PER_HOUSE := 10.0
 const HUNGER_STEP := 6.0
 const HUNGER_RELIEF := 12.0
 const TREE_REGROW_EVERY := 10
+const HUNGRY_REACH := 2
 const TREE_REGROW_CHANCE := 0.012
 const PLANTED_BOOST := 4.0
 const PLANTED_TREES := 5
@@ -38,7 +39,7 @@ static func step(state: Dictionary, rng: Rng, census: Dictionary) -> void:
 		var m: Dictionary = e["mods"]
 		var jobs: Dictionary = e["jobs"]
 		var gatherers: float = jobs.get("cueilleur", 0) + e["helpers"] * HELPER_SHARE
-		var gain := _gather(state, s, gatherers * GATHER_PER_WORKER * m["gather"])
+		var gain := _gather(state, s, gatherers * GATHER_PER_WORKER * m["gather"], e["hungry"] > 0)
 		gain += _hunt(state, s, jobs.get("chasseur", 0), m["hunt"])
 		if s["geo"]["water"] > 0:
 			gain += Harvest.fish(state, s, jobs.get("pêcheur", 0), m["fish"])
@@ -48,10 +49,10 @@ static func step(state: Dictionary, rng: Rng, census: Dictionary) -> void:
 		Mining.step(state, s, jobs.get("forgeron", 0))
 
 
-static func _gather(state: Dictionary, s: Dictionary, wanted: float) -> float:
+static func _gather(state: Dictionary, s: Dictionary, wanted: float, far: bool) -> float:
 	var got := 0.0
 	var world: Dictionary = state["world"]
-	for o in offsets():
+	for o in Geography.offsets(GATHER_RADIUS + (HUNGRY_REACH if far else 0)):
 		if got >= wanted:
 			break
 		var x: int = s["x"] + o.x
