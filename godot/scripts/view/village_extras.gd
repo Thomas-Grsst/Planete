@@ -6,6 +6,10 @@ const ANVIL := Color("3d3f44")
 const LAMP_POST := Color("4a4a4a")
 const ROCKET := Color("eceff1")
 const MAX_STATUES := 3
+const WELL_SPOT := Vector2(0.45, 0.62)
+const MARKET_SPOT := Vector2(-0.4, 0.75)
+const BELFRY_SPOT := Vector2(-1.5, -0.1)
+const AWNINGS := [Color("e57373"), Color("fff176"), Color("64b5f6"), Color("81c784")]
 const LAMPS := [Vector2(1.2, 0.2), Vector2(-1.1, 0.4), Vector2(0.2, -1.3), Vector2(-0.3, 1.4)]
 
 var village
@@ -48,6 +52,12 @@ func _draw() -> void:
 	var s: Dictionary = village.settlement
 	if not village.alive():
 		return
+	if s["level"] >= 2:
+		_well(_local(village.center() + WELL_SPOT))
+	if s["level"] >= HouseStyle.TOWN_LEVEL:
+		_market(_local(village.center() + MARKET_SPOT), s["id"])
+	if s["level"] >= HouseStyle.CITY_LEVEL:
+		_belfry(_local(village.center() + BELFRY_SPOT), HouseStyle.of(s, 0))
 	if Techs.METALS.any(func(k): return Techs.has_tech(s, k)):
 		_anvil(_local(village.forge_spot(0)) + Vector2(4, 1))
 	var statues: Array = s.get("statues", []).slice(-MAX_STATUES)
@@ -97,3 +107,34 @@ func _rocket(p: Vector2) -> void:
 	draw_colored_polygon(PackedVector2Array([p + Vector2(-1.8, -2), p + Vector2(-3.5, 0), p + Vector2(-1.8, -6)]), Color("e53935"))
 	draw_colored_polygon(PackedVector2Array([p + Vector2(1.8, -2), p + Vector2(3.5, 0), p + Vector2(1.8, -6)]), Color("e53935"))
 	draw_circle(p + Vector2(0, -11), 0.9, Color("64b5f6"))
+
+
+func _well(p: Vector2) -> void:
+	draw_circle(p + Vector2(0, -1.5), 3.2, STONE)
+	draw_circle(p + Vector2(0, -2.2), 2.1, Color("37474f"))
+	draw_line(p + Vector2(-2.8, -1.5), p + Vector2(-2.8, -8), Color("6d4c41"), 1.0)
+	draw_line(p + Vector2(2.8, -1.5), p + Vector2(2.8, -8), Color("6d4c41"), 1.0)
+	draw_colored_polygon(PackedVector2Array([p + Vector2(-4, -7.5), p + Vector2(0, -10.5), p + Vector2(4, -7.5)]), Color("8d6e63"))
+
+
+func _market(p: Vector2, seed_value: int) -> void:
+	for i in 3:
+		var q := p + Vector2(i * 7.0 - 7.0, i * 1.5)
+		var awning: Color = AWNINGS[(seed_value + i) % AWNINGS.size()]
+		draw_rect(Rect2(q + Vector2(-3, -3), Vector2(6, 3)), Color("8d6e63"))
+		draw_circle(q + Vector2(-1.2, -3.4), 0.9, Color("c0392b"))
+		draw_circle(q + Vector2(1.2, -3.4), 0.9, Color("d9c25a"))
+		draw_line(q + Vector2(-3, 0), q + Vector2(-3, -8), Color("5d4037"), 0.8)
+		draw_line(q + Vector2(3, 0), q + Vector2(3, -8), Color("5d4037"), 0.8)
+		draw_colored_polygon(PackedVector2Array([q + Vector2(-4, -7), q + Vector2(4, -7), q + Vector2(3.2, -9.5), q + Vector2(-3.2, -9.5)]), awning)
+
+
+func _belfry(p: Vector2, style: Dictionary) -> void:
+	var wall: Color = style["wall"]
+	var shade: Color = style["shade"]
+	draw_colored_polygon(PackedVector2Array([p + Vector2(-4, -30), p + Vector2(0, -28), p + Vector2(0, 2), p + Vector2(-4, 0)]), wall)
+	draw_colored_polygon(PackedVector2Array([p + Vector2(0, -28), p + Vector2(4, -30), p + Vector2(4, 0), p + Vector2(0, 2)]), shade)
+	draw_colored_polygon(PackedVector2Array([p + Vector2(-2.6, -25.5), p + Vector2(-1, -24.8), p + Vector2(-1, -21), p + Vector2(-2.6, -21.7)]), Color("3b3326"))
+	draw_circle(p + Vector2(2, -24), 1.4, Color("fff3c4"))
+	draw_colored_polygon(PackedVector2Array([p + Vector2(-5, -29.5), p + Vector2(0, -40), p + Vector2(0, -27)]), style["roof"].lightened(0.1))
+	draw_colored_polygon(PackedVector2Array([p + Vector2(0, -27), p + Vector2(0, -40), p + Vector2(5, -29.5)]), style["roof"].darkened(0.12))

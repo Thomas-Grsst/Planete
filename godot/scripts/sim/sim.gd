@@ -96,6 +96,7 @@ func tick(announce: bool = true) -> void:
 	Work.regrow(state)
 	var census := Census.build(state)
 	Work.step(state, rng, census)
+	Famine.step(state, rng, census)
 	People.step(state, rng, census)
 	Epidemics.step(state, rng, census)
 	Zombies.step(state, rng, census)

@@ -132,7 +132,7 @@ static func _exchange(state: Dictionary, rng: Rng, census: Dictionary) -> void:
 		var b = Settlements.by_id(state, r["b"])
 		if a == null or b == null or not census.has(a["id"]) or not census.has(b["id"]) or not Sieges.can_trade(a, r["kind"]) or not Sieges.can_trade(b, r["kind"]):
 			continue
-		var moved := _balance(a, b, "food", _food_cap(census[a["id"]]), _food_cap(census[b["id"]]))
+		var moved := _balance(a, b, "food", food_cap(census[a["id"]]), food_cap(census[b["id"]]))
 		moved += _balance(a, b, "wood", _wood_cap(a), _wood_cap(b))
 		moved += _balance(a, b, "metal", Mining.METAL_CAP, Mining.METAL_CAP)
 		r["goods"] += moved
@@ -144,7 +144,7 @@ static func _exchange(state: Dictionary, rng: Rng, census: Dictionary) -> void:
 			rel["score"] = min(100.0, rel["score"] + FRIENDSHIP)
 
 
-static func _food_cap(e: Dictionary) -> float:
+static func food_cap(e: Dictionary) -> float:
 	return (Work.STORE_BASE + e["s"]["houses"] * Work.STORE_PER_HOUSE) * e["mods"]["store"]
 
 

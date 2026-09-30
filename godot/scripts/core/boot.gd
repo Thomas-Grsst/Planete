@@ -26,6 +26,8 @@ static func start(options: Dictionary) -> int:
 			Sim.state["acc_ms"] = fposmod(float(options["hour"]) - 6.0, 24.0) / 24.0 * Sim.MS_PER_DAY
 		if options.has("speed"):
 			Sim.speed = float(options["speed"])
+		if options.has("era"):
+			DebugOptions.apply_era(options)
 		Sim.world_loaded.emit()
 		return 0
 	var id := SaveStore.current_id()

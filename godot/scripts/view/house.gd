@@ -1,9 +1,6 @@
 extends Node2D
 
-const WALL := Color("d8c3a0")
-const WALL_SHADE := Color("b59a74")
-const THATCH := Color("b8913f")
-const TILES := Color("b5452f")
+const FLOOR := 6.0
 const DOOR := Color("5a3b24")
 const WINDOW_DARK := Color("3b3326")
 const WINDOW_LIT := Color("ffd76a")
@@ -13,7 +10,7 @@ var index := 0
 var smoke: CPUParticles2D
 var lamp: Sprite2D
 var grow := 1.0
-var tiled := false
+var style: Dictionary = {}
 var lift := 0.0
 var _was_lit := false
 
@@ -47,7 +44,9 @@ func setup(v, i: int, animate: bool, ground_lift: float) -> void:
 
 
 func refresh() -> void:
-	tiled = Techs.has_tech(village.settlement, "poterie")
+	style = HouseStyle.of(village.settlement, index)
+	var tall: float = (style["floors"] - 1) * FLOOR
+	smoke.position = Vector2(4, -17 - lift - tall)
 	queue_redraw()
 
 
@@ -82,17 +81,55 @@ func _ease(t: float) -> float:
 
 func _draw() -> void:
 	draw_set_transform(Vector2(0, -lift))
-	var w := 7.0
-	var h := 7.0
 	var abandoned: bool = not village.alive()
-	var wall := WALL.darkened(0.35) if abandoned else WALL
-	draw_colored_polygon(PackedVector2Array([Vector2(-w, -h), Vector2(0, -h + 3.5), Vector2(0, 3.5), Vector2(-w, 0)]), wall)
-	draw_colored_polygon(PackedVector2Array([Vector2(0, -h + 3.5), Vector2(w, -h), Vector2(w, 0), Vector2(0, 3.5)]), WALL_SHADE.darkened(0.35) if abandoned else WALL_SHADE)
-	draw_colored_polygon(PackedVector2Array([Vector2(-w * 0.62, -3.5), Vector2(-w * 0.32, -2.0), Vector2(-w * 0.32, 2.5), Vector2(-w * 0.62, 1.0)]), DOOR)
+	var dim := 0.35 if abandoned else 0.0
+	var wall: Color = style["wall"].darkened(dim)
+	var shade: Color = style["shade"].darkened(dim)
+	var roof: Color = style["roof"].darkened(dim)
 	var window := WINDOW_LIT if _was_lit else WINDOW_DARK
-	draw_colored_polygon(PackedVector2Array([Vector2(w * 0.3, -h + 5.5), Vector2(w * 0.65, -h + 3.8), Vector2(w * 0.65, -h + 6.8), Vector2(w * 0.3, -h + 8.5)]), window)
-	var roof := (TILES if tiled else THATCH).darkened(0.3 if abandoned else 0.0)
+	if style["era"] == "tent":
+		_tent(wall, shade)
+		return
+	var w := 7.0
+	var h: float = 7.0 + (style["floors"] - 1) * FLOOR
+	draw_colored_polygon(PackedVector2Array([Vector2(-w, -h), Vector2(0, -h + 3.5), Vector2(0, 3.5), Vector2(-w, 0)]), wall)
+	draw_colored_polygon(PackedVector2Array([Vector2(0, -h + 3.5), Vector2(w, -h), Vector2(w, 0), Vector2(0, 3.5)]), shade)
+	if style["era"] == "stone":
+		for f in int(style["floors"]):
+			var y: float = -f * FLOOR
+			draw_line(Vector2(-w, y - 1.0), Vector2(0, y + 2.5), shade, 0.6)
+	draw_colored_polygon(PackedVector2Array([Vector2(-w * 0.62, -3.5), Vector2(-w * 0.32, -2.0), Vector2(-w * 0.32, 2.5), Vector2(-w * 0.62, 1.0)]), DOOR)
+	for f in int(style["floors"]):
+		var up: float = -f * FLOOR
+		_window(Vector2(w * 0.3, -7.0 + 5.5 + up), window)
+		if f > 0:
+			_window(Vector2(-w * 0.65, -7.0 + 5.5 + up + 0.2), window, true)
+			_window(Vector2(-w * 0.35, -7.0 + 5.5 + up + 1.9), window, true)
+	if style["era"] == "brick":
+		_flat_roof(w, h, roof)
+		return
 	var peak := Vector2(0, -h - 8.5)
 	draw_colored_polygon(PackedVector2Array([Vector2(-w - 1.5, -h + 0.5), peak + Vector2(-0.5, 0), Vector2(-0.5, -h + 4.5)]), roof.lightened(0.1))
 	draw_colored_polygon(PackedVector2Array([peak, Vector2(w + 1.5, -h + 0.5), Vector2(0, -h + 4.5)]), roof.darkened(0.12))
 	draw_rect(Rect2(Vector2(3, -h - 6), Vector2(2, 4)), Color("7a6a5a"))
+
+
+func _window(at: Vector2, color: Color, left_face: bool = false) -> void:
+	var dy := 1.7 if left_face else -1.7
+	draw_colored_polygon(PackedVector2Array([at, at + Vector2(2.45, dy), at + Vector2(2.45, dy + 3.0), at + Vector2(0, 3.0)]), color)
+
+
+func _flat_roof(w: float, h: float, roof: Color) -> void:
+	draw_colored_polygon(PackedVector2Array([Vector2(-w, -h), Vector2(0, -h - 3.5), Vector2(w, -h), Vector2(0, -h + 3.5)]), roof)
+	draw_line(Vector2(-w, -h), Vector2(0, -h + 3.5), roof.darkened(0.3), 1.0)
+	draw_line(Vector2(0, -h + 3.5), Vector2(w, -h), roof.darkened(0.3), 1.0)
+	draw_rect(Rect2(Vector2(3, -h - 7), Vector2(2.2, 6)), Color("6d4c41"))
+
+
+func _tent(hide: Color, hide_shade: Color) -> void:
+	var peak := Vector2(0, -15)
+	draw_colored_polygon(PackedVector2Array([Vector2(-8, 0), peak, Vector2(0, 3.5)]), hide)
+	draw_colored_polygon(PackedVector2Array([Vector2(0, 3.5), peak, Vector2(8, 0)]), hide_shade)
+	draw_colored_polygon(PackedVector2Array([Vector2(-3.2, 1.6), Vector2(-1.2, -5), Vector2(0.4, 2.8)]), DOOR)
+	for dx in [-1.5, 0.0, 1.5]:
+		draw_line(peak, peak + Vector2(dx, -3), Color("6d4c2a"), 0.8)

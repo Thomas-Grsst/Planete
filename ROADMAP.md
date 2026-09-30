@@ -95,6 +95,8 @@ Remplacer les « points de savoir » par des **idées déclenchées** : fini le 
 - [x] **Échanges entre les îles et les villages** : les routes transportent aussi des idées (un marin rapporte un savoir), des croyances (missionnaires qui débarquent), des maladies (un navire apporte la toux rouge) et des gens (mariages entre villages), chacun apporté par un bateau ou une caravane visible.
 - [x] **Guerres sur terre et sur mer** : débarquements, batailles navales, blocus, sièges, palissades et murailles, fronts qui avancent, guerres pour les ressources.
 - [x] **Rotation de la vue** par quarts de tour (↻).
+- [x] **Famines moins brutales** : rationnement (les morts s'étalent au lieu de vider le village d'un coup), voisins qui envoient des vivres, familles affamées qui se réfugient chez un voisin. Sur 8 mondes et 50 ans : plus aucun monde éteint (1 avant) et 4 fois moins de morts de faim.
+- [x] **Villes qui évoluent à l'œil** : tentes de peaux, chaumières, tuiles, maisons de pierre à étages, immeubles de brique ; enduits et toits propres à chaque civilisation ; puits, chemins puis rues pavées, place et marché au bourg, beffroi en ville.
 
 ### ⚔️ Après la V3
 - [x] Routes commerciales et caravanes visibles, bateaux et ports.

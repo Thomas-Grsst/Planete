@@ -35,6 +35,21 @@ static func _fake_voyage() -> void:
 	Sim.event_logged.emit({"type": "diffusion", "tech": "feu", "x": a["x"], "y": a["y"], "settlement": a["id"], "text": "⛵ Test de voyage.", "voyage": trip})
 
 
+# --era=tent|hut|tiled|stone|brick [--level=N] [--houses=N] : habille le premier village pour tester son allure.
+static func apply_era(options: Dictionary) -> void:
+	var eras := {"tent": [[], 0], "hut": [["feu", "agriculture"], 2], "tiled": [["feu", "agriculture", "poterie"], 2],
+		"stone": [["feu", "agriculture", "poterie", "architecture", "roue"], 3], "brick": [["feu", "agriculture", "poterie", "architecture", "roue", "machines", "electricite"], 4]}
+	var era: Array = eras.get(options["era"], eras["hut"])
+	var s: Dictionary = Sim.state["settlements"][0]
+	for k in era[0]:
+		if not s["techs"].has(k):
+			s["techs"].append(k)
+	if era[0].is_empty():
+		s["techs"] = s["techs"].filter(func(k): return k == "feu")
+	s["level"] = int(options.get("level", str(era[1])))
+	s["houses"] = int(options.get("houses", str(4 + s["level"] * 4)))
+
+
 static func panel_id(kind: String) -> int:
 	var st: Dictionary = Sim.state
 	var lists := {"settlement": st["settlements"], "faith": st.get("religions", []), "civ": st.get("civs", []), "person": st["people"].filter(func(p): return p["alive"])}

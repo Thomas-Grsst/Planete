@@ -15,6 +15,7 @@ const WOOD_CAP_BASE := 40.0
 const WOOD_PER_HOUSE := 10.0
 const HUNGER_STEP := 6.0
 const HUNGER_RELIEF := 12.0
+const RATION_RELIEF := 0.5
 const TREE_REGROW_EVERY := 10
 const HUNGRY_REACH := 2
 const TREES_SEEN_DAYS := 10
@@ -85,10 +86,20 @@ static func _feed(s: Dictionary, e: Dictionary, gain: float, m: Dictionary) -> v
 		for p in e["people"]:
 			p["hunger"] = max(0.0, p["hunger"] - HUNGER_RELIEF)
 		return
-	var shortage: float = 1.0 - s["food"] / max(0.01, need)
+	# Rationnement : ce qui reste nourrit d'abord ceux qui tiennent encore, les autres jeûnent.
+	# Les morts s'étalent et le village retrouve une taille qu'il peut nourrir, au lieu de mourir d'un coup.
+	var left: float = s["food"]
 	s["food"] = 0.0
-	for p in e["people"]:
-		p["hunger"] = min(100.0, p["hunger"] + HUNGER_STEP * shortage * (0.6 if p["job"] == "enfant" else 1.0))
+	var order: Array = e["people"].duplicate()
+	order.sort_custom(func(a, b): return a["hunger"] < b["hunger"] or (a["hunger"] == b["hunger"] and a["id"] < b["id"]))
+	for p in order:
+		var kid: bool = p["job"] == "enfant"
+		var meal := CHILD_MEAL if kid else ADULT_MEAL
+		if left >= meal:
+			left -= meal
+			p["hunger"] = max(0.0, p["hunger"] - HUNGER_RELIEF * RATION_RELIEF)
+		else:
+			p["hunger"] = min(100.0, p["hunger"] + HUNGER_STEP * (0.6 if kid else 1.0))
 
 
 static func _cut_wood(state: Dictionary, rng: Rng, s: Dictionary, workers: int, mod: float) -> void:

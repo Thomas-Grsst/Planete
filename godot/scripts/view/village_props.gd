@@ -8,6 +8,9 @@ const SOIL := Color("7a5a36")
 const CROP := Color("d9c25a")
 const SPROUT := Color("8fc25a")
 const SCAFFOLD := Color("a07a4a")
+const PATH := Color("a58d6a")
+const PAVED := Color("9e978c")
+const PLAZA_RADIUS := 0.7
 const MAX_LOGS := 8
 const MAX_BASKETS := 6
 
@@ -126,6 +129,7 @@ func _draw_site(progress: float) -> void:
 
 
 func _draw_ground() -> void:
+	_draw_streets()
 	for tile in village.fields:
 		var c: Vector2 = Iso.ground(Sim.state["world"], tile.x, tile.y) - global_position
 		var ripe: bool = Weather.season(Sim.state["day"]) in [1, 2]
@@ -159,3 +163,26 @@ func _draw_label() -> void:
 	if village.alive() and village.praying():
 		var pulse := 0.55 + 0.45 * sin(Time.get_ticks_msec() * 0.004)
 		label.draw_string(font, Vector2(-10, y - 14), "🙏", HORIZONTAL_ALIGNMENT_CENTER, 20, 12, Color(1, 1, 1, pulse))
+
+
+# Chemins de terre au village, puis rues pavées et place centrale au bourg.
+func _draw_streets() -> void:
+	var s: Dictionary = village.settlement
+	if not village.alive() or s["level"] < 2:
+		return
+	var world: Dictionary = Sim.state["world"]
+	var paved: bool = s["level"] >= HouseStyle.TOWN_LEVEL
+	var ink := PAVED if paved else PATH
+	var c: Vector2 = Iso.ground(world, s["x"], s["y"]) - global_position
+	for i in village.houses.size():
+		var tile: Vector2 = village.slot_tile(i)
+		var door: Vector2 = tile + (village.center() - tile) * 0.22
+		ground.draw_line(c, Iso.ground(world, door.x, door.y) - global_position, ink, 3.0 if paved else 2.0, true)
+	if paved:
+		var hw := Iso.TILE_W * PLAZA_RADIUS
+		var hh := Iso.TILE_H * PLAZA_RADIUS
+		ground.draw_colored_polygon(PackedVector2Array([c + Vector2(0, -hh), c + Vector2(hw, 0), c + Vector2(0, hh), c + Vector2(-hw, 0)]), PAVED)
+		for k in 3:
+			var f := (k + 1) / 4.0
+			ground.draw_line(c + Vector2(-hw * (1.0 - f), -hh * f), c + Vector2(hw * f, hh * (1.0 - f)), PAVED.darkened(0.12), 0.6)
+			ground.draw_line(c + Vector2(-hw * f, hh * (1.0 - f)), c + Vector2(hw * (1.0 - f), -hh * f), PAVED.darkened(0.12), 0.6)
