@@ -110,7 +110,7 @@ func tick(announce: bool = true) -> void:
 	Diplomacy.step(state, rng, census)
 	Wars.step(state, rng, census)
 	Sieges.step(state)
-	Trade.step(state, census)
+	Trade.step(state, rng, census)
 	Lore.step(state, rng, census)
 	Ideas.step(state, rng, census)
 	World.step(state, rng, census)

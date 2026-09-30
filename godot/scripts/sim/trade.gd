@@ -17,11 +17,11 @@ static func routes(state: Dictionary) -> Array:
 	return state.get_or_add("routes", [])
 
 
-static func step(state: Dictionary, census: Dictionary) -> void:
+static func step(state: Dictionary, rng: Rng, census: Dictionary) -> void:
 	if state["day"] % PLAN_DAYS == 0:
 		_plan(state, census)
 	if state["day"] % EXCHANGE_DAYS == 0:
-		_exchange(state, census)
+		_exchange(state, rng, census)
 
 
 static func sea_range(s: Dictionary) -> int:
@@ -126,7 +126,7 @@ static func _valid(state: Dictionary, census: Dictionary, r: Dictionary) -> bool
 	return Civs.relation(state, ca, cb)["pact"] != "" and Civs.war_between(state, ca, cb) == null
 
 
-static func _exchange(state: Dictionary, census: Dictionary) -> void:
+static func _exchange(state: Dictionary, rng: Rng, census: Dictionary) -> void:
 	for r in routes(state):
 		var a = Settlements.by_id(state, r["a"])
 		var b = Settlements.by_id(state, r["b"])
@@ -136,6 +136,7 @@ static func _exchange(state: Dictionary, census: Dictionary) -> void:
 		moved += _balance(a, b, "wood", _wood_cap(a), _wood_cap(b))
 		moved += _balance(a, b, "metal", Mining.METAL_CAP, Mining.METAL_CAP)
 		r["goods"] += moved
+		Voyages.travel(state, rng, census, r, a, b)
 		var ca = Civs.of(state, a)
 		var cb = Civs.of(state, b)
 		if moved > 0.0 and ca != null and cb != null and ca["id"] != cb["id"]:

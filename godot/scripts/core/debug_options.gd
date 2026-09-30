@@ -24,6 +24,17 @@ static func _fake_conversion() -> void:
 	Sim.event_logged.emit({"type": "conversion", "from": s["id"], "settlement": alive[1]["id"], "religion": rel["id"], "text": "🕯️ Test de pèlerinage."})
 
 
+static func _fake_voyage() -> void:
+	var alive: Array = Sim.state["settlements"].filter(func(s): return s["abandoned"] < 0)
+	if alive.is_empty():
+		return
+	var a: Dictionary = alive[0]
+	var b: Dictionary = alive[-1]
+	var sea := Ports.has_port(a) and Ports.has_port(b)
+	var trip := {"from": b["id"], "to": a["id"], "sea": sea, "icon": "🔥"} if b["id"] != a["id"] else {"from": a["id"], "to": a["id"], "sea": false, "icon": "🔥"}
+	Sim.event_logged.emit({"type": "diffusion", "tech": "feu", "x": a["x"], "y": a["y"], "settlement": a["id"], "text": "⛵ Test de voyage.", "voyage": trip})
+
+
 static func panel_id(kind: String) -> int:
 	var st: Dictionary = Sim.state
 	var lists := {"settlement": st["settlements"], "faith": st.get("religions", []), "civ": st.get("civs", []), "person": st["people"].filter(func(p): return p["alive"])}
@@ -52,6 +63,9 @@ static func schedule_shot(host: Node, options: Dictionary) -> void:
 	if options.has("siege"):
 		await host.get_tree().create_timer(1.0).timeout
 		_fake_siege()
+	if options.has("voyage"):
+		await host.get_tree().create_timer(1.0).timeout
+		_fake_voyage()
 	if options.has("tap"):
 		await host.get_tree().create_timer(after * 0.5).timeout
 		_tap(host, host.get_viewport().get_visible_rect().size * 0.5 + Vector2(0, float(options["tap"])))

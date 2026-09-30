@@ -28,7 +28,7 @@ static func _weight(state: Dictionary, key: String, s: Dictionary, e: Dictionary
 	return d["weight"] * f
 
 
-static func start(state: Dictionary, rng: Rng, s: Dictionary, e: Dictionary, key: String, source_name: String) -> void:
+static func start(state: Dictionary, rng: Rng, s: Dictionary, e: Dictionary, key: String, source_name: String, more: Dictionary = {}, carrier: String = "") -> void:
 	var d: Dictionary = Diseases.DATA[key]
 	var patients: Array = []
 	for draw in 6:
@@ -44,7 +44,11 @@ static func start(state: Dictionary, rng: Rng, s: Dictionary, e: Dictionary, key
 	var p0: Dictionary = patients[0]
 	var text := "%s %s atteint %s par un voyageur %s." % [d["emoji"], FaithData.capitalize(d["label"]), s["name"], Names.of_place(source_name)] if source_name != "" \
 		else "%s %s se déclare à %s. %s est %s." % [d["emoji"], FaithData.capitalize(d["label"]), s["name"], p0["name"], "la première touchée" if p0["sex"] == "F" else "le premier touché"]
-	Journal.log_event(state, "epidemie", text, {"x": s["x"], "y": s["y"], "person": p0["id"], "settlement": s["id"]})
+	if carrier != "":
+		text = "%s %s débarque à %s avec %s." % [d["emoji"], FaithData.capitalize(d["label"]), s["name"], carrier]
+	var extra := {"x": s["x"], "y": s["y"], "person": p0["id"], "settlement": s["id"]}
+	extra.merge(more)
+	Journal.log_event(state, "epidemie", text, extra)
 
 
 static func step(state: Dictionary, rng: Rng, census: Dictionary) -> void:

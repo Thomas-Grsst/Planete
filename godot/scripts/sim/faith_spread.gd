@@ -20,7 +20,7 @@ static func _target(state: Dictionary, rng: Rng, s: Dictionary, rel: Dictionary)
 	return rng.pick(options) if not options.is_empty() else null
 
 
-static func _persuades(state: Dictionary, rng: Rng, s: Dictionary, target: Dictionary) -> bool:
+static func persuades(state: Dictionary, rng: Rng, s: Dictionary, target: Dictionary) -> bool:
 	var odds := BASE_ODDS
 	var old = Religions.of(state, target)
 	if old != null:
@@ -32,7 +32,7 @@ static func _persuades(state: Dictionary, rng: Rng, s: Dictionary, target: Dicti
 	return rng.chance(min(MAX_ODDS, odds))
 
 
-static func _missionary(state: Dictionary, rng: Rng, e: Dictionary) -> Variant:
+static func missionary(state: Dictionary, rng: Rng, e: Dictionary) -> Variant:
 	var adults: Array = e["people"].filter(func(p): return People.is_adult(state, p))
 	var eager: Array = adults.filter(func(p): return p["traits"].has("sociable") or p["traits"].has("aventurier"))
 	if not eager.is_empty():
@@ -46,9 +46,9 @@ static func spread(state: Dictionary, rng: Rng, s: Dictionary, e: Dictionary, re
 	if not rng.chance(SPREAD_CHANCE * (s["devotion"] / 100.0) * (1.0 + 0.5 * s["temple"])):
 		return
 	var target = _target(state, rng, s, rel)
-	if target == null or not _persuades(state, rng, s, target):
+	if target == null or not persuades(state, rng, s, target):
 		return
-	var missionary = _missionary(state, rng, e)
+	var missionary = FaithSpread.missionary(state, rng, e)
 	var old = Religions.of(state, target)
 	Religions.adopt(state, target, rel, CONVERT_DEVOTION)
 	var who := "Des pèlerins %s convertissent %s" % [Names.of_place(s["name"]), target["name"]]

@@ -17,7 +17,7 @@ func _init() -> void:
 		["herds", func(c): Herds.step(st, rng)], ["settlements", func(c): Settlements.step(st, rng, c)], ["exploration", func(c): Exploration.step(st, rng, c)],
 		["wolves", func(c): Wolves.step(st, rng, c)], ["jobs", func(c): Jobs.step(st, rng, c)], ["governance", func(c): Governance.step(st, rng, c)],
 		["faith", func(c): Faith.step(st, rng, c)], ["civ_formation", func(c): CivFormation.step(st, rng, c)], ["diplomacy", func(c): Diplomacy.step(st, rng, c)],
-		["wars", func(c): Wars.step(st, rng, c)], ["sieges", func(c): Sieges.step(st)], ["trade", func(c): Trade.step(st, c)], ["lore", func(c): Lore.step(st, rng, c)],
+		["wars", func(c): Wars.step(st, rng, c)], ["sieges", func(c): Sieges.step(st)], ["trade", func(c): Trade.step(st, rng, c)], ["lore", func(c): Lore.step(st, rng, c)],
 		["ideas", func(c): Ideas.step(st, rng, c)], ["world", func(c): World.step(st, rng, c)], ["fame", func(c): Fame.yearly(st)], ["achievements", func(c): Achievements.daily(st)],
 		["housekeeping", func(c): Housekeeping.step(st)],
 	]

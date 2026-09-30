@@ -105,6 +105,22 @@ func _icon_for(type: String) -> String:
 	return {"guerre": "⚔️", "conquete": "🏴", "revolution": "✊", "independance": "✊", "civilisation": "🏰", "raid": "🔥", "apocalypse": "🧟", "statue": "🗿", "savoir_perdu": "🕯️"}.get(type, "")
 
 
+func voyage(entry: Dictionary, arrive: Callable) -> void:
+	var v: Dictionary = entry["voyage"]
+	var a = Settlements.by_id(Sim.state, v["from"])
+	var b = Settlements.by_id(Sim.state, v["to"])
+	if a == null or b == null:
+		arrive.call()
+		return
+	var sea: bool = v["sea"]
+	var civ = Civs.of(Sim.state, a)
+	var landing := Iso.ground(Sim.state["world"], b["x"], b["y"])
+	_walk(RouteLayer.ends(a, sea), RouteLayer.ends(b, sea), "boat" if sea else "caravan", civ["color"] if civ != null else Color("b0bec5"), 1, func():
+		effects.burst(landing + LABEL_LIFT * 0.5, Color("fff3c4"))
+		effects.float_text(landing + LABEL_LIFT, v["icon"], Color.WHITE, true)
+		arrive.call())
+
+
 func _expedition(entry: Dictionary) -> void:
 	var home = _tile_of(entry.get("settlement", -1))
 	if home == null or not entry.has("to_x"):

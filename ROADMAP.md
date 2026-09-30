@@ -92,6 +92,7 @@ Remplacer les « points de savoir » par des **idées déclenchées** : fini le 
 - [x] **Carte presque infinie** créée par morceaux quand on la découvre, brume aux limites des terres connues, rendu uniquement autour de la caméra.
 - [x] **Ports**, barques de pêche, expéditions à pied et en bateau (explorateurs perdus en mer), colonies sur les îles.
 - [x] **Routes commerciales** durables sur terre et sur mer, qui échangent vivres, bois et métal.
+- [x] **Échanges entre les îles et les villages** : les routes transportent aussi des idées (un marin rapporte un savoir), des croyances (missionnaires qui débarquent), des maladies (un navire apporte la toux rouge) et des gens (mariages entre villages), chacun apporté par un bateau ou une caravane visible.
 - [x] **Guerres sur terre et sur mer** : débarquements, batailles navales, blocus, sièges, palissades et murailles, fronts qui avancent, guerres pour les ressources.
 - [x] **Rotation de la vue** par quarts de tour (↻).
 

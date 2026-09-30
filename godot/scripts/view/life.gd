@@ -145,6 +145,11 @@ func herd_near(tile: Vector2):
 
 
 func _on_event(entry: Dictionary) -> void:
+	if entry.has("voyage"):
+		world_fx.voyage(entry, func():
+			effects.on_event(entry, self)
+			faith_fx.on_event(entry))
+		return
 	effects.on_event(entry, self)
 	faith_fx.on_event(entry)
 	world_fx.on_event(entry)

@@ -82,7 +82,7 @@ static func _tell(story: String, p: Dictionary, s: Dictionary) -> String:
 	return story.replace("{name}", p["name"]).replace("{place}", s["name"]).replace("{Il}", "Elle" if female else "Il").replace("{il}", "elle" if female else "il")
 
 
-static func discover(state: Dictionary, s: Dictionary, key: String, who, source, story: String) -> void:
+static func discover(state: Dictionary, s: Dictionary, key: String, who, source, story: String, more: Dictionary = {}) -> void:
 	if Techs.has_tech(s, key):
 		return
 	s["techs"].append(key)
@@ -93,6 +93,7 @@ static func discover(state: Dictionary, s: Dictionary, key: String, who, source,
 	var extra := {"x": s["x"], "y": s["y"], "settlement": s["id"], "tech": key, "highlight": first and source == null}
 	if who != null:
 		extra["person"] = who["id"]
+	extra.merge(more)
 	var type := "diffusion" if source != null else ("decouverte" if first else "decouverte_locale")
 	Journal.log_event(state, type, story if first or source != null else "🔁 " + story, extra)
 	if key == "espace" and state.get("exodus", {}).is_empty():
