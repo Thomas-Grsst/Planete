@@ -13,9 +13,9 @@ func _ready() -> void:
 	var offline := Boot.start(options)
 	_on_world_loaded()
 	Sim.world_loaded.connect(_on_world_loaded)
+	Sim.resumed.connect(func(_days): _catch_up_screen())
 	if offline > 0:
-		hud.start_catch_up()
-		Sim.caught_up.connect(func(days): hud.welcome(days), CONNECT_ONE_SHOT)
+		_catch_up_screen()
 	else:
 		hud.welcome(0)
 	if options.has("panel"):
@@ -52,6 +52,15 @@ func _build_scene() -> void:
 	add_child(hud)
 	hud.focus_requested.connect(func(pos): camera.focus(pos))
 	world_view.life.selected.connect(func(kind, id): hud.show_info(kind, id))
+	var phone := Node.new()
+	phone.name = "Phone"
+	phone.set_script(load("res://scripts/core/phone.gd"))
+	add_child(phone)
+
+
+func _catch_up_screen() -> void:
+	hud.start_catch_up()
+	Sim.caught_up.connect(func(days): hud.welcome(days), CONNECT_ONE_SHOT)
 
 
 func debug_report() -> String:

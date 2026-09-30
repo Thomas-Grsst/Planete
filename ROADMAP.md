@@ -1,6 +1,6 @@
 # Petite Planète — Feuille de route
 
-État actuel : **version Godot 4 complète + APK Android** : civilisations, territoires, diplomatie et guerres, religions nées de tes miracles, en plus des métiers, des 22 savoirs découverts par causes, des maladies, de l'apocalypse zombie et du cycle jour/nuit de 10 min.
+État actuel : **version Godot 4 complète + APK Android avec notifications et widget** (la version web est figée dans `web/`) : civilisations, territoires, diplomatie et guerres, religions nées de tes miracles, en plus des métiers, des 22 savoirs découverts par causes, des maladies, de l'apocalypse zombie et du cycle jour/nuit de 10 min.
 
 ---
 
@@ -17,7 +17,7 @@ Objectif : un monde **qui bouge sous tes yeux**, pas seulement dans le journal, 
 - [x] Pouvoirs (pluie, soleil, végétation, avancer le temps) et religions : prières visibles le soir, miracles, légendes, prophètes auréolés, pèlerins missionnaires, temples et grands temples, schismes.
 - [x] Tout le reste de la version web : 22 savoirs, savoir fragile, maladies, loups, zombies et leur pouvoir, chefs, conseils, civilisations, territoires, diplomatie, guerres, religion officielle et guerres saintes.
 - [x] Export Android (APK, testé dans l'émulateur).
-- [ ] Notifications Android (nécessite un plugin Android natif).
+- [x] Notifications Android et widget d'écran d'accueil (plugin Android natif, prévision déterministe des événements).
 - [x] Sons d'ambiance générés (oiseaux, grillons, pluie, feu, cloche, carillon, cor, tonnerre).
 
 ## ⏱️ Rythme du temps (à faire en premier)
@@ -58,10 +58,12 @@ Remplacer les « points de savoir » par des **idées déclenchées** : fini le 
 
 ## 📱 Widget et notifications
 
+- [x] Version web figée (`web/`, étiquette git `web-final`) : tout continue dans Godot.
 - [x] App Android : faite avec l'export Godot (APK installé sans Play Store).
-  - Nécessite Node.js + Android Studio sur la machine.
-  - Bonus : vraies notifications (« Aster a découvert le bronze »).
-- [ ] iPhone : nécessite Mac + Xcode + compte développeur Apple (compliqué hors App Store).
+- [x] Vraies notifications (« Aster a découvert le bronze »), programmées à l'heure où l'événement arrive, jamais la nuit.
+- [x] Widget : nom du monde, jour, population et dernier grand événement, sans ouvrir le jeu.
+- [x] Rattrapage aussi quand le jeu revient de l'arrière-plan (écran « Bon retour »).
+- ~~iPhone~~ : pas prévu.
 
 ---
 
@@ -105,4 +107,4 @@ Remplacer les « points de savoir » par des **idées déclenchées** : fini le 
 - [x] Partage de graine de monde entre amis.
 - [x] Succès (« Atteindre l'espace », « Survivre à 3 apocalypses »…).
 
-**Coups de cœur** (renforcent le « qu'est-ce qui s'est passé pendant mon absence ? ») : ~~découvertes par causes~~, ~~religions liées à tes pouvoirs~~, personnages célèbres, chronique automatique.
+**Coups de cœur** (renforcent le « qu'est-ce qui s'est passé pendant mon absence ? ») : ~~découvertes par causes~~, ~~religions liées à tes pouvoirs~~, ~~personnages célèbres~~, ~~chronique automatique~~, ~~notifications et widget~~.

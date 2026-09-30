@@ -45,5 +45,9 @@ func show_catch_up() -> void:
 	veil.add_child(label)
 	get_parent().add_child(veil)
 	veil.position -= veil.size * 0.5
-	Sim.catch_up_progress.connect(func(done, total): label.text = "⏳ Pendant ton absence…\n%s · %d %%" % [Journal.format_day(Sim.state["day"]), done * 100 / max(1, total)])
-	Sim.caught_up.connect(func(_d): veil.queue_free(), CONNECT_ONE_SHOT)
+	var progress := func(done, total): label.text = "⏳ Pendant ton absence…\n%s · %d %%" % [Journal.format_day(Sim.state["day"]), done * 100 / max(1, total)]
+	var finish := func(_d):
+		Sim.catch_up_progress.disconnect(progress)
+		veil.queue_free()
+	Sim.catch_up_progress.connect(progress)
+	Sim.caught_up.connect(finish, CONNECT_ONE_SHOT)

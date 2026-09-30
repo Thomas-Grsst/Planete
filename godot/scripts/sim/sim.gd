@@ -6,12 +6,14 @@ signal world_loaded
 signal catch_up_progress(done: int, total: int)
 signal caught_up(days: int)
 signal power_used(name: String, answered: Array)
+signal resumed(days: int)
 
 const MS_PER_DAY := 600000.0
 const MAX_OFFLINE_DAYS := 4320
 const MAX_TICKS_PER_FRAME := 30
 const AUTOSAVE_SECONDS := 20.0
 const CATCH_UP_BUDGET_MS := 14
+const MAX_FRAME_SECONDS := 0.5
 
 var state: Dictionary = {}
 var speed := 1.0
@@ -78,7 +80,7 @@ func _process(delta: float) -> void:
 		save_now()
 	if speed <= 0.0:
 		return
-	state["acc_ms"] += delta * 1000.0 * speed
+	state["acc_ms"] += minf(delta, MAX_FRAME_SECONDS) * 1000.0 * speed
 	var ticks := 0
 	while state["acc_ms"] >= MS_PER_DAY and ticks < MAX_TICKS_PER_FRAME:
 		state["acc_ms"] -= MS_PER_DAY
@@ -164,3 +166,14 @@ func save_now() -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_APPLICATION_PAUSED:
 		save_now()
+	elif what == NOTIFICATION_APPLICATION_RESUMED:
+		_resume()
+
+
+func _resume() -> void:
+	if not persist or state.is_empty() or pending_days > 0:
+		return
+	state["pending_summary"] = {}
+	state["pending_highlights"] = []
+	if catch_up() > 0:
+		resumed.emit(pending_days)

@@ -2,30 +2,30 @@
 
 Un petit monde vivant dans ta poche. Tu ne le diriges pas : tu l'observes.
 
-Des habitants naissent, travaillent, s'aiment, découvrent le feu, le bronze ou l'écriture, fondent des villages, affrontent des épidémies… et tout continue **même quand l'application est fermée**. Quand tu reviens, le jeu te raconte ce qui s'est passé pendant ton absence.
+Des habitants naissent, travaillent, s'aiment, découvrent le feu, le bronze ou l'écriture, fondent des villages, affrontent des épidémies… et tout continue **même quand l'application est fermée**. Quand tu reviens, le jeu te raconte ce qui s'est passé pendant ton absence. Sur Android, ton téléphone te prévient des grands événements et un widget montre ta planète en direct.
 
 > *« Nilo ramasse une pierre verte dans la montagne près d'Aster. Chauffée dans le feu, elle suinte un métal rouge : le cuivre. »*
+
+Le jeu est fait avec **Godot 4** (dossier [`godot/`](godot)). La première version web en JavaScript est figée dans [`web/`](web).
 
 ---
 
 ## ✨ Ce que fait le jeu
 
 - **Un monde généré** : plaines, forêts, montagnes, déserts, marais, rivières, lacs et océans, avec des gisements (cuivre, étain, fer, charbon, obsidienne, argile) répartis différemment dans chaque monde.
-- **Des habitants autonomes** : nom, âge, traits (curieux, courageux, inventif…), famille, santé, bonheur, et un métier (cueilleur, fermier, chasseur, pêcheur, bâtisseur, guérisseur, forgeron, gardien, chef).
-- **Des colonies qui grandissent** : camp → hameau → village → bourg → ville → grande ville, avec migrations et fondations de nouvelles colonies.
-- **Des découvertes qui ont une cause** : chaque savoir naît d'un déclencheur concret (la foudre, un minerai touché, un tronc qui flotte), d'un besoin (famine, loups, épidémie) et d'un inventeur. 22 savoirs, du feu au voyage spatial, en réseau à plusieurs chemins.
+- **Une vie quotidienne visible** : les habitants se lèvent, partent travailler (cueillette, bois, pêche, chasse, champs, forge, garde, soins), rapportent leur récolte, se retrouvent au feu le soir et rentrent dormir. Arbres qui ondulent, eau animée, fumée des cheminées, fenêtres allumées, saisons, rivières gelées, pluie, neige, orages et sons d'ambiance.
+- **Des habitants autonomes** : nom, âge, traits, famille, santé, bonheur, métier, amitiés, rivalités et duels, arbre généalogique.
+- **Des colonies qui grandissent** : camp → hameau → village → bourg → ville → grande ville, avec migrations et nouvelles colonies.
+- **Des découvertes qui ont une cause** : chaque savoir naît d'un déclencheur concret (la foudre, un minerai touché, un tronc qui flotte), d'un besoin (famine, loups, épidémie) et d'un inventeur. 22 savoirs, du feu au voyage spatial.
 - **Du savoir fragile** : il se transmet de maître à apprenti, et peut se perdre si son dernier gardien meurt.
-- **Des maladies**, des **loups**, et une rare **🧟 apocalypse zombie**.
-- **Une gouvernance** : chefs élus, conseils de sages, lois.
-- **Des civilisations** : un village d'au moins 30 habitants avec un chef peut proclamer un royaume, un empire, une république… selon le caractère de son chef. Les colonies voisines s'y rallient, les villes lointaines ou conquises peuvent proclamer leur indépendance.
-- **Des territoires** visibles sur la carte, avec les frontières de chaque civilisation.
-- **De la diplomatie** : relations qui évoluent (frontières, commerce, caractère des chefs), routes commerciales qui échangent des savoirs, alliances, ruptures.
-- **Des guerres** : batailles entre villes frontalières avec leurs héros et leurs morts, conquêtes, paix, chute de civilisations.
-- **Des religions** : un orage ou un deuil fait naître le culte de l'Orage ou des Ancêtres… mais **tes pouvoirs sont vus comme des miracles**. Les villages en détresse prient ; si ta pluie répond à leur sécheresse, ils crient au miracle et fondent un culte envers toi (le Faiseur de Pluie, l'Œil d'Or, la Mère Verte… ou le Semeur de Morts). Prophètes, missionnaires, temples, religions officielles qui rapprochent ou opposent les civilisations, guerres saintes et schismes.
-- **Des légendes** : chacune de tes interventions entre dans les récits (« la Grande Pluie de l'An 12 »).
-- **Le retour du joueur** : un écran « Bon retour » résume tout ce qui s'est passé, avec les événements marquants.
-- **Le journal du monde** et la possibilité de **suivre** un habitant ou un village.
-- **Des pouvoirs** ponctuels : pluie, soleil, végétation, accélération du temps… et réveiller les morts. Le panneau ✨ montre qui prie, et pour quoi.
+- **Des fléaux** : maladies, loups et loups mutants, barbares, pirates, machines rebelles, et une rare **🧟 apocalypse zombie**.
+- **Des catastrophes qui changent la carte** : volcans, séismes, crues, météorites, montée des eaux causée par une civilisation industrielle.
+- **Une gouvernance** : chefs, conseils, lois, dynasties, révoltes.
+- **Des civilisations** : royaumes, empires, républiques… avec territoires visibles, diplomatie, commerce et caravanes, espions, alliances, guerres, conquêtes et indépendances.
+- **Des religions** nées d'un orage, d'un deuil… ou de **tes pouvoirs, vus comme des miracles**. Prophètes, pèlerins, temples, religions officielles, guerres saintes et schismes.
+- **Une culture** : langues qui dérivent, monuments, personnages célèbres et statues, légendes qui racontent tes interventions.
+- **Une fin de partie spatiale** : fusée, exode, et nouvelle planète fondée par l'équipage du vaisseau. Contact extraterrestre et archéologie, très rares.
+- **Pour le joueur** : écran « Bon retour », journal, chronique « Le Livre du monde », replay accéléré, succès, graine de monde à partager, et des **pouvoirs** ponctuels (pluie, soleil, végétation, avancer le temps… et réveiller les morts).
 
 ## ⏱️ Le temps
 
@@ -36,89 +36,78 @@ Des habitants naissent, travaillent, s'aiment, découvrent le feu, le bronze ou 
 | 1 mois | ≈ 12 ans |
 | 1 an | ≈ 146 ans |
 
-Vitesses disponibles : ⏸ pause, ▶ ×1, ▶▶ ×10, ▶▶▶ ×100.
-Quand l'application est fermée, le monde continue au rythme normal (jusqu'à 30 jours d'absence rattrapés).
+Quand l'application est fermée, le monde continue au rythme normal (jusqu'à 30 jours d'absence rattrapés), et ce, même si tu la mets simplement en arrière-plan.
 
-## 🎮 Version Godot 4 (dossier `godot/`)
-
-La version principale du jeu est désormais faite avec **Godot 4** : un monde qui bouge sous tes yeux, et une vraie app Android.
-
-- **Vie quotidienne visible** : les habitants se lèvent, partent travailler (cueillette, bois, pêche, chasse, champs, forge, garde, soins), rapportent leur récolte, se retrouvent au feu le soir et rentrent dormir. Arbres qui ondulent, eau animée, fumée des cheminées, fenêtres allumées, saisons, rivières gelées, pluie, neige, orages et sons d'ambiance.
-- **Toute la simulation de la version web** : 22 savoirs découverts par causes et savoir fragile, maladies, loups, zombies, chefs, conseils, lois, dynasties, révoltes, civilisations, territoires, diplomatie, commerce, guerres, conquêtes, religions nées de tes miracles, temples, schismes.
-- **Nouveautés** : catastrophes qui changent la carte (volcans, séismes, crues, météorites, montée des eaux), barbares, pirates, espions, machines rebelles, loups mutants, visiteurs venus d'ailleurs, archéologie, langues qui dérivent, monuments, personnages célèbres et statues, amitiés, rivalités, duels, arbre généalogique, chronique « Le Livre du monde », replay accéléré, succès, graine de monde à partager, et nouvelle planète fondée par l'équipage du vaisseau.
+## 🚀 Lancer le jeu
 
 ```bash
 godot --path godot
 ```
 
-Ou ouvre `godot/project.godot` dans l'éditeur Godot puis F5.
+Ou ouvre `godot/project.godot` dans l'éditeur Godot 4.7 puis F5.
 
-### 📱 Android
+## 📱 Android : APK, notifications et widget
 
-L'export produit `godot/build/PetitePlanete.apk` (Android 7 et plus, ARM64 et x86_64). Il faut OpenJDK 17, le kit Android (build-tools 35.0.1, plateforme 35) et les modèles d'export Godot 4.7.2 :
+L'export produit `godot/build/PetitePlanete.apk` (Android 7 et plus, ARM64 et x86_64). Il faut OpenJDK 17, le kit Android (build-tools 35.0.1, plateforme 35) et les modèles d'export Godot 4.7.
+
+Les notifications et le widget utilisent du code Android natif (le plugin `godot/addons/petite_planete_android`). L'export passe donc par la **compilation Gradle**. Il faut installer une fois le modèle de compilation Android :
+
+- dans l'éditeur : **Projet → Installer le modèle de compilation Android…**
+- ou en ligne de commande :
+
+```bash
+godot --headless --path godot --install-android-build-template
+```
+
+Puis exporter :
 
 ```bash
 godot --headless --path godot --export-debug "Android" build/PetitePlanete.apk
 ```
 
-Copie l'APK sur ton téléphone et installe-le (autoriser les sources inconnues). La version web ci-dessous reste disponible.
+La première compilation télécharge Gradle, elle prend quelques minutes. Copie ensuite l'APK sur ton téléphone et installe-le (autoriser les sources inconnues).
 
-## 🚀 Lancer le jeu
+### 🔔 Notifications
 
-Le jeu est une **PWA** (application web installable) en JavaScript pur : aucune dépendance, aucune compilation.
+La simulation est déterministe : quand tu quittes le jeu, il sait déjà ce qui va se passer. Il calcule en avance les 3 prochains jours réels (432 jours de jeu), choisit les grands événements (guerre, épidémie, découverte, apocalypse, fin du monde…) et programme une notification à l'heure exacte où ils arriveront.
 
-### En local (Windows)
+- Au plus 6 notifications à l'avance, espacées d'au moins 4 h.
+- Rien entre 22 h et 8 h : un événement de la nuit est annoncé à 8 h.
+- Quand tu rouvres le jeu, les notifications en attente sont annulées.
+- Le jeu demande l'autorisation d'envoyer des notifications au premier lancement (Android 13 et plus).
+
+### 🪟 Widget
+
+Appui long sur l'écran d'accueil → **Widgets** → **Petite Planète**. Il affiche le nom du monde, le jour (☀️ ou 🌙), la population et le dernier grand événement, grâce à la même prévision. Il se met à jour toutes les 30 min et à chaque notification. Le toucher ouvre le jeu.
+
+### 🧪 Vérifier la prévision sur PC
 
 ```bash
-powershell -ExecutionPolicy Bypass -File serve.ps1
+godot --headless --path godot -s tests/phone_preview.gd
 ```
 
-Puis ouvre http://localhost:8080 dans ton navigateur.
-
-N'importe quel serveur de fichiers statiques fonctionne aussi. Il en faut un, car les modules JavaScript ne se chargent pas en ouvrant `index.html` directement.
-
-### Sur téléphone
-
-1. Héberge le dossier sur un site en **HTTPS** (GitHub Pages, Netlify…).
-2. Ouvre le site sur ton téléphone.
-3. **Android** : menu du navigateur → « Installer l'application ».
-   **iPhone** : bouton Partager → « Sur l'écran d'accueil ».
-
-Pas besoin de Play Store ni d'App Store.
+Le script simule un monde, affiche les notifications qui seraient programmées et vérifie que la prévision correspond exactement au vrai déroulement.
 
 ## 🎮 Comment jouer
 
 - **Glisser** pour déplacer la caméra, **pincer** ou **molette** pour zoomer.
 - **Toucher** un habitant, un village ou une case pour voir ses informations.
-- **👁️ Suivre** un habitant ou un village pour garder ses événements dans le journal.
 - **📜 Journal** : toute l'histoire du monde. Touche un événement pour y aller.
-- **👥** : population, colonies, savoirs découverts, animaux.
 - **✨ Pouvoirs** : intervenir ponctuellement. Chaque action a des conséquences.
-- **☰** : gérer plusieurs mondes.
 
-## 🗂️ Organisation du code
+## 🗂️ Organisation du code (`godot/`)
 
-| Dossier / fichier | Rôle |
+| Dossier | Rôle |
 |---|---|
-| `index.html`, `css/`, `manifest.json`, `sw.js` | Page, style, installation PWA et cache hors ligne |
-| `js/main.js` | Démarrage, boucle de jeu, rattrapage du temps |
-| `js/simulation.js` | Tick quotidien, météo, catastrophes, rattrapage hors ligne |
-| `js/world.js`, `js/resources.js`, `js/regions.js` | Génération du terrain, gisements, masses de terre |
-| `js/people.js`, `js/jobs.js`, `js/work.js` | Habitants, métiers et leurs effets |
-| `js/settlements.js`, `js/governance.js` | Colonies, migrations, chefs et conseils |
-| `js/civs.js`, `js/civFormation.js`, `js/territory.js` | Civilisations, ralliements, indépendances, culture, territoires |
-| `js/diplomacy.js`, `js/war.js` | Relations, commerce, alliances, guerres, batailles et conquêtes |
-| `js/religions.js`, `js/faith*.js`, `js/miracles.js` | Religions, prières, miracles et légendes, missionnaires, temples, schismes |
-| `js/techTree.js`, `js/ideasEarly.js`, `js/ideasLate.js` | Savoirs, leurs effets, déclencheurs et besoins |
-| `js/context.js`, `js/inspiration.js`, `js/lore.js`, `js/technology.js` | Ce que voient les habitants, naissance des idées, transmission et perte du savoir |
-| `js/disease*.js`, `js/epidemics.js` | Maladies et épidémies |
-| `js/zombies.js`, `js/hordes.js`, `js/defense.js`, `js/animals.js` | Zombies, défense, animaux et loups |
-| `js/render.js`, `js/decor.js`, `js/daylight.js`, `js/borders.js`, `js/camera.js` | Rendu 2.5D, cycle jour/nuit, frontières, caméra |
-| `js/panels*.js`, `js/ui.js`, `js/navigation.js`, `js/events.js` | Interface, fiches, journal, écran de retour |
-| `js/save.js`, `js/migrate.js` | Sauvegarde locale et compatibilité des anciennes parties |
+| `scripts/sim/` | Simulation : monde, habitants, métiers, savoirs, maladies, civilisations, guerres, religions, catastrophes, journal, sauvegarde |
+| `scripts/view/` | Rendu isométrique, habitants animés, villages, météo, jour et nuit, sons |
+| `scripts/ui/` | Interface : fiches, journal, chronique, replay, écran de retour |
+| `scripts/core/` | Démarrage, hasard à graine, prévision et lien avec le téléphone |
+| `addons/petite_planete_android/` | Plugin Android : notifications, widget, et son code Java |
+| `tests/` | Bancs d'essai de la simulation et vérification de la prévision |
 
-La simulation est **déterministe** : tout le hasard passe par un générateur à graine, pour que le rattrapage hors ligne soit fiable.
+La simulation est **déterministe** : tout le hasard passe par un générateur à graine, pour que le rattrapage hors ligne et les notifications soient fiables.
 
 ## 🛣️ La suite
 
-La feuille de route complète est dans [ROADMAP.md](ROADMAP.md). La V3 (civilisations) et les religions sont livrées ; les prochaines idées : personnages célèbres, chronique automatique, commerce visible sur la carte.
+La feuille de route est dans [ROADMAP.md](ROADMAP.md).

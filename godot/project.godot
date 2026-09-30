@@ -16,6 +16,10 @@ boot_splash/show_image=false
 
 Sim="*res://scripts/sim/sim.gd"
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/petite_planete_android/plugin.cfg")
+
 [display]
 
 window/size/viewport_width=720
